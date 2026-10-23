@@ -139,7 +139,7 @@ export function TourOverlay({ step, index, total, arrived, onBack, onNext, onExi
       {/* Dim layer with a cut-out. Purely visual: the page stays clickable so the presenter can interact. */}
       {hole ? (
         <div
-          className="pointer-events-none fixed rounded-xl ring-1 ring-gold/60 motion-safe:transition-all motion-safe:duration-300"
+          className="pointer-events-none fixed rounded-xl ring-1 ring-accent/60 motion-safe:transition-all motion-safe:duration-300"
           style={{
             top: hole.top,
             left: hole.left,
@@ -156,11 +156,11 @@ export function TourOverlay({ step, index, total, arrived, onBack, onNext, onExi
         ref={cardRef}
         role="dialog"
         aria-label={`Tour step ${index + 1} of ${total}: ${step.title}`}
-        className="pointer-events-auto fixed rounded-xl border border-t-2 border-line-strong border-t-gold bg-surface-2 p-4 shadow-2xl shadow-black/50 motion-safe:transition-[top,left] motion-safe:duration-300"
+        className="pointer-events-auto fixed rounded-xl border border-t-2 border-line-strong border-t-accent bg-surface-2 p-4 shadow-2xl shadow-black/50 motion-safe:transition-[top,left] motion-safe:duration-300"
         style={{ top: cardTop, left: cardLeft, width: cardW }}
       >
         <div className="mb-2 flex items-center justify-between gap-3">
-          <span className="text-[11px] font-medium tracking-wide text-gold tabular">
+          <span className="text-[11px] font-medium tracking-wide text-accent tabular">
             Tour · {index + 1} / {total}
           </span>
           <button
@@ -182,7 +182,7 @@ export function TourOverlay({ step, index, total, arrived, onBack, onNext, onExi
         <div className="mt-4 flex items-center justify-between gap-3">
           <div className="flex gap-1" aria-hidden>
             {Array.from({ length: total }, (_, i) => (
-              <span key={i} className={cx("h-1 w-2 rounded-full", i <= index ? "bg-gold" : "bg-line-strong")} />
+              <span key={i} className={cx("h-1 w-2 rounded-full", i <= index ? "bg-accent" : "bg-line-strong")} />
             ))}
           </div>
           <div className="flex gap-2">
@@ -197,7 +197,7 @@ export function TourOverlay({ step, index, total, arrived, onBack, onNext, onExi
             <button
               type="button"
               onClick={onNext}
-              className="rounded-md bg-gold px-3 py-1.5 text-sm font-medium text-bg transition hover:bg-gold/90"
+              className="rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-bg transition hover:bg-accent/90"
             >
               {last ? "Finish" : "Next"}
             </button>

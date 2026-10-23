@@ -58,7 +58,7 @@ export function ActionDetail({
       </div>
 
       <div>
-        <p className="text-xs text-gold">My call</p>
+        <p className="text-xs text-accent">My call</p>
         <VerdictWord verdict={verdictOf(a, minTestWeeks)} className="mt-1" />
         <p className="mt-1 text-sm leading-snug text-ink/90">{whySentence(a, all, minTestWeeks)}</p>
       </div>

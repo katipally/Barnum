@@ -9,6 +9,8 @@ export const NAV_ITEMS: NavItem[] = [
   { href: "/strategy", label: "Where the money goes" },
   { href: "/evaluation", label: "Numbers we watch" },
   { href: "/goals", label: "Goals and limits" },
+  { href: "/deep-dives", label: "Deep dives" },
+  { href: "/sources", label: "Data sources" },
 ];
 
 export function isActive(pathname: string, href: string) {

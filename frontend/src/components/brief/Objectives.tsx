@@ -21,9 +21,9 @@ export function Objectives({ scorecard, caseId }: { scorecard: ObjectiveScore[];
     <section data-tour="scorecard">
       <Heading>What marketing is working on</Heading>
       {rows.length === 0 ? (
-        <p className="rounded-xl border border-line bg-surface px-4 py-3 text-sm text-muted">No marketing objectives yet.</p>
+        <p className="panel px-4 py-3 text-sm text-muted">No marketing objectives yet.</p>
       ) : (
-        <ul className="divide-y divide-line rounded-xl border border-line bg-surface">
+        <ul className="divide-y divide-line panel">
           {shown.map((r) => (
             <ObjectiveRow key={r.objective.id} row={r} />
           ))}
@@ -39,7 +39,7 @@ export function Objectives({ scorecard, caseId }: { scorecard: ObjectiveScore[];
         )}
         <Link
           href={withCase("/evaluation", caseId)}
-          className="text-muted underline decoration-line-strong underline-offset-4 hover:text-ink hover:decoration-gold"
+          className="text-muted underline decoration-line-strong underline-offset-4 hover:text-ink hover:decoration-accent"
         >
           Weekly charts for each one are in Numbers we watch
         </Link>

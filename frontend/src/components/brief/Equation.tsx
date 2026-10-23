@@ -164,7 +164,7 @@ function Block({
           type="button"
           onClick={onToggle}
           aria-expanded={open}
-          className="mt-3 flex items-center gap-1 self-start rounded-sm text-xs text-muted hover:text-ink focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gold/60"
+          className="mt-3 flex items-center gap-1 self-start rounded-sm text-xs text-muted hover:text-ink focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent/60"
         >
           {open ? "Hide what drives this" : "What drives this?"}
           <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden className={cx("transition", open && "rotate-180")}>

@@ -108,10 +108,10 @@ export function BudgetSection({ f }: { f: CompanyForm }) {
           value={v.autonomyPct}
           onChange={(e) => set("autonomyPct", Number(e.target.value))}
           aria-valuetext={`${v.autonomyPct} percent`}
-          className="w-full accent-gold"
+          className="w-full accent-accent"
         />
         <p className="rounded-lg border border-line bg-surface-2 px-3 py-2.5 text-sm text-ink" aria-live="polite">
-          <span className="mr-2 text-gold" aria-hidden>
+          <span className="mr-2 text-accent" aria-hidden>
             ◆
           </span>
           {autonomySentence(parseNumber(v.budget), v.autonomyPct)}

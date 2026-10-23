@@ -18,8 +18,8 @@ export function ChatBubble({ message, onRetry }: { message: ChatMessage; onRetry
   const empty = message.status === "done" && !message.text.trim();
   return (
     <div>
-      <div className="mb-1.5 flex items-center gap-2 text-[11px] font-medium tracking-wide text-gold">
-        <span aria-hidden className="h-1.5 w-1.5 rotate-45 bg-gold" />
+      <div className="mb-1.5 flex items-center gap-2 text-[11px] font-medium tracking-wide text-accent">
+        <span aria-hidden className="h-1.5 w-1.5 rotate-45 bg-accent" />
         CMO agent
       </div>
       {message.startedAt !== undefined && message.steps && (

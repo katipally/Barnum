@@ -41,7 +41,7 @@ export function AwaitingMemo({ brief, caseId }: { brief: WeeklyBrief; caseId: Ca
       <Step n={3} title="What I need from you" subtitle="Bigger calls that need your yes or no." tour="decisions">
         <p className="text-[15px] text-muted">
           Nothing yet. Check that your goal, budget and limits are right in{" "}
-          <Link href={withCase("/goals", caseId)} className="text-ink underline decoration-line-strong underline-offset-4 hover:decoration-gold">
+          <Link href={withCase("/goals", caseId)} className="text-ink underline decoration-line-strong underline-offset-4 hover:decoration-accent">
             Goals and limits
           </Link>
           . Once I can see where you stand today, I&apos;ll suggest a target for each number.
@@ -72,7 +72,7 @@ function GoalHero({ goal: g, objective }: { goal: HeroGoal; objective: string })
   const soFar = unset ? 0 : Math.max(0, Math.min(g.current / g.target, 1));
   return (
     <section data-tour="headline" className="mt-4">
-      <h1 className="text-[34px] font-medium leading-tight tracking-tight text-ink">
+      <h1 className="text-[34px] font-light leading-tight tracking-tight text-ink">
         {unset ? (
           <>
             Your goal: <LabelTerm label={g.label}>{inSentence(g.label)}</LabelTerm>. No target set yet.
@@ -89,11 +89,11 @@ function GoalHero({ goal: g, objective }: { goal: HeroGoal; objective: string })
         <>
           <div className="relative mt-6 h-2 rounded-full bg-surface-3">
             <div className="absolute inset-y-0 left-0 rounded-full bg-ink" style={{ width: `${(soFar * 100).toFixed(1)}%` }} />
-            <div className="absolute -top-1.5 h-5 w-px bg-gold" style={{ left: "100%" }} />
+            <div className="absolute -top-1.5 h-5 w-px bg-accent" style={{ left: "100%" }} />
           </div>
           <div className="mt-2 flex justify-between text-xs text-muted tabular">
             <span>{fmt(g.current, g.unit)} today</span>
-            <span className="text-gold">Goal {fmt(g.target, g.unit)}</span>
+            <span className="text-accent">Goal {fmt(g.target, g.unit)}</span>
           </div>
         </>
       )}

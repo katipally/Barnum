@@ -31,7 +31,7 @@ export function Term({ k, children, explain }: { k?: GlossaryKey; children?: Rea
         onFocus={show}
         onBlur={() => setOpen(false)}
         onClick={() => (open ? setOpen(false) : show())}
-        className="cursor-help underline decoration-dotted decoration-muted/60 underline-offset-[3px] focus:outline-none focus-visible:rounded-sm focus-visible:ring-1 focus-visible:ring-gold/60"
+        className="cursor-help underline decoration-dotted decoration-muted/60 underline-offset-[3px] focus:outline-none focus-visible:rounded-sm focus-visible:ring-1 focus-visible:ring-accent/60"
       >
         {children ?? entry?.term}
       </button>
@@ -40,7 +40,7 @@ export function Term({ k, children, explain }: { k?: GlossaryKey; children?: Rea
         role="tooltip"
         className={`pointer-events-none absolute bottom-full z-50 mb-2 w-64 rounded-lg border border-line-strong bg-surface-3 px-3 py-2 text-left text-xs font-normal normal-case leading-relaxed tracking-normal text-ink shadow-lg ${alignRight ? "right-0" : "left-0"} ${open ? "block" : "hidden"}`}
       >
-        {entry && <span className="mb-0.5 block font-medium text-gold">{entry.term}</span>}
+        {entry && <span className="mb-0.5 block font-medium text-accent">{entry.term}</span>}
         {text}
       </span>
     </span>

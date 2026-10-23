@@ -23,7 +23,7 @@ export function CompanyRow({
           <p className="flex items-center gap-1.5 text-sm font-medium text-ink">
             <span className="truncate">{c.name}</span>
             {c.sample && <SampleTag />}
-            {current && <span className="text-[11px] font-normal text-gold">Open now</span>}
+            {current && <span className="text-[11px] font-normal text-accent">Open now</span>}
           </p>
           <p className="truncate text-xs text-faint">{c.tagline || plainStage(c.stageLabel).short}</p>
         </div>

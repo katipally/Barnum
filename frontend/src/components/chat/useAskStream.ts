@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { api } from "@/lib/api";
-import type { AskEvent, CaseId } from "@/lib/types";
+import type { AskEvent, CaseId, DeepDiveMessage } from "@/lib/types";
 import { type AskStep, nextSteps } from "./askSteps";
 
 export interface ChatMessage {
@@ -15,12 +15,28 @@ export interface ChatMessage {
   endedAt?: number;
 }
 
-// Transcript for one case. Mount with key={caseId} so switching case starts a fresh conversation.
-export function useAskStream(caseId: CaseId) {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+export const fromDeepDive = (ms: DeepDiveMessage[]): ChatMessage[] =>
+  ms.map((m, i) => ({ id: i + 1, role: m.role, text: m.text, status: "done" }));
+
+interface Options {
+  deepDiveId?: string | null; // continue this deep dive; otherwise one is created on the first question
+  initial?: ChatMessage[];
+  onSaved?: (deepDiveId: string) => void; // after each answer is stored
+}
+
+// Transcript for one conversation, saved as a deep dive. Mount with a key so a new conversation starts fresh.
+export function useAskStream(caseId: CaseId, opts: Options = {}) {
+  const [messages, setMessages] = useState<ChatMessage[]>(opts.initial ?? []);
   const [busy, setBusy] = useState(false);
-  const nextId = useRef(1);
+  const [deepDiveId, setDeepDiveId] = useState<string | null>(opts.deepDiveId ?? null);
+  const ddRef = useRef<string | null>(opts.deepDiveId ?? null);
+  const nextId = useRef((opts.initial?.length ?? 0) + 1);
   const alive = useRef(true);
+  const onSaved = useRef(opts.onSaved);
+
+  useEffect(() => {
+    onSaved.current = opts.onSaved;
+  });
 
   useEffect(() => {
     alive.current = true;
@@ -68,8 +84,14 @@ export function useAskStream(caseId: CaseId) {
         return { ...m, status: "error", endedAt: at, steps: nextSteps(m.steps ?? [], { type: "done" }, at) };
       };
       try {
-        await api.ask(caseId, question, onEvent);
+        if (!ddRef.current) {
+          ddRef.current = (await api.createDeepDive(caseId, question)).id;
+          if (alive.current) setDeepDiveId(ddRef.current);
+        }
+        const id = ddRef.current;
+        await api.ask(caseId, question, onEvent, id);
         patch(agentId, (m) => (m.status === "streaming" ? cutOff(m) : m));
+        onSaved.current?.(id);
       } catch {
         patch(agentId, cutOff);
       } finally {
@@ -90,5 +112,5 @@ export function useAskStream(caseId: CaseId) {
     [messages, busy, send],
   );
 
-  return { messages, busy, send, retry };
+  return { messages, busy, send, retry, deepDiveId };
 }

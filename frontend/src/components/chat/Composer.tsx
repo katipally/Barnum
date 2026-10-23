@@ -3,8 +3,8 @@
 import { forwardRef, useState } from "react";
 import { Button } from "@/components/ui";
 
-export const Composer = forwardRef<HTMLTextAreaElement, { onSend: (q: string) => void; busy: boolean }>(
-  function Composer({ onSend, busy }, ref) {
+export const Composer = forwardRef<HTMLTextAreaElement, { onSend: (q: string) => void; busy: boolean; inputId?: string; placeholder?: string }>(
+  function Composer({ onSend, busy, inputId = "ask-cmo-input", placeholder }, ref) {
     const [value, setValue] = useState("");
     const submit = () => {
       if (!value.trim() || busy) return;
@@ -19,11 +19,11 @@ export const Composer = forwardRef<HTMLTextAreaElement, { onSend: (q: string) =>
         }}
         className="flex items-end gap-2 rounded-lg border border-line-strong bg-surface-2 p-1.5 focus-within:border-ink/30"
       >
-        <label htmlFor="ask-cmo-input" className="sr-only">
+        <label htmlFor={inputId} className="sr-only">
           Ask the CMO agent
         </label>
         <textarea
-          id="ask-cmo-input"
+          id={inputId}
           ref={ref}
           rows={1}
           value={value}
@@ -34,7 +34,7 @@ export const Composer = forwardRef<HTMLTextAreaElement, { onSend: (q: string) =>
               submit();
             }
           }}
-          placeholder="Ask anything, e.g. where is the money working best?"
+          placeholder={placeholder ?? "Ask anything, e.g. where is the money working best?"}
           className="max-h-32 min-h-8 flex-1 resize-none bg-transparent px-2 py-1.5 text-sm text-ink outline-none placeholder:text-faint [field-sizing:content]"
         />
         <Button type="submit" variant="primary" disabled={busy || !value.trim()}>

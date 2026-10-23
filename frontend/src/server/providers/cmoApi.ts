@@ -8,13 +8,16 @@ import type {
   CaseId,
   CaseSummary,
   Change,
+  DataSource,
   Contribution,
   Decision,
   Metric,
   TreeNode,
 } from "@/lib/types";
+import fs from "node:fs/promises";
+import path from "node:path";
 import { money } from "@/lib/format";
-import type { CmoProvider } from "../provider";
+import type { AgentTurn, CmoProvider } from "../provider";
 import { mockProvider } from "./mock";
 
 const base = () => (process.env.CMO_API_URL ?? "").replace(/\/$/, "");
@@ -39,8 +42,10 @@ interface Memo {
   impact: { budget_usd?: number | null; run_rate_usd?: number | null; moved_usd?: number; sqls_before?: number; sqls_after?: number; sql_gain?: number; unallocated_usd?: number | null; autonomy_limit_usd?: number; estimated_channels?: string[] | null };
 }
 
+const TIMEOUT_MS = Number(process.env.CMO_API_TIMEOUT_MS ?? 20000);
+
 async function get<T>(path: string): Promise<T> {
-  const res = await fetch(`${base()}${path}`, { cache: "no-store" });
+  const res = await fetch(`${base()}${path}`, { cache: "no-store", signal: AbortSignal.timeout(TIMEOUT_MS) });
   if (!res.ok) throw new Error(`CMO API ${path}: ${res.status} ${await res.text()}`);
   const body = await res.json();
   // Deterministic routes wrap their result as { data, sql }.
@@ -85,12 +90,44 @@ function hypothesisOf(c: Channel, assumed: boolean) {
   return `${Math.round(c.mqls)} marketing leads became ${c.sqls_estimated ? "about " : ""}${Math.round(c.sqls)} qualified leads${rate}.${spend} I judge it on qualified leads, because those turn into revenue.`;
 }
 
+// Snowflake views can take 10+ s, so pages read a cached snapshot and refresh it in the background
+// (stale-while-revalidate). The last good snapshot is also kept on disk so a restart or a backend
+// outage still shows numbers instead of an empty screen.
+const FRESH_MS = Number(process.env.CMO_API_CACHE_MS ?? 30000);
+const SNAPSHOT = () => path.join(process.env.CMO_DATA_DIR ?? path.join(process.cwd(), ".data"), "live-snapshot.json");
+const live = ((globalThis as { __cmoLive?: { data?: CaseData; at: number; inflight?: Promise<CaseData> } }).__cmoLive ??= { at: 0 });
+
+function refresh(): Promise<CaseData> {
+  live.inflight ??= fetchLive()
+    .then(async (d) => {
+      Object.assign(live, { data: d, at: Date.now() });
+      await fs.mkdir(path.dirname(SNAPSHOT()), { recursive: true }).catch(() => {});
+      await fs.writeFile(SNAPSHOT(), JSON.stringify(d)).catch(() => {});
+      return d;
+    })
+    .finally(() => (live.inflight = undefined));
+  return live.inflight;
+}
+
+async function cachedLive(): Promise<CaseData> {
+  if (!live.data) {
+    try {
+      live.data = JSON.parse(await fs.readFile(SNAPSHOT(), "utf8")) as CaseData;
+    } catch {
+      return refresh(); // first ever load: nothing to show yet, wait for the backend
+    }
+  }
+  if (Date.now() - live.at > FRESH_MS) refresh().catch((e) => console.warn(`CMO API refresh failed: ${String(e)}`));
+  return live.data!;
+}
+
 export async function fetchLive(): Promise<CaseData> {
   const [a, s, chans, memos] = await Promise.all([
     get<AssumptionRow[]>("/assumptions").then(assumptionMap),
     get<Strip>("/now/strip"),
-    get<Channel[]>("/now/channels"),
-    get<Memo[]>("/memos"),
+    // The backend may be mid-migration; a missing channel view should not take the whole company down.
+    get<Channel[]>("/now/channels").catch((e) => (console.warn(String(e)), [] as Channel[])),
+    get<Memo[]>("/memos").catch((e) => (console.warn(String(e)), [] as Memo[])),
   ]);
   const p = period(a);
   const win = num(a, "SQL_TO_WON", 0.15);
@@ -243,7 +280,7 @@ export async function fetchLive(): Promise<CaseData> {
   };
 }
 
-// The chat route only sends the question, so the live conversation is kept here (single-user demo).
+// Plain /ask calls (no deep dive) keep their conversation here (single-user demo); deep dives pass their own turns.
 type AgentMessage = { role: "user" | "assistant"; content: { type: "text"; text: string }[] };
 const HISTORY_TURNS = 8;
 const HISTORY_IDLE_MS = 30 * 60 * 1000;
@@ -252,13 +289,15 @@ let lastAskAt = 0;
 
 const msg = (role: AgentMessage["role"], text: string): AgentMessage => ({ role, content: [{ type: "text", text }] });
 
-async function* askLive(question: string): AsyncIterable<string | AskEvent> {
-  if (Date.now() - lastAskAt > HISTORY_IDLE_MS) history = [];
+async function* askLive(question: string, turns?: AgentTurn[]): AsyncIterable<string | AskEvent> {
+  const own = !turns;
+  if (own && Date.now() - lastAskAt > HISTORY_IDLE_MS) history = [];
   lastAskAt = Date.now();
+  const sent = turns ? turns.map((t) => msg(t.role, t.text)) : history;
   const res = await fetch(`${base()}/ask`, {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({ question, history }),
+    body: JSON.stringify({ question, history: sent }),
   });
   if (!res.ok || !res.body) throw new Error(`CMO agent unavailable (${res.status})`);
   const reader = res.body.getReader();
@@ -309,10 +348,48 @@ async function* askLive(question: string): AsyncIterable<string | AskEvent> {
   } finally {
     await reader.cancel().catch(() => {});
     // Only finished, error-free answers become history; a cancelled stream would leave half an answer.
-    if (complete && !failed && answer.trim()) {
+    if (own && complete && !failed && answer.trim()) {
       history = [...history, msg("user", question), msg("assistant", answer)].slice(-HISTORY_TURNS * 2);
     }
   }
+}
+
+interface ChannelRow {
+  channel_id: string; display_name: string; description: string; schema_name: string; status: string;
+  map_version: number | null; updated_at: string;
+}
+
+const firstSentence = (s: string) => (s.match(/^.*?[.!?](?=\s|$)/)?.[0] ?? s).trim();
+
+// What the live company's agent reads: the warehouse, one Snowflake schema per channel agent, the CRM and the plan.
+async function liveSources(): Promise<DataSource[]> {
+  const [channels, assumptions] = await Promise.all([get<ChannelRow[]>("/channels"), get<AssumptionRow[]>("/assumptions")]);
+  const latest = channels.map((c) => c.updated_at).sort().at(-1);
+  return [
+    {
+      id: "snowflake", name: "Snowflake", kind: "warehouse", status: "connected",
+      provides: "Every channel's spend, leads and deals in one common funnel, by day, channel and campaign.",
+      usedFor: ["Cost per qualified lead", "Budget left", "Payback"],
+      detail: "CMO_DB.CORE · funnel views and the semantic view the agent queries", updatedAt: latest,
+    },
+    ...channels.map((c): DataSource => ({
+      id: `channel-${c.channel_id}`, name: c.display_name, kind: "channel",
+      status: c.status === "active" ? "connected" : "paused",
+      provides: firstSentence(c.description), usedFor: [`${c.display_name} spend`, "Leads", "Qualified leads"],
+      detail: `CMO_DB.${c.schema_name}${c.map_version ? ` · mapping v${c.map_version}` : ""} · has its own channel agent`,
+      updatedAt: c.updated_at,
+    })),
+    {
+      id: "crm", name: "CRM export", kind: "crm", status: "connected",
+      provides: "Leads, qualified leads and deals, matched to channels by campaign tags and landing pages.",
+      usedFor: ["Qualified leads", "Deals won"], detail: "Uploaded as files and matched to each channel's campaigns",
+    },
+    {
+      id: "plan", name: "Planning assumptions", kind: "plan", status: "connected",
+      provides: "The quarter's budget, deal size, win rate and the limits you set.",
+      usedFor: ["Forecasts", "Payback", "Autonomy limit"], detail: `${assumptions.length} values in CMO_DB.CORE`,
+    },
+  ];
 }
 
 export const cmoApiProvider: CmoProvider = {
@@ -321,14 +398,18 @@ export const cmoApiProvider: CmoProvider = {
     return [live, ...(await mockProvider.listCases())];
   },
   async getCaseData(caseId: CaseId) {
-    return caseId === LIVE_ID ? fetchLive() : mockProvider.getCaseData(caseId);
+    return caseId === LIVE_ID ? cachedLive() : mockProvider.getCaseData(caseId);
   },
   isLive: (caseId: CaseId) => caseId === LIVE_ID,
   async decide(_caseId, decisionId, status) {
     const res = await fetch(`${base()}/memos/${encodeURIComponent(decisionId)}/${status === "approved" ? "approve" : "reject"}`, { method: "POST" });
     if (!res.ok) throw new Error(`CMO API decide: ${res.status} ${await res.text()}`);
+    await refresh(); // the next read must show the decision, not the cached pending card
   },
-  ask(caseId: CaseId, question: string, data: () => Promise<CaseData>) {
-    return caseId === LIVE_ID ? askLive(question) : mockProvider.ask(caseId, question, data);
+  ask(caseId: CaseId, question: string, data: () => Promise<CaseData>, turns?: AgentTurn[]) {
+    return caseId === LIVE_ID ? askLive(question, turns) : mockProvider.ask(caseId, question, data, turns);
+  },
+  async listSources(caseId: CaseId) {
+    return caseId === LIVE_ID ? liveSources() : null;
   },
 };

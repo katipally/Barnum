@@ -20,7 +20,7 @@ export default function GoalsPage() {
   return (
     <section data-tour="steering" className="pb-4">
       <header className="mb-6">
-        <h1 className="text-xl font-semibold tracking-tight text-ink">What should I aim for, and how much may I do on my own?</h1>
+        <h1 className="text-[30px] font-light leading-tight tracking-tight text-ink sm:text-[38px]">What should I aim for, and how much may I do on my own?</h1>
         <p className="mt-1.5 max-w-2xl text-sm text-muted">
           {briefReady && isAwaiting(data.case)
             ? `Start here. Set the goal, the budget and my limits for ${data.case.name} in ${data.case.periodLabel}. Once your data is connected, I'll suggest targets for the numbers behind the goal.`

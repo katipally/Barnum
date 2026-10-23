@@ -1,24 +1,34 @@
 @import "tailwindcss";
 
-/* "War room" theme: near-black canvas, warm ink, one gold accent. Status colors only for status. */
+/* Blue-black canvas, glassy panels, one lavender accent. Status colors only for status. */
 @theme {
-  --color-bg: #0b0d0c;
-  --color-surface: #121514;
-  --color-surface-2: #181c1a;
-  --color-surface-3: #1f2421;
-  --color-line: rgba(255, 255, 255, 0.08);
-  --color-line-strong: rgba(255, 255, 255, 0.16);
-  --color-ink: #ece9e2;
-  --color-muted: #8b908c;
-  --color-faint: #5d625f;
-  --color-gold: #d4a84b;
-  --color-gold-soft: rgba(212, 168, 75, 0.14);
-  --color-ok: #4cb782;
-  --color-warn: #e0a23b;
-  --color-bad: #e5534b;
-  --color-info: #6ea8fe;
+  --color-bg: #07070d;
+  --color-surface: #0d0d16;
+  --color-surface-2: #13131e;
+  --color-surface-3: #1a1a27;
+  --color-line: rgba(255, 255, 255, 0.07);
+  --color-line-strong: rgba(255, 255, 255, 0.13);
+  --color-ink: #f3f2fa;
+  --color-muted: #8f8ea6;
+  --color-faint: #5c5b70;
+  --color-accent: #b9a7ff;
+  --color-accent-strong: #8b6dff;
+  --color-accent-ink: #15102e;
+  --color-accent-soft: rgba(185, 167, 255, 0.13);
+  --color-ok: #3fd88a;
+  --color-warn: #f2b84b;
+  --color-bad: #ff5d5d;
+  --color-info: #7ea6ff;
 
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --radius-sm: 6px;
+  --radius: 8px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
+  --radius-2xl: 24px;
+
+  --font-sans: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 }
 
@@ -31,8 +41,75 @@ body {
 body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+  background-image:
+    radial-gradient(900px 480px at 85% -10%, rgba(139, 109, 255, 0.10), transparent 70%),
+    radial-gradient(700px 420px at 0% 110%, rgba(126, 166, 255, 0.05), transparent 70%);
+  background-attachment: fixed;
 }
 
 .tabular {
   font-variant-numeric: tabular-nums;
+}
+
+/* Glass panel: faint top light, hairline border, soft inner highlight. */
+.panel {
+  position: relative;
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--color-line);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.008) 40%, transparent),
+    var(--color-surface);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 20px 40px -24px rgba(0, 0, 0, 0.6);
+}
+
+/* Inset well for content inside a panel. */
+.well {
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-line);
+  background: rgba(255, 255, 255, 0.015);
+}
+
+.dot-grid {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+  background-size: 14px 14px;
+}
+
+/* The one loud surface on a page: violet gradient for the call to action. */
+.hero-violet {
+  border-radius: var(--radius-xl);
+  border: 1px solid rgba(185, 167, 255, 0.28);
+  background:
+    radial-gradient(120% 90% at 100% 100%, rgba(139, 109, 255, 0.55), transparent 60%),
+    radial-gradient(80% 60% at 0% 0%, rgba(185, 167, 255, 0.12), transparent 70%),
+    linear-gradient(180deg, #16122e, #1d1640);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 30px 60px -30px rgba(139, 109, 255, 0.45);
+}
+
+.num-display {
+  font-family: var(--font-display);
+  font-weight: 300;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--color-line);
+  background: var(--color-surface-3);
+  padding: 0.2rem 0.55rem;
+  font-size: 11px;
+  color: var(--color-muted);
+  white-space: nowrap;
+}
+
+.glow-accent {
+  filter: drop-shadow(0 0 6px rgba(185, 167, 255, 0.7));
 }

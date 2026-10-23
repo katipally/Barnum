@@ -47,7 +47,7 @@ export function ChannelList({
                 onClick={toggle}
                 onKeyDown={onKey}
                 className={cx(
-                  "grid cursor-pointer gap-x-8 gap-y-3 rounded-lg border px-4 py-3.5 transition focus:outline-none focus-visible:ring-1 focus-visible:ring-gold/60 sm:grid-cols-[minmax(0,1fr)_230px]",
+                  "grid cursor-pointer gap-x-8 gap-y-3 rounded-lg border px-4 py-3.5 transition focus:outline-none focus-visible:ring-1 focus-visible:ring-accent/60 sm:grid-cols-[minmax(0,1fr)_230px]",
                   selected ? "border-line-strong bg-surface-2" : "border-transparent hover:bg-surface-2",
                 )}
               >

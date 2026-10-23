@@ -13,10 +13,10 @@ export const STAGE_LABEL: Record<FunnelStage, string> = {
 };
 
 export const STAGE_TONE: Record<FunnelStage, string> = {
-  awareness: "bg-ink/75",
-  consideration: "bg-ink/50",
-  conversion: "bg-ink/30",
-  retention: "bg-ink/15",
+  awareness: "bg-accent",
+  consideration: "bg-accent/65",
+  conversion: "bg-info/60",
+  retention: "bg-info/30",
 };
 
 export const METHOD_LABEL: Record<Contribution["method"], string> = {

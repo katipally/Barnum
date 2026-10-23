@@ -37,7 +37,7 @@ export function MetricCard({ metric: m, northStar }: { metric: Metric; northStar
 
       <div className="flex items-end justify-between gap-3">
         <div className="tabular">
-          <div className="text-2xl font-medium tracking-tight text-ink">{latest == null ? "No data" : fmt(latest, m.unit)}</div>
+          <div className="num-display text-[38px] text-ink">{latest == null ? "No data" : fmt(latest, m.unit)}</div>
           <div className="mt-0.5 text-xs text-faint">
             {hasTarget(m) ? (
               <>

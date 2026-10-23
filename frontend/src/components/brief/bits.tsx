@@ -14,7 +14,7 @@ export function StatusWord({ status, className }: { status: PartStatus; classNam
 export function Heading({ children, hint }: { children: ReactNode; hint?: ReactNode }) {
   return (
     <div className="mb-4 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-      <h2 className="text-lg font-medium text-ink">{children}</h2>
+      <h2 className="text-[19px] font-light text-ink">{children}</h2>
       {hint && <span className="text-xs text-muted">{hint}</span>}
     </div>
   );

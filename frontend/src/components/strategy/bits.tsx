@@ -63,7 +63,7 @@ export function SpendBar({ action: a, max }: { action: Action; max: number }) {
     <div className="flex items-center gap-3">
       <div className="h-2 min-w-0 flex-1">
         <div className="h-full overflow-hidden rounded-full bg-surface-3" style={{ width: `${len}%` }}>
-          <div className="h-full rounded-full bg-ink/55" style={{ width: `${fill}%` }} />
+          <div className="h-full rounded-full bg-gradient-to-r from-accent-strong to-accent shadow-[0_0_10px_rgba(185,167,255,0.6)]" style={{ width: `${fill}%` }} />
         </div>
       </div>
       <span className="tabular shrink-0 text-xs text-muted">

@@ -74,7 +74,7 @@ export function CompanyMenu({ id, cases, currentId, onPick, onClose, addHref, ma
           </span>
         </span>
         {active && (
-          <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden className="shrink-0 text-gold">
+          <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden className="shrink-0 text-accent">
             <path d="m3 7.25 2.5 2.5L11 4.25" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         )}

@@ -7,7 +7,7 @@ export default function NewCompanyPage() {
   return (
     <div className="mx-auto max-w-2xl pb-16">
       <header className="mb-10">
-        <h1 className="text-xl font-semibold tracking-tight text-ink">Add a company</h1>
+        <h1 className="text-[30px] font-light leading-tight tracking-tight text-ink sm:text-[38px]">Add a company</h1>
         <p className="mt-1.5 text-sm leading-relaxed text-muted">
           Tell me what you sell, what you want to achieve and how much I may spend. It takes about two minutes. Once your data is
           connected, I start planning.
