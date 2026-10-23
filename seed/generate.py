@@ -57,7 +57,7 @@ def lead(source: str, created: date, mql: bool, sql: bool, **attrs) -> dict:
     company, industry, emp = rng.choice(ICP) if mql else rng.choice(ICP + NON_ICP)
     title = rng.choice(SENIOR) if mql else rng.choice(JUNIOR)
     fn, ln = rng.choice(FIRST), rng.choice(LAST)
-    mql_d = created + timedelta(rng.randint(0, 2)) if mql else None
+    mql_d = min(created + timedelta(rng.randint(0, 2)), END) if mql else None
     sql_d = mql_d + timedelta(rng.randint(3, 9)) if sql else None
     if sql_d and sql_d > END:
         sql_d = END

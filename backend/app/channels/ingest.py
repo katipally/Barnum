@@ -56,8 +56,8 @@ def set_plan(cid: str, plan_usd: float, memo_id: str | None = None) -> None:
     )
 
 
-def load_csv(schema: str, filename: str, data: bytes) -> dict:
-    """Stage one CSV and load it into RAW_<file stem>. Same stem appends; new columns are added."""
+def load_csv(schema: str, filename: str, data: bytes, replace: bool = False) -> dict:
+    """Stage one CSV and load it into RAW_<file stem>. Same stem appends (or replaces); new columns are added."""
     stem = sf.ident(re.sub(r"\W", "_", Path(filename).stem).strip("_") or "upload")
     table, prefix = f"CMO_DB.{schema}.RAW_{stem}", f"@CMO_DB.{schema}.UPLOADS/{stem}/"
     staged = f"{stem}_{int(time.time() * 1000)}.csv"
@@ -74,15 +74,17 @@ def load_csv(schema: str, filename: str, data: bytes) -> dict:
     added = [c for c in inferred if c not in existing] if existing else []
     for c in added:
         sf.execute(f'ALTER TABLE {table} ADD COLUMN "{c}" {inferred[c]}')
+    if replace and existing:
+        sf.execute(f"TRUNCATE TABLE {table}")
     res = sf.query(f"""COPY INTO {table} FROM {prefix} FILES = ('{staged}.gz')
                        FILE_FORMAT = (FORMAT_NAME = 'CMO_DB.CORE.CSV_FMT') MATCH_BY_COLUMN_NAME = CASE_INSENSITIVE""")
     return {"table": table, "rows_loaded": sum(r.get("rows_loaded") or 0 for r in res),
             "columns": list(inferred), "added_columns": added, "new_table": not existing}
 
 
-def upload(cid: str, filename: str, data: bytes) -> dict:
+def upload(cid: str, filename: str, data: bytes, replace: bool = False) -> dict:
     ch = get_channel(cid)
-    result = load_csv(ch["schema_name"], filename, data)
+    result = load_csv(ch["schema_name"], filename, data, replace)
     if ch["status"] == "active" and (result["added_columns"] or result["new_table"]):
         sf.execute("UPDATE CMO_DB.CORE.CHANNEL_REGISTRY SET status = 'needs_mapping', updated_at = CURRENT_TIMESTAMP() "
                    "WHERE channel_id = %s", (cid,))

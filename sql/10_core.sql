@@ -2,7 +2,10 @@
 
 MERGE INTO CMO_DB.CORE.ASSUMPTIONS t USING (
   SELECT * FROM VALUES
-    ('RESPONSE_EXPONENT', 0.52, NULL, 'b in SQLs = k * spend^b; b<1 means diminishing returns. Marginal $/SQL = $/SQL / b'),
+    ('RESPONSE_EXPONENT', 0.52, NULL, 'default b in SQLs = k * spend^b; b<1 means diminishing returns. Marginal $/SQL = $/SQL / b'),
+    ('RESPONSE_EXPONENT:google', 0.42, NULL, 'demo seed: search saturates on query volume'),
+    ('RESPONSE_EXPONENT:linkedin', 0.62, NULL, 'demo seed'),
+    ('RESPONSE_EXPONENT:conferences', 0.56, NULL, 'demo seed'),
     ('PLANNING_STEP_USD', 10000, NULL, 'allocation granularity for UNIT_ECON')
   AS v(key, num, txt, note)
 ) s ON t.key = s.key
@@ -31,13 +34,14 @@ SELECT r.channel_id, r.display_name,
        SUM(f.spend_usd) / NULLIF(SUM(f.mqls), 0) AS cost_per_mql,
        SUM(f.spend_usd) / NULLIF(SUM(f.sqls), 0) AS cost_per_sql,
        SUM(f.sqls) / NULLIF(SUM(f.mqls), 0)      AS mql_to_sql,
-       SUM(f.spend_usd) / NULLIF(SUM(f.sqls), 0) / CMO_DB.CORE.A('RESPONSE_EXPONENT') AS marginal_cost_per_sql,
+       SUM(f.spend_usd) / NULLIF(SUM(f.sqls), 0) / COALESCE(e.num, CMO_DB.CORE.A('RESPONSE_EXPONENT')) AS marginal_cost_per_sql,
        SUM(f.sqls) * CMO_DB.CORE.A('SQL_TO_WON') AS expected_wins
 FROM CMO_DB.CORE.CHANNEL_REGISTRY r
 LEFT JOIN CMO_DB.CORE.FUNNEL_FACT f ON f.channel = r.channel_id
 LEFT JOIN CMO_DB.CORE.CURRENT_PLAN p ON p.channel_id = r.channel_id
+LEFT JOIN CMO_DB.CORE.ASSUMPTIONS e ON e.key = 'RESPONSE_EXPONENT:' || r.channel_id
 WHERE r.status = 'active'
-GROUP BY r.channel_id, r.display_name, p.planned_usd;
+GROUP BY r.channel_id, r.display_name, p.planned_usd, e.num;
 
 CREATE OR REPLACE FUNCTION CMO_DB.CORE.CHANNEL_STATS(cid STRING)
 RETURNS OBJECT
