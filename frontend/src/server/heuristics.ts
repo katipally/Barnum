@@ -205,7 +205,7 @@ export function verdictFor(a: Action, all: Action[], g: Pick<Guardrails, "minTes
 /** Cost per result, falling back to spent / results; null when there are no results. */
 export function unitCostOf(a: Pick<Action, "costPerResult" | "spent" | "results">): number | null {
   if (a.costPerResult != null && a.costPerResult > 0) return a.costPerResult;
-  return a.results > 0 ? a.spent / a.results : null;
+  return a.results && a.spent != null ? a.spent / a.results : null;
 }
 
 /**
@@ -214,7 +214,7 @@ export function unitCostOf(a: Pick<Action, "costPerResult" | "spent" | "results"
  */
 export function efficiencyOf(a: Action, all: Action[]): number {
   const own = unitCostOf(a);
-  if (a.status === "planned" || a.results === 0 || own == null || own <= 0) return 0;
+  if (a.status === "planned" || !a.results || own == null || own <= 0) return 0;
   const peers = all
     .filter((p) => p.status === "live" && p.resultLabel === a.resultLabel)
     .map(unitCostOf)

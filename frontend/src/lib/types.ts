@@ -96,9 +96,9 @@ export interface Action {
   channel: string; // "Google Search", "TV", "Founder outreach", ...
   funnelStage: FunnelStage;
   budget: number; // period budget
-  spent: number; // spent to date
+  spent: number | null; // spent to date; null = spend not tracked
   resultLabel: string; // "SQL", "conversion", "household reach", "interview"
-  results: number; // results to date
+  results: number | null; // results to date; null = not measured
   costPerResult: number | null;
   marginalCostPerResult: number | null; // cost of the next result at current spend
   weeksRunning: number;
