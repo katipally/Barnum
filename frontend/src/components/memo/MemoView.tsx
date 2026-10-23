@@ -70,7 +70,7 @@ function Memo({ caseId }: { caseId: CaseId }) {
         {[
           ["/breakdown", "How we reach the goal"],
           ["/strategy", "Where the money goes"],
-          ["/goals", "Change goals or limits"],
+          ["/goals", "Open the 2027 plan"],
         ].map(([href, label]) => (
           <Link key={href} href={withCase(href, caseId)} className="rounded-lg border border-line bg-surface-2/60 px-3 py-1.5 text-muted transition hover:border-line-strong hover:text-ink">
             {label} ↗

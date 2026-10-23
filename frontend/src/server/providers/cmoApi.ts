@@ -4,6 +4,7 @@ import type {
   Action,
   AgentLogEntry,
   AskEvent,
+  CampaignDraft,
   CaseData,
   CaseId,
   CaseSummary,
@@ -12,12 +13,17 @@ import type {
   Contribution,
   Decision,
   Metric,
+  Plan2027Load,
+  PlanEvent,
+  PlanInputs,
+  SavedPlan,
   TreeNode,
 } from "@/lib/types";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { money } from "@/lib/format";
-import type { AgentTurn, CmoProvider } from "../provider";
+import type { AgentTurn, CmoProvider, Plan2027Provider } from "../provider";
+import { DEFAULT_PLAN_INPUTS } from "../plan-mock";
 import { mockProvider } from "./mock";
 
 const base = () => (process.env.CMO_API_URL ?? "").replace(/\/$/, "");
@@ -401,6 +407,125 @@ async function liveSources(): Promise<DataSource[]> {
   ];
 }
 
+// ---- 2027 plan: inputs live in ASSUMPTIONS; the plan streams from POST /plan/2027 and is saved by the backend ----
+
+const PLAN_KEYS: Record<keyof PlanInputs, string> = {
+  budget_usd: "PLAN_2027_BUDGET_USD",
+  revenue_target_usd: "REVENUE_TARGET_USD",
+  sqls_per_quarter: "SQL_TARGET_PER_QUARTER",
+  brand_pct: "BRAND_PCT",
+};
+const PLAN_FIELDS = Object.keys(PLAN_KEYS) as (keyof PlanInputs)[];
+
+// Routes answer { data } (sometimes with sql); unwrap either shape.
+const unwrap = <T>(body: unknown): T =>
+  (body && typeof body === "object" && !Array.isArray(body) && "data" in body ? (body as { data: T }).data : body) as T;
+
+const NOT_DEPLOYED = "The planning tables are not deployed in Snowflake yet (PLAN_2027 is missing). Deploy the backend SQL, then retry.";
+
+const reachable = (e: unknown) =>
+  e instanceof TypeError || (e instanceof DOMException && e.name === "TimeoutError") ? new Error("Cannot reach the CMO API. Is the backend running?") : e;
+
+async function planCall<T>(path: string, init?: RequestInit): Promise<T> {
+  try {
+    const res = await fetch(`${base()}${path}`, { cache: "no-store", signal: AbortSignal.timeout(TIMEOUT_MS), ...init });
+    if (!res.ok) throw new Error(`CMO API ${path}: ${res.status} ${await res.text()}`);
+    return unwrap<T>(await res.json());
+  } catch (e) {
+    throw reachable(e);
+  }
+}
+
+const jsonInit = (method: string, body: unknown): RequestInit => ({ method, headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
+
+async function* sse(res: Response): AsyncGenerator<{ event: string; data: Record<string, unknown> }> {
+  const reader = res.body!.getReader();
+  const dec = new TextDecoder();
+  let buf = "";
+  let event = "message";
+  try {
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) return;
+      buf += dec.decode(value, { stream: true });
+      let i;
+      while ((i = buf.indexOf("\n")) >= 0) {
+        const line = buf.slice(0, i).trim();
+        buf = buf.slice(i + 1);
+        if (line.startsWith("event:")) event = line.slice(6).trim();
+        else if (line.startsWith("data:")) yield { event, data: JSON.parse(line.slice(5).trim() || "{}") };
+      }
+    }
+  } finally {
+    await reader.cancel().catch(() => {});
+  }
+}
+
+interface PlanPayload {
+  text?: string;
+  message?: string;
+  name?: string;
+  input?: Record<string, unknown>;
+  model?: string;
+  tool_use_id?: string;
+  seconds?: number;
+  ok?: boolean;
+  plan_id?: string;
+}
+
+async function* plan2027Live(inputs: PlanInputs): AsyncGenerator<PlanEvent> {
+  yield { type: "status", message: "Saving your inputs" };
+  await Promise.all(PLAN_FIELDS.map((f) => planCall(`/assumptions/${PLAN_KEYS[f]}`, jsonInit("PUT", { num: inputs[f] }))));
+  let res: Response;
+  try {
+    res = await fetch(`${base()}/plan/2027`, jsonInit("POST", inputs));
+  } catch (e) {
+    throw reachable(e);
+  }
+  if (!res.ok || !res.body) {
+    const detail = await res.text().catch(() => "");
+    throw new Error(/PLAN_2027/i.test(detail) ? NOT_DEPLOYED : `The planner is unavailable (${res.status}). ${detail.slice(0, 200)}`.trim());
+  }
+  for await (const { event, data } of sse(res)) {
+    const d = data as PlanPayload;
+    if (event === "meta" && d.model) yield { type: "meta", model: d.model };
+    else if (event === "status" && d.message) yield { type: "status", message: d.message };
+    else if (event === "tool" && d.name) yield { type: "tool", name: d.name, input: d.input, toolUseId: d.tool_use_id };
+    else if (event === "tool_done" && d.tool_use_id) yield { type: "tool_done", toolUseId: d.tool_use_id, seconds: d.seconds, ok: d.ok !== false };
+    else if (event === "plan" || event === "channel_plan" || event === "targets") yield { type: event, ...data } as PlanEvent;
+    else if (event === "cmo_delta" && d.text) yield { type: "text", text: d.text };
+    else if (event === "error") {
+      yield { type: "error", message: /unknown user-defined function.*PLAN_2027/i.test(d.message ?? "") ? NOT_DEPLOYED : (d.message ?? JSON.stringify(d)) };
+      return;
+    } else if (event === "done") {
+      if (d.model) yield { type: "meta", model: d.model };
+      yield { type: "done", planId: d.plan_id };
+      return;
+    }
+  }
+}
+
+const livePlan2027: Plan2027Provider = {
+  async load() {
+    const [assumptions, latest] = await Promise.allSettled([
+      planCall<AssumptionRow[]>("/assumptions"),
+      planCall<SavedPlan | null>("/plan/2027/latest"),
+    ]);
+    const stored = assumptions.status === "fulfilled" ? assumptionMap(assumptions.value) : {};
+    const inputs = Object.fromEntries(PLAN_FIELDS.map((f) => [f, num(stored, PLAN_KEYS[f], DEFAULT_PLAN_INPUTS[f])])) as unknown as PlanInputs;
+    const failed = [assumptions, latest].find((r) => r.status === "rejected");
+    return {
+      inputs,
+      saved: latest.status === "fulfilled" ? latest.value : null,
+      live: true,
+      notice: failed?.status === "rejected" ? `Some saved values could not be loaded. ${(failed.reason as Error).message}` : undefined,
+    } satisfies Plan2027Load;
+  },
+  run: (_caseId, inputs) => plan2027Live(inputs),
+  draft: (_caseId, planId, channelId) => planCall<CampaignDraft>("/campaigns/draft", jsonInit("POST", { plan_id: planId, channel_id: channelId })),
+  campaigns: (_caseId, channelId) => planCall<CampaignDraft[]>(`/campaigns?channel_id=${encodeURIComponent(channelId)}`),
+};
+
 export const cmoApiProvider: CmoProvider = {
   async listCases(): Promise<CaseSummary[]> {
     const live: CaseSummary = { id: LIVE_ID, name: LIVE_NAME, stageLabel: "Scaling company", tagline: "Live from Snowflake", sample: false, dataStatus: "connected" };
@@ -410,6 +535,7 @@ export const cmoApiProvider: CmoProvider = {
     return caseId === LIVE_ID ? cachedLive() : mockProvider.getCaseData(caseId);
   },
   isLive: (caseId: CaseId) => caseId === LIVE_ID,
+  plan2027: livePlan2027,
   async decide(_caseId, decisionId, status) {
     const res = await fetch(`${base()}/memos/${encodeURIComponent(decisionId)}/${status === "approved" ? "approve" : "reject"}`, { method: "POST" });
     if (!res.ok) throw new Error(`CMO API decide: ${res.status} ${await res.text()}`);

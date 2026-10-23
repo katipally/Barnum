@@ -1,46 +1,31 @@
 "use client";
 
-import { GoalsSteering } from "@/components/goals/GoalsSteering";
-import { isAwaiting } from "@/components/empty/state";
+import { Plan2027View } from "@/components/plan2027/Plan2027View";
+import { PageHeader } from "@/components/strategy/PageHeader";
 import { ErrorNote, Skeleton } from "@/components/ui";
 import { api, useApi } from "@/lib/api";
 import { useCaseId } from "@/lib/case";
 
-export default function GoalsPage() {
+export default function PlanPage() {
   const caseId = useCaseId();
-  const { data, error, setData } = useApi(() => api.brief(caseId), [caseId]);
-  // Objectives without data have no scorecard row; the strategy map still lists them for priority steering.
-  const strategy = useApi(() => api.strategy(caseId), [caseId]);
-  const briefReady = data && data.case.id === caseId;
-  const needsObjectives = briefReady && data.scorecard.length === 0;
-  const objectivesReady = !needsObjectives || strategy.data?.case.id === caseId || !!strategy.error;
-  const ready = briefReady && objectivesReady;
-  const objectives = strategy.data?.case.id === caseId ? strategy.data.objectives : [];
+  const { data, error, loading } = useApi(() => api.plan2027(caseId), [caseId]);
 
   return (
     <section data-tour="steering" className="pb-4">
-      <header className="mb-6">
-        <h1 className="text-[30px] font-light leading-tight tracking-tight text-ink sm:text-[38px]">What should I aim for, and how much may I do on my own?</h1>
-        <p className="mt-1.5 max-w-2xl text-sm text-muted">
-          {briefReady && isAwaiting(data.case)
-            ? `Start here. Set the goal, the budget and my limits for ${data.case.name} in ${data.case.periodLabel}. Once your data is connected, I'll suggest targets for the numbers behind the goal.`
-            : `You set the goals and the limits; I plan within them${
-                briefReady ? ` for ${data.case.name}, ${data.case.periodLabel} (week ${data.case.week} of ${data.case.weeksInPeriod})` : ""
-              }. Nothing changes until you press Save.`}
-        </p>
-      </header>
-      {error && !briefReady ? (
-        <ErrorNote message={`Could not load your goals. ${error}`} />
-      ) : !ready ? (
+      <PageHeader
+        page="2027 Plan"
+        question="Where should the 2027 budget go?"
+        answer="Give me your budget, revenue target, lead goal and brand share. I ask every channel agent what its data says, then propose a budget and the next campaign action for each channel."
+      />
+      {error ? (
+        <ErrorNote message={`Could not load the plan. ${error}`} />
+      ) : !data || loading ? (
         <div className="space-y-5">
-          <Skeleton className="h-64" />
-          <div className="grid gap-5 lg:grid-cols-2">
-            <Skeleton className="h-80" />
-            <Skeleton className="h-80" />
-          </div>
+          <Skeleton className="h-72" />
+          <Skeleton className="h-40" />
         </div>
       ) : (
-        <GoalsSteering key={caseId} brief={data} objectives={objectives} onSaved={setData} />
+        <Plan2027View key={caseId} caseId={caseId} load={data} />
       )}
     </section>
   );

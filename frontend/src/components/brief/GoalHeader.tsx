@@ -64,7 +64,7 @@ export function GoalHeader({ brief, gap }: { brief: WeeklyBrief; gap: TreeNode[]
         {unset ? (
           <p className="mt-2 text-sm text-muted">
             <Link href={withCase("/goals", c.id)} className="underline decoration-line-strong underline-offset-4 hover:text-ink hover:decoration-accent">
-              Set a target in Goals and limits
+              Set a target in 2027 Plan
             </Link>{" "}
             and this page shows which part is behind.
           </p>

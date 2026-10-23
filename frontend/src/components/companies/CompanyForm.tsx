@@ -52,7 +52,7 @@ export function CompanyForm() {
             Cancel
           </Link>
         </div>
-        <p className="text-xs text-faint">You can change the goal, budget and limits any time under Goals and limits.</p>
+        <p className="text-xs text-faint">You can change the budget and targets any time under 2027 Plan.</p>
       </div>
     </form>
   );

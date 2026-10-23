@@ -70,8 +70,8 @@ export const TOUR_STEPS: TourStep[] = [
     route: "/goals",
     caseId: "tessellate",
     anchor: "steering",
-    title: "The CEO sets the limits",
-    body: "Change a target, the budget or how much the agent may move on its own, and the plan updates on the spot. The money kept for brand building can only be changed by a person.",
+    title: "The 2027 plan",
+    body: "Set the budget, the revenue target, the leads you need and the share for brand. The CMO asks every channel agent and proposes a budget and the next campaign action for each channel.",
   },
   {
     route: "/goals",

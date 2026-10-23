@@ -1,5 +1,5 @@
 // Shared helpers for route handlers: company resolution and JSON error mapping.
-import type { AskEvent, CaseData, CaseId } from "@/lib/types";
+import type { CaseData, CaseId, PlanEvent } from "@/lib/types";
 import { companyExists } from "./companies";
 import { HttpError } from "./errors";
 import { getCase } from "./store";
@@ -45,11 +45,11 @@ export async function handle(fn: () => Promise<Response>): Promise<Response> {
 export const isObj = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null && !Array.isArray(v);
 export const isNum = (v: unknown): v is number => typeof v === "number" && Number.isFinite(v);
 
-/** NDJSON stream: one AskEvent per line, ending with "done" (or "error"). Strings are answer text. */
-export function ndjsonResponse(source: AsyncIterable<string | AskEvent>): Response {
+/** NDJSON stream: one event per line, ending with "done" (or "error"). Strings are answer text. */
+export function ndjsonResponse(source: AsyncIterable<string | PlanEvent>): Response {
   const iterator = source[Symbol.asyncIterator]();
   const enc = new TextEncoder();
-  const line = (e: AskEvent) => enc.encode(`${JSON.stringify(e)}\n`);
+  const line = (e: PlanEvent) => enc.encode(`${JSON.stringify(e)}\n`);
   const stream = new ReadableStream<Uint8Array>({
     async pull(controller) {
       try {

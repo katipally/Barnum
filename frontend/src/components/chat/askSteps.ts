@@ -18,6 +18,7 @@ const TOOL_LABELS: Record<string, string> = {
   unit_econ: "Running unit economics",
   propose_reallocation: "Drafting a budget move",
   data_to_chart: "Building chart",
+  plan_2027: "Planning budget (plan_2027)",
 };
 
 const words = (id: string) => id.replace(/[_-]+/g, " ").trim();

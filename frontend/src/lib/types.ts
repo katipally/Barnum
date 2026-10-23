@@ -250,7 +250,96 @@ export type AskEvent =
   | { type: "tool"; name: string; input?: Record<string, unknown>; toolUseId?: string }
   | { type: "tool_done"; toolUseId: string; seconds?: number; ok: boolean }
   | { type: "error"; message: string }
-  | { type: "done" };
+  | { type: "done"; planId?: string };
+
+// ---- 2027 plan: inputs -> CMO agent -> per-channel budgets and campaign actions. Field names mirror the backend. ----
+
+export interface PlanInputs {
+  budget_usd: number;
+  revenue_target_usd: number;
+  sqls_per_quarter: number;
+  brand_pct: number; // 0..1
+}
+
+export type PlanKind = "performance" | "brand" | "unpriced";
+export type PlanVerdict = "start" | "scale" | "optimize" | "maintain" | "cut";
+
+export interface PlanChannel {
+  channel_id: string;
+  display_name: string;
+  kind: PlanKind;
+  budget_usd: number;
+  share: number;
+  current_annual_spend_usd: number | null;
+  projected_sqls_per_quarter: number | null;
+  projected_customers: number | null;
+  projected_native: unknown; // brand KPI; shape not fixed by the contract, rendered defensively
+  estimated: boolean;
+  basis_note: string | null;
+  // filled by the channel agent; absent while the channel is still being planned
+  verdict?: PlanVerdict;
+  rationale?: string;
+  actions?: { title: string; detail: string }[];
+  risk?: string | null;
+  source?: "agent" | "fallback";
+}
+
+export interface PlanTotals {
+  budget_usd: number;
+  allocated_usd: number;
+  unallocated_usd: number;
+  projected_sqls_per_quarter: number | null;
+  projected_customers: number | null;
+  projected_new_arr_usd: number | null;
+}
+
+export interface PlanTargets {
+  revenue: { target_usd: number; projected_usd: number | null; gap_usd: number | null; met: boolean };
+  sqls_per_quarter: { target: number; projected: number | null; gap: number | null; met: boolean };
+  budget_needed_for_targets_usd: number | null;
+  limited_by: string | null;
+  notes: string[];
+}
+
+export interface PlanData {
+  inputs: PlanInputs;
+  assumptions_used?: Record<string, unknown>;
+  channels: PlanChannel[];
+  totals: PlanTotals;
+  targets: PlanTargets;
+}
+
+export interface SavedPlan extends Omit<PlanData, "assumptions_used"> {
+  plan_id: string;
+  created_at: string;
+  summary: string;
+  model: string | null;
+}
+
+export interface Plan2027Load {
+  inputs: PlanInputs;
+  saved: SavedPlan | null;
+  live: boolean; // false: a simulated plan for a sample company
+  notice?: string; // the backend could not be fully read; inputs fall back to defaults
+}
+
+export type PlanEvent = AskEvent | ({ type: "plan" } & PlanData) | ({ type: "channel_plan" } & PlanChannel) | ({ type: "targets" } & PlanTargets);
+
+export interface CampaignDraft {
+  campaign_id: string;
+  plan_id: string;
+  channel_id: string;
+  status: string;
+  stub: boolean;
+  created_at?: string;
+  brief: {
+    name: string;
+    objective: string;
+    budget_usd: number;
+    kpis: string[];
+    steps: { title: string; detail: string }[];
+  };
+}
 
 // ---- Deep dives: saved conversations with the agent, optionally written up as an artifact ----
 
