@@ -1,0 +1,95 @@
+-- Provisions one channel's isolated stack. Rendered by backend/app/channels/provision.py.
+-- Inputs: s (schema), cid (channel id), display, description, map_select, raw_spend_sql, model, warehouse.
+
+CREATE OR REPLACE VIEW CMO_DB.{{ s }}.MAP AS
+{{ map_select }};
+
+CREATE OR REPLACE SEMANTIC VIEW CMO_DB.{{ s }}.SV
+  TABLES (funnel AS CMO_DB.{{ s }}.MAP COMMENT = '{{ display | sq }} funnel rows: one row per day and campaign')
+  FACTS (
+    funnel.spend_fact AS spend_usd, funnel.mql_fact AS mqls, funnel.sql_fact AS sqls,
+    funnel.opp_fact AS opps, funnel.pipeline_fact AS pipeline_usd, funnel.won_fact AS won
+  )
+  DIMENSIONS (
+    funnel.day AS date WITH SYNONYMS = ('date', 'day'),
+    funnel.campaign AS campaign WITH SYNONYMS = ('creative', 'keyword', 'event', 'board', 'audience segment'),
+    funnel.creative_text AS creative_text,
+    funnel.audience AS audience
+  )
+  METRICS (
+    funnel.spend AS SUM(spend_usd) COMMENT = 'Spend in USD',
+    funnel.mql_count AS SUM(mqls) WITH SYNONYMS = ('MQLs', 'marketing qualified leads'),
+    funnel.sql_count AS SUM(sqls) WITH SYNONYMS = ('SQLs', 'sales qualified leads'),
+    funnel.pipeline AS SUM(pipeline_usd),
+    funnel.cost_per_mql AS SUM(spend_usd) / NULLIF(SUM(mqls), 0),
+    funnel.cost_per_sql AS SUM(spend_usd) / NULLIF(SUM(sqls), 0) WITH SYNONYMS = ('$ per SQL', 'CPS'),
+    funnel.mql_to_sql_rate AS SUM(sqls) / NULLIF(SUM(mqls), 0)
+  )
+  COMMENT = '{{ description | sq }}';
+
+CREATE OR REPLACE FUNCTION CMO_DB.{{ s }}.REPORT()
+RETURNS OBJECT
+AS 'SELECT CMO_DB.CORE.CHANNEL_STATS(''{{ cid }}'')';
+
+CREATE OR REPLACE PROCEDURE CMO_DB.{{ s }}.RECONCILE()
+RETURNS OBJECT
+LANGUAGE SQL
+AS
+$$
+DECLARE
+  raw_spend FLOAT;
+  map_spend FLOAT;
+BEGIN
+  raw_spend := ({{ raw_spend_sql }});
+  map_spend := (SELECT SUM(spend_usd) FROM CMO_DB.{{ s }}.MAP);
+  RETURN OBJECT_CONSTRUCT('raw_spend_usd', ROUND(raw_spend, 2), 'mapped_spend_usd', ROUND(map_spend, 2),
+                          'diff_usd', ROUND(map_spend - raw_spend, 2), 'ok', ABS(map_spend - raw_spend) <= 1);
+END;
+$$;
+
+CREATE OR REPLACE AGENT CMO_DB.{{ s }}.AGENT
+  COMMENT = '{{ display | sq }} channel agent'
+  PROFILE = '{"display_name": "{{ display | sq }} agent"}'
+  FROM SPECIFICATION
+$$
+models:
+  orchestration: {{ model }}
+instructions:
+  orchestration: >
+    You are the {{ display | yq }} channel agent, reporting to the CMO. {{ description | yq }}
+    You only know your own channel. Judge performance on cost per SQL, never on clicks, impressions or scans.
+    For any status or review request: call report first, then reconcile, then use ChannelData for the
+    breakdown by campaign to find the best and worst campaigns by cost per SQL.
+  response: >
+    Lead with numbers. Always state spend vs plan, MQLs, SQLs, cost per SQL, MQL-to-SQL rate and
+    what the next $10k buys (sqls_per_next_10k from report). Name the best and worst campaign by cost per SQL.
+    Say whether spend reconciles. End with one recommendation: scale, keep, cut, or test, with a dollar amount.
+    Use only tool results; label anything else as an assumption.
+tools:
+  - tool_spec:
+      type: cortex_analyst_text_to_sql
+      name: ChannelData
+      description: "{{ display | yq }} funnel by day and campaign: spend, MQLs, SQLs, pipeline, cost per SQL."
+  - tool_spec:
+      type: generic
+      name: report
+      description: "Headline numbers for this channel: spend, plan, pacing, MQLs, SQLs, cost per SQL, marginal cost per SQL, SQLs the next $10k buys."
+      input_schema: {type: object, properties: {}}
+  - tool_spec:
+      type: generic
+      name: reconcile
+      description: "Check that spend in the funnel equals spend in the raw platform data, to the dollar."
+      input_schema: {type: object, properties: {}}
+tool_resources:
+  ChannelData:
+    semantic_view: CMO_DB.{{ s }}.SV
+    execution_environment: {type: warehouse, warehouse: {{ warehouse }}}
+  report:
+    type: function
+    identifier: CMO_DB.{{ s }}.REPORT
+    execution_environment: {type: warehouse, warehouse: {{ warehouse }}}
+  reconcile:
+    type: procedure
+    identifier: CMO_DB.{{ s }}.RECONCILE
+    execution_environment: {type: warehouse, warehouse: {{ warehouse }}}
+$$;

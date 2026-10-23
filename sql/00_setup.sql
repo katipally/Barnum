@@ -3,7 +3,7 @@ CREATE DATABASE IF NOT EXISTS CMO_DB;
 CREATE SCHEMA IF NOT EXISTS CMO_DB.CORE;
 CREATE WAREHOUSE IF NOT EXISTS CMO_WH WAREHOUSE_SIZE = 'XSMALL' AUTO_SUSPEND = 60 AUTO_RESUME = TRUE;
 
-CREATE STAGE IF NOT EXISTS CMO_DB.CORE.CRM_UPLOADS;
+CREATE STAGE IF NOT EXISTS CMO_DB.CORE.UPLOADS;  -- shared CRM uploads; every schema has an UPLOADS stage
 CREATE FILE FORMAT IF NOT EXISTS CMO_DB.CORE.CSV_FMT
   TYPE = CSV PARSE_HEADER = TRUE FIELD_OPTIONALLY_ENCLOSED_BY = '"'
   ERROR_ON_COLUMN_COUNT_MISMATCH = FALSE EMPTY_FIELD_AS_NULL = TRUE;
@@ -24,11 +24,11 @@ CREATE TABLE IF NOT EXISTS CMO_DB.CORE.CHANNEL_REGISTRY (
 CREATE TABLE IF NOT EXISTS CMO_DB.CORE.MAPPING_HISTORY (
   channel_id   STRING,
   version      INT,
-  select_sql   STRING,
+  mapping      VARIANT,                -- {outcome_mode, select_sql, raw_spend_sql, crm_mql_sql, notes, assumptions}
   notes        STRING,
   fingerprint  STRING,                 -- hash of raw column sets the mapping was written for
   validation   VARIANT,
-  status       STRING,                 -- proposed | approved | rejected
+  status       STRING,                 -- proposed | failed | approved
   created_at   TIMESTAMP_LTZ DEFAULT CURRENT_TIMESTAMP()
 );
 
