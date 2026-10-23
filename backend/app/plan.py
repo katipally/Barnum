@@ -110,7 +110,10 @@ def merge_channels(numbers: dict, agent: dict | None, answers: dict[str, str]) -
                       "risk": str(g.get("risk") or RISKS[c["kind"]]), "source": "agent"}
         else:
             judged = _fallback(c, portfolio_cps, answers.get(c["channel_id"]))
-        out.append(c | judged)
+        sqls_year = (c["projected_sqls_per_quarter"] or 0) * 4
+        extra = {"plan_cost_per_sql": round(c["budget_usd"] / sqls_year, 2) if sqls_year else None,
+                 "agent_recommends_cut": judged["source"] == "agent" and judged["verdict"] == "cut" and c["budget_usd"] > 0}
+        out.append(c | judged | extra)
     return out
 
 

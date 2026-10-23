@@ -74,8 +74,10 @@ function planChannels(groups: Group[], inputs: PlanInputs): PlanChannel[] {
       budget_usd: budget,
       share: budget / inputs.budget_usd,
       current_annual_spend_usd: Math.round(g.annualSpend),
+      current_cost_per_sql: g.kind === "performance" && g.cost ? g.cost / SQL_RATE : null,
       projected_sqls_per_quarter: sqlsYear === null ? null : sqlsYear / 4,
       projected_customers: sqlsYear === null ? null : sqlsYear * WIN_RATE,
+      plan_cost_per_sql: sqlsYear ? budget / sqlsYear : null,
       projected_native: g.kind === "brand" && units !== null ? { [g.label]: Math.round(units) } : null,
       estimated: true,
       basis_note: g.cost ? `Sample estimate from the sample data, ${money(g.cost)} per ${g.label}.` : "Sample estimate. No results measured yet.",
@@ -173,7 +175,8 @@ async function* run(caseId: CaseId, inputs: PlanInputs, getData: () => Promise<C
     const id = `ask-${c.channel_id}`;
     yield { type: "tool", name: "ask_channel", input: { channel_id: c.channel_id }, toolUseId: id };
     await sleep(STEP_MS + (i % 3) * 200);
-    const call = { ...c, ...judge(c, groups[i], avgCost), source: "agent" as const };
+    const judgment = judge(c, groups[i], avgCost);
+    const call = { ...c, ...judgment, agent_recommends_cut: judgment.verdict === "cut" && c.budget_usd > 0, source: "agent" as const };
     judged.push(call);
     yield { type: "tool_done", toolUseId: id, seconds: 0.5 + (i % 3) * 0.2, ok: true };
     yield { type: "channel_plan", ...call };

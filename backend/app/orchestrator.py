@@ -14,7 +14,7 @@ Events (SSE `event:` names) the frontend can render:
 
 /plan/2027 reuses meta, status, tool, tool_done, cmo_delta, done and error, and adds:
   plan          PLAN_2027 numbers, sent as soon as the procedure returns
-  channel_plan  one per channel: numbers + verdict, rationale, actions, risk, source (agent|fallback)
+  channel_plan  one per channel: numbers + plan_cost_per_sql, verdict, agent_recommends_cut, rationale, actions, risk, source (agent|fallback)
   targets       targets block of the plan
 """
 import asyncio

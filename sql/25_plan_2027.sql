@@ -129,6 +129,7 @@ def plan(budget, revenue_target, sqls_per_quarter, brand_pct, a, rows, mql_to_sq
             note += "; at the scale cap"
         out.append({"channel_id": c, "display_name": v["name"], "kind": v["kind"], "budget_usd": floor2(y),
                     "share": round(y / budget, 4), "current_annual_spend_usd": round(v["spend"]) if v["spend"] else None,
+                    "current_cost_per_sql": round(v["spend"] / v["sqls"], 2) if v["curve"] else None,
                     "projected_sqls_per_quarter": round(s / 4, 1) if s is not None else None,
                     "projected_customers": round(s * win, 1) if s is not None else None,
                     "projected_native": native, "estimated": v["est"] and s is not None, "basis_note": note})

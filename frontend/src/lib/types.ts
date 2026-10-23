@@ -271,6 +271,7 @@ export interface PlanChannel {
   budget_usd: number;
   share: number;
   current_annual_spend_usd: number | null;
+  current_cost_per_sql?: number | null; // today's blended cost per SQL; null without a cost curve
   projected_sqls_per_quarter: number | null;
   projected_customers: number | null;
   projected_native: Record<string, number> | null; // {metric: value}, e.g. {impressions: 4106667}
@@ -282,6 +283,8 @@ export interface PlanChannel {
   actions?: { title: string; detail: string }[];
   risk?: string | null;
   source?: "agent" | "fallback";
+  plan_cost_per_sql?: number | null; // budget / (projected_sqls_per_quarter * 4); null without SQLs
+  agent_recommends_cut?: boolean; // the agent said cut while budget_usd > 0; the allocation is unchanged
 }
 
 export interface PlanTotals {

@@ -21,15 +21,15 @@ CREATE OR REPLACE SEMANTIC VIEW CMO_DB.CORE.FUNNEL_SV
     native.metric_activity_date AS "DATE" WITH SYNONYMS = ('date', 'day', 'month', 'time'),
     native.metric_channel AS channel,
     native.metric_campaign AS campaign,
-    native.metric AS metric WITH SYNONYMS = ('native metric', 'kpi')
+    native.metric AS metric WITH SYNONYMS = ('native metric', 'kpi', 'reply outcomes')
   )
   METRICS (
     funnel.spend AS SUM(spend_usd) COMMENT = 'Spend in USD, only channels that measure spend',
     funnel.mql_count AS SUM(mqls) WITH SYNONYMS = ('MQLs'),
-    funnel.sql_count AS SUM(sqls) WITH SYNONYMS = ('SQLs'),
+    funnel.sql_count AS SUM(sqls) WITH SYNONYMS = ('SQLs', 'SQL', 'sales qualified lead', 'sales qualified leads'),
     funnel.pipeline AS SUM(pipeline_usd),
-    funnel.cost_per_mql AS SUM(spend_usd) / NULLIF(SUM(IFF(spend_usd IS NOT NULL, mqls, NULL)), 0),
-    funnel.cost_per_sql AS SUM(spend_usd) / NULLIF(SUM(IFF(spend_usd IS NOT NULL, sqls, NULL)), 0),
+    funnel.cost_per_mql AS SUM(spend_usd) / NULLIF(SUM(IFF(spend_usd IS NOT NULL, mqls, NULL)), 0) WITH SYNONYMS = ('cost per lead'),
+    funnel.cost_per_sql AS SUM(spend_usd) / NULLIF(SUM(IFF(spend_usd IS NOT NULL, sqls, NULL)), 0) WITH SYNONYMS = ('cheapest lead', 'cost per qualified lead'),
     funnel.mql_to_sql_rate AS SUM(sqls) / NULLIF(SUM(mqls), 0),
     native.metric_total AS SUM(value) COMMENT = 'Sum of a native metric; always filter or group by metric and channel'
   )

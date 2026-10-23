@@ -15,13 +15,13 @@ Events, in order of arrival:
 | `status` | `{stage, message}` |
 | `tool` | `{name, input, tool_use_id}` (CMO agent tool call started; `ask_channel` calls overlap) |
 | `tool_done` | `{name, tool_use_id, seconds, ok}` |
-| `channel_plan` | one per channel, final: `{channel_id, display_name, kind, budget_usd, share, current_annual_spend_usd, projected_sqls_per_quarter, projected_customers, projected_native, estimated, basis_note, verdict, rationale, actions: [{title, detail}], risk, source}` |
+| `channel_plan` | one per channel, final: `{channel_id, display_name, kind, budget_usd, share, current_annual_spend_usd, current_cost_per_sql, projected_sqls_per_quarter, projected_customers, projected_native, estimated, basis_note, plan_cost_per_sql, verdict, agent_recommends_cut, rationale, actions: [{title, detail}], risk, source}` |
 | `targets` | `targets` block of the plan |
 | `cmo_delta` | `{text}` the plan summary |
 | `error` | `{message}` (an agent failure still ends in fallback `channel_plan`s and `done`) |
 | `done` | `{seconds, model, plan_id}` (`plan_id` is null if saving failed; an `error` precedes it) |
 
-`verdict` is `start|scale|optimize|maintain|cut`. `source` is `agent` or `fallback`. `kind` is `performance|brand|unpriced`.
+`verdict` is `start|scale|optimize|maintain|cut`. `plan_cost_per_sql` is `budget_usd / (projected_sqls_per_quarter * 4)`, null without SQLs. `agent_recommends_cut` is true when the agent's verdict is `cut` while `budget_usd > 0`; the allocation is not changed. `source` is `agent` or `fallback`. `kind` is `performance|brand|unpriced`.
 
 ### PLAN_2027 JSON
 
@@ -29,7 +29,7 @@ Events, in order of arrival:
 {inputs: {budget_usd, revenue_target_usd, sqls_per_quarter, brand_pct},
  assumptions_used: {acv_usd, sql_to_won, mql_to_sql_rate, mql_to_sql_source, scale_cap_x, test_budget_usd},
  channels: [{channel_id, display_name, kind, budget_usd, share, current_annual_spend_usd,
-             projected_sqls_per_quarter, projected_customers, projected_native: {metric: n} | null,
+             current_cost_per_sql | null, projected_sqls_per_quarter, projected_customers, projected_native: {metric: n} | null,
              estimated, basis_note}],
  totals: {budget_usd, allocated_usd, unallocated_usd, projected_sqls_per_quarter, projected_customers, projected_new_arr_usd},
  targets: {revenue: {target_usd, projected_usd, gap_usd, met, needed_customers, needed_sqls_per_year},

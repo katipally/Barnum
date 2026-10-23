@@ -116,6 +116,14 @@ export function ChannelPlanCard({ caseId, channel: c, planId, planning }: { case
             {c.estimated && <span className="chip ml-1.5">estimated</span>}
           </dd>
         </div>
+        {c.plan_cost_per_sql != null && (
+          <div>
+            <dt className="text-faint">Cost per SQL</dt>
+            <dd className="mt-0.5 text-muted tabular">
+              {c.current_cost_per_sql != null && `today ${money(c.current_cost_per_sql)}, `}at plan {money(c.plan_cost_per_sql)}
+            </dd>
+          </div>
+        )}
       </dl>
       {c.basis_note && <p className="-mt-2 break-words text-xs text-faint">{c.basis_note}</p>}
 
@@ -129,6 +137,7 @@ export function ChannelPlanCard({ caseId, channel: c, planId, planning }: { case
         )
       ) : (
         <>
+          {c.agent_recommends_cut && <p className="break-words text-xs text-bad">Agent recommends moving this {money(c.budget_usd)}</p>}
           {c.rationale && <p className="break-words text-sm leading-relaxed text-ink/90">{c.rationale}</p>}
           {c.actions && c.actions.length > 0 && (
             <ol className="list-decimal space-y-2 pl-5 text-sm marker:text-faint">
