@@ -70,10 +70,13 @@ def load_csv(schema: str, filename: str, data: bytes, replace: bool = False) -> 
     inferred = {r["column_name"]: r["type"] for r in sf.query(f"SELECT column_name, type FROM {infer}")}
     existing = columns(schema, f"RAW_{stem}")
     if not existing:
-        sf.execute(f"CREATE TABLE {table} USING TEMPLATE (SELECT ARRAY_AGG(OBJECT_CONSTRUCT(*)) FROM {infer})")
+        # Inferred precision fits only the first file (max 9 -> NUMBER(1,0)); widen so later uploads never overflow.
+        sf.execute(f"""CREATE TABLE {table} USING TEMPLATE (
+            SELECT ARRAY_AGG(OBJECT_CONSTRUCT('COLUMN_NAME', column_name, 'NULLABLE', TRUE,
+                   'TYPE', REGEXP_REPLACE(type, 'NUMBER\\\\(\\\\d+,', 'NUMBER(38,'))) FROM {infer})""")
     added = [c for c in inferred if c not in existing] if existing else []
     for c in added:
-        sf.execute(f'ALTER TABLE {table} ADD COLUMN "{c}" {inferred[c]}')
+        sf.execute(f'ALTER TABLE {table} ADD COLUMN "{c}" {re.sub(r"NUMBER\(\d+,", "NUMBER(38,", inferred[c])}')
     if replace and existing:
         sf.execute(f"TRUNCATE TABLE {table}")
     res = sf.query(f"""COPY INTO {table} FROM {prefix} FILES = ('{staged}.gz')

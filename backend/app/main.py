@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
-from . import orchestrator, queries
+from . import orchestrator, queries, simulate
 from .channels import ingest, mapping, provision
 
 app = FastAPI(title="Agentic CMO", version="0.1.0")
@@ -187,9 +187,15 @@ def put_assumption(key: str, body: AssumptionIn):
     return queries.set_assumption(key, body.num, body.txt)
 
 
+@app.post("/simulate")
+def simulate_days(days: int = 14):
+    """Append telemetry in raw platform formats; call /q4/review afterwards for the CMO follow-up."""
+    return _guard(simulate.simulate, days)
+
+
 @app.post("/demo/reset")
-def demo_reset():
-    return {"status": queries.reset_demo()}
+def demo_reset(restore_seed: bool = True):
+    return {"status": queries.reset_demo(), "restored": simulate.restore_seed() if restore_seed else []}
 
 
 @app.get("/health")
