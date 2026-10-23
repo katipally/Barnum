@@ -246,7 +246,9 @@ export interface SteeringUpdate {
 export type AskEvent =
   | { type: "text"; text: string }
   | { type: "status"; message: string }
-  | { type: "tool"; name: string; input?: Record<string, unknown> }
+  | { type: "meta"; model: string }
+  | { type: "tool"; name: string; input?: Record<string, unknown>; toolUseId?: string }
+  | { type: "tool_done"; toolUseId: string; seconds?: number; ok: boolean }
   | { type: "error"; message: string }
   | { type: "done" };
 

@@ -326,6 +326,10 @@ async function* askLive(question: string, turns?: AgentTurn[]): AsyncIterable<st
             message?: string;
             name?: string;
             input?: Record<string, unknown>;
+            model?: string;
+            tool_use_id?: string;
+            seconds?: number;
+            ok?: boolean;
           };
           // cmo_delta: teammate's orchestrator /ask; token: the earlier backend.
           if ((event === "cmo_delta" || event === "token") && payload.text) {
@@ -333,12 +337,17 @@ async function* askLive(question: string, turns?: AgentTurn[]): AsyncIterable<st
             yield payload.text;
           } else if (event === "status" && payload.message) {
             yield { type: "status", message: payload.message };
+          } else if (event === "meta" && payload.model) {
+            yield { type: "meta", model: payload.model };
           } else if (event === "tool" && payload.name) {
-            yield { type: "tool", name: payload.name, input: payload.input };
+            yield { type: "tool", name: payload.name, input: payload.input, toolUseId: payload.tool_use_id };
+          } else if (event === "tool_done" && payload.tool_use_id) {
+            yield { type: "tool_done", toolUseId: payload.tool_use_id, seconds: payload.seconds, ok: payload.ok !== false };
           } else if (event === "error") {
             failed = true;
             yield { type: "error", message: payload.message ?? JSON.stringify(payload) };
           } else if (event === "done") {
+            if (payload.model) yield { type: "meta", model: payload.model };
             complete = true;
             return;
           }

@@ -10,6 +10,7 @@ export interface ChatMessage {
   role: "user" | "agent";
   text: string;
   status?: "streaming" | "done" | "error";
+  model?: string;
   steps?: AskStep[];
   startedAt?: number;
   endedAt?: number;
@@ -74,6 +75,7 @@ export function useAskStream(caseId: CaseId, opts: Options = {}) {
         patch(agentId, (m) => {
           const at = Date.now();
           const steps = nextSteps(m.steps ?? [], e, at);
+          if (e.type === "meta") return { ...m, model: e.model };
           if (e.type === "text") return { ...m, steps, text: m.text + e.text };
           if (e.type === "error") return { ...m, steps, status: "error", endedAt: at };
           if (e.type === "done") return { ...m, steps, status: m.status === "error" ? "error" : "done", endedAt: at };

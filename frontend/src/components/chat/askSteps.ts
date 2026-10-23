@@ -6,6 +6,10 @@ export interface AskStep {
   startedAt: number;
   endedAt?: number;
   thinking?: boolean;
+  id?: string; // tool_use_id: such a row is closed by its own tool_done, so parallel calls finish independently
+  detail?: string;
+  seconds?: number;
+  failed?: boolean;
 }
 
 const TOOL_LABELS: Record<string, string> = {
@@ -28,18 +32,31 @@ export function toolLabel(name: string, input?: Record<string, unknown>): string
   return TOOL_LABELS[name] ?? sentence(words(name.replace(/([a-z])([A-Z])/g, "$1 $2")).toLowerCase());
 }
 
-const finish = (steps: AskStep[], now: number) =>
-  steps.filter((s) => !s.thinking).map((s) => (s.endedAt ? s : { ...s, endedAt: now }));
+const finish = (steps: AskStep[], now: number, keepTracked = false) =>
+  steps.filter((s) => !s.thinking).map((s) => (s.endedAt || (keepTracked && s.id) ? s : { ...s, endedAt: now }));
+
+const HEARTBEAT = /^Still working on /;
 
 export function nextSteps(steps: AskStep[], e: AskEvent, now: number): AskStep[] {
   switch (e.type) {
+    case "meta":
+      return steps;
     case "status": {
-      // A status line after a tool call means that tool returned.
+      if (HEARTBEAT.test(e.message)) {
+        const running = steps.findLastIndex((s) => !s.thinking && !s.endedAt);
+        const at = running >= 0 ? running : steps.findLastIndex((s) => s.thinking);
+        return steps.map((s, i) => (i === at ? { ...s, detail: e.message } : s));
+      }
+      // A status line after an untracked tool call means that tool returned; tracked ones wait for their tool_done.
       const think = steps.find((s) => s.thinking);
-      return [...finish(steps, now), { label: e.message, startedAt: think?.startedAt ?? now, thinking: true }];
+      return [...finish(steps, now, true), { label: e.message, startedAt: think?.startedAt ?? now, thinking: true }];
     }
     case "tool":
-      return [...steps.filter((s) => !s.thinking), { label: toolLabel(e.name, e.input), startedAt: now }];
+      return [...steps.filter((s) => !s.thinking), { label: toolLabel(e.name, e.input), startedAt: now, id: e.toolUseId }];
+    case "tool_done":
+      return steps.map((s) =>
+        s.id === e.toolUseId && !s.endedAt ? { ...s, endedAt: now, seconds: e.seconds, failed: !e.ok, detail: undefined } : s,
+      );
     default:
       return finish(steps, now);
   }

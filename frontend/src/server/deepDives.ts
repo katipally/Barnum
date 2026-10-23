@@ -148,6 +148,8 @@ export async function* askInDeepDive(caseId: CaseId, id: string, question: strin
   answering.add(id);
   let answer = "";
   try {
+    const last = d.messages.at(-1);
+    if (last?.role === "user" && last.text === question) d.messages.pop(); // a retry replaces the unanswered turn
     const history = [...(await notes(caseId, id)), ...toTurns(d.messages)];
     if (!d.messages.length) d.title = titleFrom(question);
     d.messages.push({ role: "user", text: question, at: now() });
