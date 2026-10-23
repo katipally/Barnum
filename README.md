@@ -43,7 +43,7 @@ uv run python -m seed.load_real ../test-data   # the 6 real exports (kept outsid
 uv run uvicorn backend.app.main:app --port 8000
 ```
 
-Environment: `CMO_CONNECTION` (default `hackathon`), `CMO_WAREHOUSE` (`CMO_WH`), `CMO_MODEL` (CMO agent), `CMO_CHANNEL_MODEL` (channel agents), `CMO_MAPPER_MODEL` (mapping). All three model variables default to `claude-sonnet-4-5`. Cross-region inference must reach the chosen model.
+Environment: `CMO_CONNECTION` (default `hackathon`), `CMO_WAREHOUSE` (`CMO_WH`), `CMO_MODEL` (CMO agent), `CMO_CHANNEL_MODEL` (channel agents), `CMO_MAPPER_MODEL` (mapping). All three model variables default to `claude-opus-5-5`. Cross-region inference must reach the chosen model.
 
 Real exports are messy, so every upload passes through a normalizer: any encoding or BOM, comma or tab, report preambles, `1,129.58`, `6.65%`, mixed date formats. Column headers become SQL-safe names.
 

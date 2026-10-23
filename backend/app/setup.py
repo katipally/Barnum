@@ -10,7 +10,7 @@ import jinja2
 from . import snowflake as sf
 
 ROOT = Path(__file__).resolve().parents[2]
-CMO_MODEL = os.getenv("CMO_MODEL", "claude-sonnet-4-5")
+CMO_MODEL = os.getenv("CMO_MODEL", "claude-opus-5-5")
 
 
 def deploy_cmo_agent() -> None:

@@ -9,7 +9,7 @@ from .. import snowflake as sf
 from . import ingest, mapping
 
 TEMPLATE = Path(__file__).resolve().parents[3] / "templates" / "channel.sql.j2"
-MODEL = os.getenv("CMO_CHANNEL_MODEL", "claude-sonnet-4-5")
+MODEL = os.getenv("CMO_CHANNEL_MODEL", "claude-opus-5-5")
 
 _env = jinja2.Environment(undefined=jinja2.StrictUndefined, autoescape=False)
 _env.filters["sq"] = lambda v: str(v or "").replace("'", "''")          # inside '...' SQL literals

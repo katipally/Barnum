@@ -10,7 +10,7 @@ import re
 from .. import snowflake as sf
 from . import ingest
 
-MODELS = [m for m in (os.getenv("CMO_MAPPER_MODEL", "claude-sonnet-4-5"), os.getenv("CMO_MAPPER_FALLBACK", "claude-opus-4-5")) if m]
+MODELS = [m for m in (os.getenv("CMO_MAPPER_MODEL", "claude-opus-5-5"), os.getenv("CMO_MAPPER_FALLBACK", "claude-opus-4-5")) if m]
 MAX_ATTEMPTS = 3
 MEASURES = ("spend_usd", "mqls", "sqls", "opps", "pipeline_usd", "won", "won_acv_usd")
 
