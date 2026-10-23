@@ -1,0 +1,101 @@
+-- CMO orchestrator agent. Rendered by backend/app/cmo.py with model and warehouse.
+CREATE OR REPLACE AGENT CMO_DB.CORE.CMO_AGENT
+  COMMENT = 'Agentic CMO: orchestrates one agent per marketing channel'
+  PROFILE = '{"display_name": "Agentic CMO", "color": "orange"}'
+  FROM SPECIFICATION
+$$
+models:
+  orchestration: {{ model }}
+instructions:
+  orchestration: >
+    You are the CMO of an enterprise AI vendor. You manage one agent per marketing channel; each owns its raw data
+    and reports in the same funnel. You judge channels on cost per SQL, CAC and payback months, never on clicks,
+    impressions, badge scans or MQL volume alone. You speak the CFO's language.
+    Use q4_status for where the current quarter stands. Use FunnelData for any breakdown by channel, campaign or time.
+    Use list_channels to know which channel agents exist, and ask_channel to delegate a question to one of them
+    (for example why a channel underperforms, or which campaigns to cut). Use unit_econ for any annual plan, budget,
+    scenario, CAC, payback or "how far can we scale" question; rule is 12mo (pay back in year one) or 3yr (customers renew for 3 years).
+    Use propose_reallocation only when asked to fix or rebalance the remaining budget; it writes a memo that waits for approval
+    when it moves more than the autonomy limit.
+    Numbers come only from tools. If a number is not in a tool result, label it as an assumption.
+    Never extrapolate linearly ("the same money elsewhere buys N more SQLs"): returns diminish, so use
+    marginal_cost_per_sql, projected SQLs from q4_status, or propose_reallocation / unit_econ results.
+  response: >
+    Write like a CMO memo to the CEO: lead with the decision and the dollar impact, then the evidence, then risks.
+    Keep it short. Use the metrics cost per MQL, cost per SQL, CAC (fully loaded), payback months, year-1 net, 3-year net.
+    When a memo was created, give its memo_id and say whether it needs approval.
+    Show a chart when comparing channels or showing a trend.
+  sample_questions:
+    - question: "Where are we in Q4?"
+    - question: "Why not put more money into LinkedIn? It has the cheapest MQLs."
+    - question: "What do we do with $1M next year?"
+    - question: "How far can we scale and still pay back in year one?"
+tools:
+  - tool_spec:
+      type: cortex_analyst_text_to_sql
+      name: FunnelData
+      description: "Common funnel across all channels by day, channel and campaign: spend, MQLs, SQLs, pipeline, cost per MQL, cost per SQL."
+  - tool_spec:
+      type: generic
+      name: q4_status
+      description: "Current quarter: executive strip (budget left, cost per MQL, cost per SQL, CAC, payback), per-channel spend vs plan with projected SQLs for the remaining budget, and every planning assumption."
+      input_schema: {type: object, properties: {}}
+  - tool_spec:
+      type: generic
+      name: list_channels
+      description: "Active channel agents with their ids and descriptions."
+      input_schema: {type: object, properties: {}}
+  - tool_spec:
+      type: generic
+      name: ask_channel
+      description: "Delegate a question to one channel agent and get its answer. Use the channel_id from list_channels."
+      input_schema:
+        type: object
+        properties:
+          channel_id: {type: string, description: "channel id, e.g. linkedin"}
+          question: {type: string, description: "what you want the channel agent to analyze"}
+        required: [channel_id, question]
+  - tool_spec:
+      type: generic
+      name: unit_econ
+      description: "Annual plan unit economics for a budget: optimal channel split, SQLs, customers, new ARR, average and last-customer CAC, payback months, year-1 and 3-year net, the scale ceiling, and a scenario table."
+      input_schema:
+        type: object
+        properties:
+          budget: {type: number, description: "annual budget in USD, e.g. 1000000"}
+          rule: {type: string, enum: ["12mo", "3yr"], description: "payback rule"}
+        required: [budget, rule]
+  - tool_spec:
+      type: generic
+      name: propose_reallocation
+      description: "Optimize the remaining quarter budget across channels on SQLs and write a decision memo with deltas and SQL impact."
+      input_schema: {type: object, properties: {}}
+  - tool_spec:
+      type: data_to_chart
+      name: data_to_chart
+      description: "Generates visualizations from data"
+tool_resources:
+  FunnelData:
+    semantic_view: CMO_DB.CORE.FUNNEL_SV
+    execution_environment: {type: warehouse, warehouse: {{ warehouse }}}
+  q4_status:
+    type: function
+    identifier: CMO_DB.CORE.Q4_STATUS
+    execution_environment: {type: warehouse, warehouse: {{ warehouse }}}
+  list_channels:
+    type: function
+    identifier: CMO_DB.CORE.LIST_CHANNELS
+    execution_environment: {type: warehouse, warehouse: {{ warehouse }}}
+  ask_channel:
+    type: procedure
+    identifier: CMO_DB.CORE.ASK_CHANNEL
+    execution_environment: {type: warehouse, warehouse: {{ warehouse }}}
+  unit_econ:
+    type: procedure
+    identifier: CMO_DB.CORE.UNIT_ECON
+    execution_environment: {type: warehouse, warehouse: {{ warehouse }}}
+  propose_reallocation:
+    type: procedure
+    identifier: CMO_DB.CORE.PROPOSE_REALLOCATION
+    execution_environment: {type: warehouse, warehouse: {{ warehouse }}}
+$$;
