@@ -100,6 +100,16 @@ SSE events: `strip`, `delegation {channel, state, text, seconds}`, `memo`, `stat
 - **Annual plan.** `UNIT_ECON(budget, rule)` uses the same curves on annualized run rates, with floors from `MIN_SHARE:<channel>`. Last-customer CAC = marginal $/SQL ÷ win rate + sales cost. The ceiling is the largest budget whose last customer still pays back: one year of gross profit (`12mo`) or three (`3yr`). Under `3yr`, `cac_bound: false` means CAC is no longer the limit; sales capacity and market size are.
 - **Assumptions.** All numbers in `seed/` and `ASSUMPTIONS` are demo values for Datasaur Foundry. Swap them via `PUT /assumptions/{key}` before showing anyone outside the team.
 
+## Use it from Claude
+
+`sql/50_mcp.sql` exposes the CMO agent and the funnel through the Snowflake-managed MCP server:
+
+```
+https://<account-host>/api/v2/databases/CMO_DB/schemas/CORE/mcp-servers/CMO_MCP
+```
+
+Add it to Claude Desktop or Claude.ai as a custom connector. For OAuth, use a security integration with a PUBLIC client type; see the Snowflake-managed MCP server docs.
+
 ## Tests
 
 ```bash
@@ -110,7 +120,7 @@ tests/smoke.sh 3           # full demo flow 3 times in a row against a running A
 ## Layout
 
 ```
-sql/              00_setup  10_core  20_unit_econ  30_decisions  40_cmo_agent
+sql/              00_setup  10_core  20_unit_econ  30_decisions  40_cmo_agent  50_mcp
 templates/        channel.sql.j2 (one channel's full stack)  cmo_agent.sql.j2
 backend/app/      main.py  orchestrator.py  queries.py  simulate.py  snowflake.py  setup.py
 backend/app/channels/  ingest.py  mapping.py  provision.py

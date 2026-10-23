@@ -107,7 +107,7 @@ Account check (done): ATTENDEE_ROLE has CORTEX_USER, CREATE DATABASE, ROLE, WARE
 ```
 CMO-Agent/
   docs/DESIGN.md
-  sql/        00_setup  10_core  20_unit_econ  30_decisions  40_cmo_agent
+  sql/        00_setup  10_core  20_unit_econ  30_decisions  40_cmo_agent  50_mcp
   templates/  channel.sql.j2 (MAP, semantic view, REPORT, RECONCILE, AGENT)  cmo_agent.sql.j2
   backend/app/ main.py orchestrator.py queries.py simulate.py snowflake.py setup.py
                channels/ ingest.py (upload + profile) mapping.py (propose + validate) provision.py

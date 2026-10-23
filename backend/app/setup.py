@@ -1,4 +1,4 @@
-"""Idempotent Snowflake setup: run every sql/*.sql in order, then deploy the CMO agent.
+"""Idempotent Snowflake setup: run every sql/*.sql in order, deploying the CMO agent after its tools exist.
 
 Usage: python -m backend.app.setup
 """
@@ -22,8 +22,9 @@ def main() -> None:
     for path in sorted((ROOT / "sql").glob("*.sql")):
         print("running", path.name)
         sf.run_script(path)
-    deploy_cmo_agent()
-    print("CMO agent deployed")
+        if path.name.startswith("40_"):  # later files (MCP server) reference the agent
+            deploy_cmo_agent()
+            print("CMO agent deployed")
 
 
 if __name__ == "__main__":
