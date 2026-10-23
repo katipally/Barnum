@@ -138,23 +138,29 @@ export const Mark: React.FC<{ size?: number; draw?: number }> = ({ size = 64, dr
 };
 
 /** Faint grid + vignette backdrop shared by every scene. */
+// Matches the web app: blue-black canvas, violet and blue glows, faint drifting dot grid.
 export const Backdrop: React.FC = () => {
   const frame = useCurrentFrame();
-  const drift = (frame * 0.15) % 80;
+  const drift = (frame * 0.12) % 28;
   return (
     <AbsoluteFill style={{ background: c.bg }}>
       <AbsoluteFill
         style={{
-          backgroundImage: `linear-gradient(${c.line} 1px, transparent 1px), linear-gradient(90deg, ${c.line} 1px, transparent 1px)`,
-          backgroundSize: "80px 80px",
-          backgroundPosition: `${drift}px ${drift}px`,
-          opacity: 0.35,
+          background:
+            "radial-gradient(1350px 720px at 85% -10%, rgba(139,109,255,0.14), transparent 70%), radial-gradient(1050px 630px at 0% 110%, rgba(126,166,255,0.07), transparent 70%)",
         }}
       />
       <AbsoluteFill
         style={{
-          background:
-            "radial-gradient(ellipse 70% 60% at 50% 45%, rgba(11,13,12,0) 0%, rgba(11,13,12,0.75) 70%, #0b0d0c 100%)",
+          backgroundImage: "radial-gradient(rgba(255,255,255,0.07) 1.4px, transparent 1.4px)",
+          backgroundSize: "28px 28px",
+          backgroundPosition: `${drift}px ${drift}px`,
+          opacity: 0.55,
+        }}
+      />
+      <AbsoluteFill
+        style={{
+          background: "radial-gradient(ellipse 75% 65% at 50% 45%, rgba(7,7,13,0) 0%, rgba(7,7,13,0.55) 75%, #07070d 100%)",
         }}
       />
     </AbsoluteFill>
