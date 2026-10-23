@@ -11,6 +11,11 @@ Events (SSE `event:` names) the frontend can render:
   tool_done     {name, tool_use_id, seconds, ok}
   done          {seconds, model}
   error         {message}
+
+/plan/2027 reuses meta, status, tool, tool_done, cmo_delta, done and error, and adds:
+  plan          PLAN_2027 numbers, sent as soon as the procedure returns
+  channel_plan  one per channel: numbers + verdict, rationale, actions, risk, source (agent|fallback)
+  targets       targets block of the plan
 """
 import asyncio
 import json
@@ -19,6 +24,7 @@ from typing import AsyncIterator
 
 import httpx
 
+from . import plan as plan_helpers
 from . import queries
 from . import snowflake as sf
 
@@ -43,9 +49,13 @@ async def _channel(ch: dict, question: str, client: httpx.AsyncClient) -> dict:
         return {"channel": ch["channel_id"], "state": "error", "text": str(e)[:500], "seconds": round(time.monotonic() - t, 1)}
 
 
-async def _cmo_stream(messages: list[dict]) -> AsyncIterator[str]:
-    model = await asyncio.to_thread(sf.agent_model, "CORE", "CMO_AGENT")
-    yield sse("meta", {"model": model})
+async def _cmo_stream(messages: list[dict], capture: dict | None = None) -> AsyncIterator[str]:
+    """With `capture`, the caller owns meta and the answer: tool calls and results go to capture["calls"], the answer to capture["text"]."""
+    if capture is None:
+        model = await asyncio.to_thread(sf.agent_model, "CORE", "CMO_AGENT")
+        yield sse("meta", {"model": model})
+    else:
+        capture["calls"] = {}
     started: dict[str, tuple[str, float]] = {}  # tool_use_id -> (name, start)
     held = ""  # text before a tool call is narration, so only text after the last tool call is sent
     events = sf.stream_agent("CORE", "CMO_AGENT", messages).__aiter__()
@@ -70,9 +80,13 @@ async def _cmo_stream(messages: list[dict]) -> AsyncIterator[str]:
             elif event == "response.tool_use":
                 held = ""
                 started[data.get("tool_use_id")] = (data.get("name"), time.monotonic())
+                if capture is not None:
+                    capture["calls"][data.get("tool_use_id")] = {"name": data.get("name"), "input": data.get("input")}
                 yield sse("tool", {"name": data.get("name"), "input": data.get("input"), "tool_use_id": data.get("tool_use_id")})
             elif event == "response.tool_result":
                 name, t_start = started.pop(data.get("tool_use_id"), (data.get("name"), time.monotonic()))
+                if capture is not None and data.get("tool_use_id") in capture["calls"] and data.get("status") != "error":
+                    capture["calls"][data["tool_use_id"]]["result"] = data
                 yield sse("tool_done", {"name": name, "tool_use_id": data.get("tool_use_id"),
                                         "seconds": round(time.monotonic() - t_start, 1), "ok": data.get("status") != "error"})
             elif event == "response.status":
@@ -85,7 +99,9 @@ async def _cmo_stream(messages: list[dict]) -> AsyncIterator[str]:
         nxt.cancel()
         await asyncio.gather(nxt, return_exceptions=True)
         await events.aclose()
-    if held:
+    if capture is not None:
+        capture["text"] = held
+    elif held:
         yield sse("cmo_delta", {"text": held})
 
 
@@ -134,3 +150,48 @@ async def ask(messages: list[dict]) -> AsyncIterator[str]:
     async for chunk in _cmo_stream(messages):
         yield chunk
     yield sse("done", {"seconds": round(time.monotonic() - t0, 1), "model": sf.agent_model("CORE", "CMO_AGENT")})
+
+
+def _plan_prompt(i: dict) -> str:
+    return (f"Plan 2027. Inputs: marketing budget ${i['budget_usd']:,.0f}; new revenue target ${i['revenue_target_usd']:,.0f}; "
+            f"sales leads (SQLs) per quarter {i['sqls_per_quarter']:g}; brand and awareness share of the budget {i['brand_pct']:.0%}. "
+            f"Call plan_2027 with budget={i['budget_usd']:g}, revenue_target={i['revenue_target_usd']:g}, "
+            f"sqls_per_quarter={i['sqls_per_quarter']:g}, brand_pct={i['brand_pct']:g}, then ask every channel in parallel.")
+
+
+async def plan_2027(inputs: dict) -> AsyncIterator[str]:
+    """Numbers first (deterministic, seconds), then the CMO agent delegates to every channel agent for verdicts and actions.
+    A failed or malformed agent answer degrades to deterministic actions; the plan is saved either way."""
+    t0 = time.monotonic()
+    try:
+        model = await asyncio.to_thread(sf.agent_model, "CORE", "CMO_AGENT")
+    except Exception:
+        model = None
+    yield sse("meta", {"model": model})
+    yield sse("status", {"stage": "plan", "message": "computing budgets per channel"})
+    try:
+        numbers = await asyncio.to_thread(queries.plan_numbers, inputs["budget_usd"], inputs["revenue_target_usd"],
+                                          inputs["sqls_per_quarter"], inputs["brand_pct"])
+    except ValueError as e:
+        yield sse("error", {"message": str(e)})
+        return
+    yield sse("plan", numbers)
+    capture: dict = {}
+    try:
+        async for chunk in _cmo_stream([{"role": "user", "content": [{"type": "text", "text": _plan_prompt(inputs)}]}], capture):
+            yield chunk
+    except Exception as e:  # the plan is still useful without the agent
+        yield sse("error", {"message": f"CMO agent failed, using fallback actions: {str(e)[:300]}"})
+    agent = plan_helpers.parse_agent_json(capture.get("text", ""))
+    channels = plan_helpers.merge_channels(numbers, agent, plan_helpers.channel_answers(capture.get("calls", {})))
+    for c in channels:
+        yield sse("channel_plan", c)
+    yield sse("targets", numbers["targets"])
+    summary = agent.get("summary") if agent and isinstance(agent.get("summary"), str) and agent["summary"].strip() else plan_helpers.fallback_summary(numbers)
+    yield sse("cmo_delta", {"text": summary})
+    try:
+        plan_id = await asyncio.to_thread(queries.save_plan, inputs, numbers, channels, summary, model)
+    except Exception as e:
+        plan_id = None
+        yield sse("error", {"message": f"Plan not saved: {str(e)[:300]}"})
+    yield sse("done", {"seconds": round(time.monotonic() - t0, 1), "model": model, "plan_id": plan_id})

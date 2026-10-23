@@ -118,3 +118,34 @@ BEGIN
   RETURN 'FUNNEL_RAW rebuilt, FUNNEL_SNAPSHOT refreshed';
 END;
 $$;
+
+-- 2027 plan: inputs live in ASSUMPTIONS so the UI and the CMO agent share them; runs and campaign drafts are kept.
+MERGE INTO CMO_DB.CORE.ASSUMPTIONS t USING (
+  SELECT * FROM VALUES
+    ('PLAN_2027_BUDGET_USD',   1000000, NULL, '2027 plan input: marketing budget'),
+    ('REVENUE_TARGET_USD',     5000000, NULL, '2027 plan input: new revenue target'),
+    ('SQL_TARGET_PER_QUARTER', 60,      NULL, '2027 plan input: sales leads (SQLs) per quarter'),
+    ('BRAND_PCT',              0.1,     NULL, '2027 plan input: share of the budget reserved for brand and awareness channels')
+  AS v(key, num, txt, note)
+) s ON t.key = s.key
+WHEN NOT MATCHED THEN INSERT VALUES (s.key, s.num, s.txt, s.note);
+
+CREATE TABLE IF NOT EXISTS CMO_DB.CORE.PLAN_RUNS (
+  plan_id    STRING PRIMARY KEY,
+  created_at TIMESTAMP_LTZ DEFAULT CURRENT_TIMESTAMP(),
+  inputs     VARIANT,
+  numbers    VARIANT,   -- full PLAN_2027 output
+  channels   VARIANT,   -- merged channel plans: numbers + verdict, rationale, actions, risk, source
+  targets    VARIANT,
+  summary    STRING,
+  model      STRING
+);
+
+CREATE TABLE IF NOT EXISTS CMO_DB.CORE.CAMPAIGN_DRAFTS (
+  campaign_id STRING PRIMARY KEY,
+  plan_id     STRING,
+  channel_id  STRING,
+  created_at  TIMESTAMP_LTZ DEFAULT CURRENT_TIMESTAMP(),
+  status      STRING DEFAULT 'draft',
+  brief       VARIANT
+);

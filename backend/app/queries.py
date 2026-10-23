@@ -4,8 +4,10 @@ import json
 import os
 import threading
 import time
+import uuid
 from collections import defaultdict
 
+from . import plan as plan_helpers
 from . import snowflake as sf
 
 CACHE_TTL_S = float(os.getenv("CMO_CACHE_TTL_S", "300"))
@@ -69,7 +71,10 @@ CAMPAIGNS_SQL = """WITH c AS (
 SELECT c.*, m.metrics FROM c LEFT JOIN m USING (campaign)
 ORDER BY cost_per_sql NULLS LAST, mqls DESC NULLS LAST"""
 UNIT_ECON_SQL = "CALL CMO_DB.CORE.UNIT_ECON(%s, %s)"
-JSON_COLS = ("deltas", "impact", "validation", "mapping", "metrics", "channels_without_spend")
+PLAN_2027_SQL = "CALL CMO_DB.CORE.PLAN_2027(%s, %s, %s, %s)"
+PLAN_RUN_SQL = "SELECT plan_id, created_at, inputs, numbers, channels, targets, summary, model FROM CMO_DB.CORE.PLAN_RUNS"
+JSON_COLS = ("deltas", "impact", "validation", "mapping", "metrics", "channels_without_spend", "brief")
+PLAN_JSON_COLS = ("inputs", "numbers", "channels", "targets")
 
 
 def _rows(sql: str, params=None) -> list[dict]:
@@ -155,3 +160,60 @@ def set_assumption(key: str, num: float | None, txt: str | None) -> dict:
 @writes
 def reset_decisions() -> str:
     return sf.query("CALL CMO_DB.CORE.RESET_DECISIONS()")[0]["reset_decisions"]
+
+
+def plan_numbers(budget: float, revenue_target: float, sqls_per_quarter: float, brand_pct: float) -> dict:
+    res = json.loads(sf.query(PLAN_2027_SQL, (budget, revenue_target, sqls_per_quarter, brand_pct))[0]["plan_2027"])
+    if "error" in res:
+        raise ValueError(res["error"])
+    return res
+
+
+def _plan_run(sql: str, params=None) -> dict | None:
+    rows = sf.query(sql, params)
+    if not rows:
+        return None
+    row = rows[0]
+    for k in PLAN_JSON_COLS:
+        row[k] = json.loads(row[k])
+    return {"plan_id": row["plan_id"], "created_at": row["created_at"], "inputs": row["inputs"], "totals": row["numbers"]["totals"],
+            "targets": row["targets"], "channels": row["channels"], "summary": row["summary"], "model": row["model"]}
+
+
+@cached
+def plan_latest() -> dict:
+    sql = PLAN_RUN_SQL + " ORDER BY created_at DESC LIMIT 1"
+    return _with_sql(_plan_run(sql), sql)
+
+
+@writes
+def save_plan(inputs: dict, numbers: dict, channels: list, summary: str, model: str | None) -> str:
+    plan_id = uuid.uuid4().hex[:12]
+    sf.execute("""INSERT INTO CMO_DB.CORE.PLAN_RUNS (plan_id, inputs, numbers, channels, targets, summary, model)
+                  SELECT %s, PARSE_JSON(%s), PARSE_JSON(%s), PARSE_JSON(%s), PARSE_JSON(%s), %s, %s""",
+               (plan_id, json.dumps(inputs), json.dumps(numbers), json.dumps(channels), json.dumps(numbers["targets"]), summary, model))
+    return plan_id
+
+
+def _draft(row: dict) -> dict:
+    return {k: row[k] for k in ("campaign_id", "plan_id", "channel_id", "created_at", "status", "brief")} | {"stub": True}
+
+
+@writes
+def create_campaign_draft(plan_id: str, channel_id: str) -> dict:
+    run = _plan_run(PLAN_RUN_SQL + " WHERE plan_id = %s", (plan_id,))
+    if not run:
+        raise KeyError(f"no plan {plan_id!r}")
+    ch = next((c for c in run["channels"] if c["channel_id"] == channel_id), None)
+    if not ch:
+        raise KeyError(f"plan {plan_id!r} has no channel {channel_id!r}")
+    campaign_id = uuid.uuid4().hex[:12]
+    sf.execute("INSERT INTO CMO_DB.CORE.CAMPAIGN_DRAFTS (campaign_id, plan_id, channel_id, brief) SELECT %s, %s, %s, PARSE_JSON(%s)",
+               (campaign_id, plan_id, channel_id, json.dumps(plan_helpers.build_brief(ch))))
+    return _draft(_rows("SELECT * FROM CMO_DB.CORE.CAMPAIGN_DRAFTS WHERE campaign_id = %s", (campaign_id,))[0])
+
+
+@cached
+def campaign_drafts(channel_id: str | None = None) -> dict:
+    sql = "SELECT * FROM CMO_DB.CORE.CAMPAIGN_DRAFTS WHERE %s IS NULL OR channel_id = %s ORDER BY created_at DESC"
+    return _with_sql([_draft(r) for r in _rows(sql, (channel_id, channel_id))], sql, (channel_id, channel_id))

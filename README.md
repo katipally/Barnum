@@ -204,11 +204,31 @@ What happens:
 | `GET /plan/current` | planned vs current annual spend per budget channel |
 | `GET /plan/scenarios?budget=&rule=12mo\|3yr` | optimal split, unallocated budget, customers, ARR, avg and last-customer CAC, payback, year-1 and 3-year net, scale ceiling, scenario table |
 | `GET /memos?status=`, `POST /memos/{id}/approve\|reject` | decision log. Approving updates `ALLOCATION` |
+| `POST /plan/2027` | **SSE**: 2027 plan. Body `{budget_usd, revenue_target_usd, sqls_per_quarter, brand_pct}`. Numbers first (`plan`), then the CMO's verdict and actions per channel (`channel_plan`), `targets`, `cmo_delta`, `done {plan_id}` |
+| `GET /plan/2027/latest` | the last saved 2027 plan, or `null` |
+| `POST /campaigns/draft`, `GET /campaigns?channel_id=` | campaign draft stub built from a saved plan; nothing is sent to an ad platform |
 | `POST /ask` | **SSE**: free-form question to the CMO, which delegates via `ask_channel` |
 | `GET /assumptions`, `PUT /assumptions/{key}` | every non-measured number (ACV, margin, win rate, curve exponents, scale cap...) |
 | `POST /decisions/reset` | clears decisions and approved plans; uploaded data is untouched |
 
 SSE events: `strip`, `delegation {channel, state, text, seconds}`, `memo`, `status`, `tool {name, input}`, `cmo_delta {text}` (the CMO's answer; narration before a tool call is dropped), `done`, `error`.
+
+## 2027 Plan
+
+Inputs (defaults seeded in `ASSUMPTIONS`, editable with `PUT /assumptions/{key}`): marketing budget (`PLAN_2027_BUDGET_USD`), revenue target (`REVENUE_TARGET_USD`), SQLs per quarter (`SQL_TARGET_PER_QUARTER`) and the brand and awareness share of the budget (`BRAND_PCT`).
+
+Outputs: a budget per channel, projected SQLs, customers and new ARR against the targets, the budget the targets would need, and per channel a verdict (start, scale, optimize, maintain, cut) with campaign actions.
+
+How the CMO delegates. `POST /plan/2027` first calls `CORE.PLAN_2027`, which is deterministic and returns in seconds, so budgets render at once. Then `CMO_AGENT` calls its `plan_2027` tool and `ask_channel` for every channel in parallel, each channel agent judging its own data at its proposed budget. The CMO returns verdicts and actions as JSON; numbers are never taken from the model. If the agent fails or omits a channel, deterministic actions fill in (`source: "fallback"`). Runs are saved in `PLAN_RUNS`.
+
+Allocation (`sql/25_plan_2027.sql`, same response curves as `UNIT_ECON`):
+- **brand**: channels with awareness metrics (`PLAN_AWARENESS_METRICS`) and no SQL cost curve, plus one-off flights such as billboards. They share `BRAND_PCT × budget` pro rata to current spend; a brand channel with no spend counts as the average spend-bearing one.
+- **unpriced**: outcomes but no spend data (outbound, conferences, email threads). Each gets a `PLAN_TEST_BUDGET_USD` test budget (at most half of what remains after brand) and keeps its run-rate SQLs.
+- **performance**: the rest, greedy on marginal SQLs per dollar, each channel capped at `SCALE_CAP_X` times its run rate. Budget that does not fit is `unallocated_usd`.
+
+Campaigns are a stub: `POST /campaigns/draft {plan_id, channel_id}` writes a draft brief (name, objective, budget, KPIs, steps) to `CAMPAIGN_DRAFTS`. Full contract: `docs/PLAN_2027_CONTRACT.md`.
+
+Existing deployment: rerun `uv run python -m backend.app.setup` (idempotent). It creates `PLAN_RUNS` and `CAMPAIGN_DRAFTS`, seeds the inputs, creates `PLAN_2027` and redeploys `CMO_AGENT` with the `plan_2027` tool.
 
 ## The model
 
@@ -229,9 +249,9 @@ tests/smoke.sh 3           # full flow 3 times in a row against a running API (r
 ## Layout
 
 ```
-sql/              00_setup  10_core  20_unit_econ  30_decisions  40_cmo_agent  50_mcp
+sql/              00_setup  10_core  20_unit_econ  25_plan_2027  30_decisions  40_cmo_agent  50_mcp
 templates/        channel.sql.j2 (one channel's full stack)  cmo_agent.sql.j2
-backend/app/      main.py  orchestrator.py  queries.py  snowflake.py  setup.py
+backend/app/      main.py  orchestrator.py  queries.py  plan.py  snowflake.py  setup.py
 backend/app/channels/  ingest.py  mapping.py  provision.py
 seed/             load_real.py  mappings/ (hand-written channel mappings)
 frontend/         Next.js app, connects through CMO_API_URL

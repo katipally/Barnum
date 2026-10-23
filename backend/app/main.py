@@ -194,6 +194,40 @@ def plan_current():
     return queries.plan()
 
 
+class PlanIn(BaseModel):
+    budget_usd: float = Field(gt=0, le=1e12, allow_inf_nan=False)
+    revenue_target_usd: float = Field(ge=0, le=1e13, allow_inf_nan=False)
+    sqls_per_quarter: float = Field(ge=0, le=1e9, allow_inf_nan=False)
+    brand_pct: float = Field(ge=0, le=1, allow_inf_nan=False, description="Share of the budget reserved for brand and awareness, 0 to 1")
+
+
+@app.post("/plan/2027")
+def plan_2027(body: PlanIn):
+    """SSE: plan numbers first, then the CMO agent's verdicts and campaign actions per channel. See docs/PLAN_2027_CONTRACT.md."""
+    return _sse(orchestrator.guarded(orchestrator.plan_2027(body.model_dump())))
+
+
+@app.get("/plan/2027/latest")
+def plan_2027_latest():
+    return queries.plan_latest()
+
+
+class DraftIn(BaseModel):
+    plan_id: str
+    channel_id: str
+
+
+@app.post("/campaigns/draft")
+def campaign_draft(body: DraftIn):
+    """Stub: records a draft brief built from the saved plan; nothing is sent to any ad platform."""
+    return {"data": _guard(queries.create_campaign_draft, body.plan_id, body.channel_id)}
+
+
+@app.get("/campaigns")
+def list_campaigns(channel_id: str | None = None):
+    return queries.campaign_drafts(channel_id)
+
+
 @app.get("/plan/scenarios")
 def plan_scenarios(budget: float = 1_000_000, rule: str = "12mo"):
     if rule not in ("12mo", "3yr"):
