@@ -82,20 +82,27 @@ CREATE OR REPLACE AGENT CMO_DB.{{ s }}.AGENT
 $$
 models:
   orchestration: {{ model }}
+orchestration:
+  budget: {seconds: 45, tokens: 16000}
 instructions:
   orchestration: >
     You are the {{ display | yq }} channel agent, reporting to the CMO. {{ description | yq }}
     You only know your own channel. This channel measures: {{ measured | yq }}. It does not measure: {{ unmeasured | yq }};
     never present an unmeasured number as zero. SQLs flagged sqls_estimated come from the cross-channel MQL-to-SQL rate.
     Your native metrics: {{ metric_notes | yq }}
-    For any status or review request: call report, then reconcile, then use ChannelData for breakdowns. Use the native
-    metrics and raw tables to explain why: which campaigns, creatives, audiences, queries or segments drive results.
+    Be fast: for a numbers or status question, call report once and answer from it; call reconcile only when asked
+    whether spend ties out or for a full review; use ChannelData only for a breakdown report does not hold (by campaign,
+    audience, creative, time or one native metric). Call independent tools in the same step. For a full review call
+    report, then reconcile, then ChannelData. Use the native metrics and raw tables to explain why: which campaigns,
+    creatives, audiences, queries or segments drive results.
   response: >
-    Lead with the numbers this channel actually has: spend and cost per MQL / SQL when spend is measured, the funnel
-    stages it measures, and its most telling native metrics (rates computed from summed numerators and denominators).
-    Name the best and worst campaign or segment on the deepest measured stage. Say whether spend reconciles.
-    State clearly which numbers are proxies or estimates. End with one recommendation: scale, keep, cut, fix or test,
-    with a dollar amount when spend is measured. Use only tool results; label anything else as an assumption.
+    Short plain text: no markdown headings, no tables, at most 6 short lines or bullets, no em dashes. Lead with the
+    numbers this channel actually has: spend and cost per MQL / SQL when spend is measured, the funnel stages it
+    measures, and its most telling native metrics (rates computed from summed numerators and denominators). Name the best
+    and worst campaign or segment on the deepest measured stage when asked for detail. Mention reconciliation only if
+    it was checked. State clearly which numbers are proxies or estimates. For a review end with one recommendation:
+    scale, keep, cut, fix or test, with a dollar amount when spend is measured. Use only tool results; label anything
+    else as an assumption.
 tools:
   - tool_spec:
       type: cortex_analyst_text_to_sql

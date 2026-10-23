@@ -3,6 +3,7 @@ import json
 import os
 import threading
 import tomllib
+from functools import lru_cache
 from pathlib import Path
 from typing import Any, AsyncIterator
 
@@ -73,6 +74,13 @@ def _headers() -> dict:
 
 def _agent_url(schema: str, agent: str) -> str:
     return f"{_base_url()}/databases/{DB}/schemas/{schema}/agents/{agent}:run"
+
+
+@lru_cache(maxsize=16)
+def agent_model(schema: str, agent: str) -> str | None:
+    """Orchestration model from the deployed agent's spec."""
+    rows = query(f"DESCRIBE AGENT {DB}.{ident(schema)}.{ident(agent)}")
+    return json.loads(rows[0]["agent_spec"]).get("models", {}).get("orchestration") if rows else None
 
 
 async def run_agent(schema: str, agent: str, question: str, client: httpx.AsyncClient) -> dict:

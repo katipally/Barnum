@@ -11,23 +11,34 @@ FROM CMO_DB.CORE.CHANNEL_SUMMARY
 WHERE annual_spend_usd > 0 AND annual_sqls > 0;
 
 -- Five headline numbers. Cost metrics cover only channels whose spend is measured.
+-- Reads CHANNEL_SUMMARY once: each extra reference re-expands the whole funnel view stack and costs seconds of compile time.
 CREATE OR REPLACE VIEW CMO_DB.CORE.EXEC_STRIP AS
-WITH paid AS (SELECT * FROM CMO_DB.CORE.CHANNEL_SUMMARY WHERE spend_usd IS NOT NULL)
-SELECT (SELECT SUM(spend_usd) FROM paid)                                   AS measured_spend_usd,
-       (SELECT SUM(annual_spend_usd) FROM paid)                            AS annual_run_rate_usd,
-       (SELECT SUM(mqls) FROM CMO_DB.CORE.CHANNEL_SUMMARY)                 AS mqls,
-       (SELECT SUM(sqls) FROM CMO_DB.CORE.CHANNEL_SUMMARY)                 AS sqls,
-       (SELECT SUM(spend_usd) / NULLIF(SUM(mqls), 0) FROM paid)            AS cost_per_mql,
-       (SELECT SUM(spend_usd) / NULLIF(SUM(sqls), 0) FROM paid)            AS cost_per_sql,
+WITH s AS (SELECT * FROM CMO_DB.CORE.CHANNEL_SUMMARY),
+t AS (
+  SELECT SUM(spend_usd)                                                  AS measured_spend_usd,
+         SUM(annual_spend_usd)                                           AS annual_run_rate_usd,
+         SUM(mqls)                                                       AS mqls,
+         SUM(sqls)                                                       AS sqls,
+         SUM(IFF(spend_usd IS NOT NULL, mqls, NULL))                     AS paid_mqls,
+         SUM(IFF(spend_usd IS NOT NULL, sqls, NULL))                     AS paid_sqls,
+         BOOLOR_AGG(IFF(spend_usd IS NOT NULL, sqls_estimated, NULL))    AS sqls_estimated,
+         ARRAY_AGG(IFF(spend_usd IS NULL, channel_id, NULL))             AS channels_without_spend,
+         SUM(IFF(annual_spend_usd > 0 AND annual_sqls > 0,
+                 annual_sqls * POWER(COALESCE(plan_usd, annual_spend_usd) / annual_spend_usd, response_exponent), NULL)) AS plan_projected_sqls,
+         SUM(IFF(annual_spend_usd > 0 AND annual_sqls > 0, COALESCE(plan_usd, annual_spend_usd), NULL)) AS plan_budget_usd
+  FROM s
+)
+SELECT measured_spend_usd, annual_run_rate_usd, mqls, sqls,
+       measured_spend_usd / NULLIF(paid_mqls, 0)                           AS cost_per_mql,
+       measured_spend_usd / NULLIF(paid_sqls, 0)                           AS cost_per_sql,
        cost_per_sql / CMO_DB.CORE.A('SQL_TO_WON')                          AS cac_media_usd,
        cac_media_usd + CMO_DB.CORE.A('SALES_COST_PER_WON')                 AS cac_full_usd,
        cac_full_usd / (CMO_DB.CORE.A('ACV_USD') * CMO_DB.CORE.A('GROSS_MARGIN') / 12) AS payback_months,
-       (SELECT BOOLOR_AGG(sqls_estimated) FROM paid)                       AS sqls_estimated,
-       (SELECT rate FROM CMO_DB.CORE.MQL_TO_SQL_RATE)                      AS mql_to_sql_rate,
-       (SELECT source FROM CMO_DB.CORE.MQL_TO_SQL_RATE)                    AS mql_to_sql_source,
-       (SELECT ARRAY_AGG(channel_id) FROM CMO_DB.CORE.CHANNEL_SUMMARY WHERE spend_usd IS NULL) AS channels_without_spend,
-       (SELECT SUM(projected_sqls) FROM CMO_DB.CORE.PLAN_PROJECTION)       AS plan_projected_sqls,
-       (SELECT SUM(planned_usd) FROM CMO_DB.CORE.PLAN_PROJECTION)          AS plan_budget_usd;
+       sqls_estimated,
+       r.rate                                                              AS mql_to_sql_rate,
+       r.source                                                            AS mql_to_sql_source,
+       channels_without_spend, plan_projected_sqls, plan_budget_usd
+FROM t CROSS JOIN CMO_DB.CORE.MQL_TO_SQL_RATE r;
 
 -- Optimize a budget across budget-bought channels on SQLs. BUDGET NULL = current annual run rate (pure mix change).
 CREATE OR REPLACE PROCEDURE CMO_DB.CORE.PROPOSE_REALLOCATION(BUDGET FLOAT)
