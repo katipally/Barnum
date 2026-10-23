@@ -3,6 +3,7 @@
 // Typed client for the server layer. UI code talks to the backend only through these functions.
 import { useCallback, useEffect, useState } from "react";
 import type {
+  AskEvent,
   CaseId,
   CaseSummary,
   CompanyInput,
@@ -42,8 +43,8 @@ export const api = {
       headers: { "content-type": "application/json" },
       body: JSON.stringify(update),
     }).then(json<WeeklyBrief>),
-  // Streams plain text chunks of the CMO agent's answer.
-  ask: async (c: CaseId, question: string, onChunk: (text: string) => void) => {
+  // Streams the CMO agent's work and answer as events (NDJSON).
+  ask: async (c: CaseId, question: string, onEvent: (e: AskEvent) => void) => {
     const res = await fetch(`/api/companies/${c}/ask`, {
       method: "POST",
       headers: { "content-type": "application/json" },
@@ -52,11 +53,21 @@ export const api = {
     if (!res.ok || !res.body) throw new Error(`${res.status}`);
     const reader = res.body.getReader();
     const dec = new TextDecoder();
+    let buf = "";
+    const flush = (line: string) => {
+      if (line.trim()) onEvent(JSON.parse(line) as AskEvent);
+    };
     for (;;) {
       const { done, value } = await reader.read();
       if (done) break;
-      onChunk(dec.decode(value, { stream: true }));
+      buf += dec.decode(value, { stream: true });
+      let i;
+      while ((i = buf.indexOf("\n")) >= 0) {
+        flush(buf.slice(0, i));
+        buf = buf.slice(i + 1);
+      }
     }
+    flush(buf);
   },
 };
 

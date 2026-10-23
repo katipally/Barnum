@@ -20,7 +20,7 @@ export const mockProvider: CmoProvider = {
   async listCases() {
     return seedSummaries();
   },
-  ask(caseId: CaseId, question: string, data: CaseData) {
-    return askMock(caseId, question, data);
+  async *ask(caseId: CaseId, question: string, data: () => Promise<CaseData>) {
+    yield* askMock(caseId, question, await data());
   },
 };

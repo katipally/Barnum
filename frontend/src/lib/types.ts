@@ -241,3 +241,11 @@ export interface SteeringUpdate {
   guardrails?: Partial<Pick<Guardrails, "budgetTotal" | "autonomyPct" | "brandFloorPct">>;
   objectivePriorities?: { id: string; priority: number }[];
 }
+
+// One line of the ask stream (NDJSON). Answer text arrives as "text"; status/tool describe the agent's work.
+export type AskEvent =
+  | { type: "text"; text: string }
+  | { type: "status"; message: string }
+  | { type: "tool"; name: string; input?: Record<string, unknown> }
+  | { type: "error"; message: string }
+  | { type: "done" };

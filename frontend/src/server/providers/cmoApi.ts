@@ -3,6 +3,7 @@
 import type {
   Action,
   AgentLogEntry,
+  AskEvent,
   CaseData,
   CaseId,
   CaseSummary,
@@ -247,7 +248,7 @@ let lastAskAt = 0;
 
 const msg = (role: AgentMessage["role"], text: string): AgentMessage => ({ role, content: [{ type: "text", text }] });
 
-async function* askLive(question: string): AsyncIterable<string> {
+async function* askLive(question: string): AsyncIterable<string | AskEvent> {
   if (Date.now() - lastAskAt > HISTORY_IDLE_MS) history = [];
   lastAskAt = Date.now();
   const res = await fetch(`${base()}/ask`, {
@@ -277,14 +278,23 @@ async function* askLive(question: string): AsyncIterable<string> {
         buf = buf.slice(i + 1);
         if (line.startsWith("event:")) event = line.slice(6).trim();
         else if (line.startsWith("data:")) {
-          const payload = JSON.parse(line.slice(5).trim() || "{}") as { text?: string; message?: string };
+          const payload = JSON.parse(line.slice(5).trim() || "{}") as {
+            text?: string;
+            message?: string;
+            name?: string;
+            input?: Record<string, unknown>;
+          };
           // cmo_delta: teammate's orchestrator /ask; token: the earlier backend.
           if ((event === "cmo_delta" || event === "token") && payload.text) {
             answer += payload.text;
             yield payload.text;
+          } else if (event === "status" && payload.message) {
+            yield { type: "status", message: payload.message };
+          } else if (event === "tool" && payload.name) {
+            yield { type: "tool", name: payload.name, input: payload.input };
           } else if (event === "error") {
             failed = true;
-            yield `\n[CMO agent error] ${payload.message ?? JSON.stringify(payload)}`;
+            yield { type: "error", message: payload.message ?? JSON.stringify(payload) };
           } else if (event === "done") {
             complete = true;
             return;
@@ -293,6 +303,7 @@ async function* askLive(question: string): AsyncIterable<string> {
       }
     }
   } finally {
+    await reader.cancel().catch(() => {});
     // Only finished, error-free answers become history; a cancelled stream would leave half an answer.
     if (complete && !failed && answer.trim()) {
       history = [...history, msg("user", question), msg("assistant", answer)].slice(-HISTORY_TURNS * 2);
@@ -313,7 +324,7 @@ export const cmoApiProvider: CmoProvider = {
     const res = await fetch(`${base()}/memos/${encodeURIComponent(decisionId)}/${status === "approved" ? "approve" : "reject"}`, { method: "POST" });
     if (!res.ok) throw new Error(`CMO API decide: ${res.status} ${await res.text()}`);
   },
-  ask(caseId: CaseId, question: string, data: CaseData) {
+  ask(caseId: CaseId, question: string, data: () => Promise<CaseData>) {
     return caseId === LIVE_ID ? askLive(question) : mockProvider.ask(caseId, question, data);
   },
 };

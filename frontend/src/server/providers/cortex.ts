@@ -69,7 +69,8 @@ async function* parseSse(body: ReadableStream<Uint8Array>): AsyncGenerator<{ eve
   }
 }
 
-async function* askCortex(caseId: CaseId, question: string, data: CaseData): AsyncGenerator<string> {
+async function* askCortex(caseId: CaseId, question: string, load: () => Promise<CaseData>): AsyncGenerator<string> {
+  const data = await load();
   const e = env();
   if (!e) {
     console.warn("[cortex] SNOWFLAKE_* env vars missing, falling back to mock answer");
@@ -126,7 +127,7 @@ export const cortexProvider: CmoProvider = {
     void company;
     return null;
   },
-  ask(caseId: CaseId, question: string, data: CaseData) {
+  ask(caseId: CaseId, question: string, data: () => Promise<CaseData>) {
     return askCortex(caseId, question, data);
   },
 };
