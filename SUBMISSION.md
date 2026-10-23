@@ -52,7 +52,7 @@ FastAPI --PAT--> Snowflake CMO_DB
 **(g) Viability**
 > Owner after today: the Head of Marketing / RevOps of a B2B company that already keeps ad and CRM data in Snowflake. Next step: run it on one real quarter, read-only, as a shadow CMO. Compare its memos with what the team actually did, and only then grant write access to ad platforms behind the same autonomy limit.
 
-**(h) Public GitHub repo:** https://github.com/katipally/CMO-Agent
+**(h) Public GitHub repo:** https://github.com/katipally/Barnum
 
 **(i) One-minute video:** _TODO link_. The script is in §3.
 

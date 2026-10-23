@@ -19,6 +19,7 @@ Events (SSE `event:` names) the frontend can render:
 """
 import asyncio
 import json
+import re
 import time
 from typing import AsyncIterator
 
@@ -113,7 +114,7 @@ async def _cmo_stream(messages: list[dict], capture: dict | None = None, run: di
     if capture is not None:
         capture["text"] = held
     elif held:
-        yield sse("cmo_delta", {"text": held})
+        yield sse("cmo_delta", {"text": _prose_from_plan_json(held)})
 
 
 async def guarded(gen: AsyncIterator[str]) -> AsyncIterator[str]:
@@ -161,6 +162,33 @@ async def review(question: str = REVIEW_QUESTION) -> AsyncIterator[str]:
             except Exception as e:
                 print(f"[memo-runs] could not record {memo['memo_id']}: {e}")
     yield sse("done", {"seconds": round(time.monotonic() - t0, 1), "model": sf.agent_model("CORE", "CMO_AGENT")})
+
+
+_FENCED_JSON = re.compile(r"```json\s*(.*?)\s*```", re.S)
+
+
+def _prose_from_plan_json(text: str) -> str:
+    """Chat must not show the plan-run JSON: a lone fenced json block becomes a summary plus one bullet per channel."""
+    m = _FENCED_JSON.search(text)
+    if not m or len(text) - len(m.group(0)) > 300:
+        return text
+    try:
+        plan = json.loads(m.group(1))
+        channels = plan["channels"]
+        lines = [str(plan.get("summary", "")).strip(), ""] if plan.get("summary") else []
+        for c in channels:
+            budget = c.get("budget_usd")
+            first = next(iter(c.get("actions") or []), {})
+            parts = [f"**{c.get('name') or c.get('channel_id')}**"]
+            if isinstance(budget, (int, float)):
+                parts.append(f"${budget:,.0f}")
+            if c.get("verdict"):
+                parts.append(str(c["verdict"]))
+            action = first.get("title") or first.get("detail")
+            lines.append("- " + ", ".join(parts) + (f". First action: {action}" if action else ""))
+    except (ValueError, KeyError, TypeError, AttributeError):
+        return text
+    return "\n".join(lines)
 
 
 def _fold(history: list[dict], question: str) -> str:
@@ -246,7 +274,7 @@ async def memo_feedback(memo_id: str, decision: str, note: str | None) -> dict:
 
 
 def _plan_prompt(i: dict) -> str:
-    return (f"Plan 2027. Inputs: marketing budget ${i['budget_usd']:,.0f}; new revenue target ${i['revenue_target_usd']:,.0f}; "
+    return (f"PLAN_2027_RUN: Plan 2027. Inputs: marketing budget ${i['budget_usd']:,.0f}; new revenue target ${i['revenue_target_usd']:,.0f}; "
             f"sales leads (SQLs) per quarter {i['sqls_per_quarter']:g}; brand and awareness share of the budget {i['brand_pct']:.0%}. "
             f"Call plan_2027 with budget={i['budget_usd']:g}, revenue_target={i['revenue_target_usd']:g}, "
             f"sqls_per_quarter={i['sqls_per_quarter']:g}, brand_pct={i['brand_pct']:g}, then ask every channel in parallel.")

@@ -92,7 +92,7 @@ The backend reads the profile named by `CMO_CONNECTION` (default `hackathon`), s
 ### 3. Install and set up
 
 ```bash
-git clone https://github.com/katipally/CMO-Agent && cd CMO-Agent
+git clone https://github.com/katipally/Barnum.git && cd Barnum
 uv sync
 export CMO_CONNECTION=cmo
 uv run python -m backend.app.setup     # runs sql/*.sql, deploys CMO_AGENT and the MCP server. Idempotent.

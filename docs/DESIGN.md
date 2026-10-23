@@ -106,7 +106,7 @@ Account check (done): ATTENDEE_ROLE has CORTEX_USER, CREATE DATABASE, ROLE, WARE
 
 ## 7. Repo layout
 ```
-CMO-Agent/
+Barnum/
   docs/DESIGN.md
   sql/        00_setup  10_core  20_unit_econ  30_decisions  40_cmo_agent  50_mcp
   templates/  channel.sql.j2 (MAP, semantic view, REPORT, RECONCILE, AGENT)  cmo_agent.sql.j2

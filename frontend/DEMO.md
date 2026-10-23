@@ -20,7 +20,7 @@ Rule for every claim: **only say what is in the repo.** Ideas that aren't built 
    ```
    With the target set, the headline reads "heading for $899k of our $900k" before approval. After approval it reads $926k.
 3. Frontend: `cd frontend && npm run dev` with `CMO_PROVIDER=cmo-api` in `.env.local`. Open the live company (the first card, "Live from Snowflake") at 1440 × 900, zoom 100%.
-4. Open a terminal tab in `CMO-Agent` with the webinar command already typed (beat 4): `uv run python -m seed.load webinars`.
+4. Open a terminal tab in `Barnum` with the webinar command already typed (beat 4): `uv run python -m seed.load webinars`.
 5. Copy the Ask question: *"Why do you want to take money away from LinkedIn when it brings us the most leads?"*
 6. Fallback: a screen recording of the full run. If Snowflake is slow, play it and narrate.
 
@@ -57,7 +57,7 @@ About 130 words of voice-over. Record from a live run after `/demo/reset`.
 | 18–30 | LinkedIn vs Conferences | "First finding: LinkedIn has the cheapest leads and some of the most expensive pipeline. Only nine percent of its leads become sales-qualified." | Cheapest leads ≠ cheapest pipeline |
 | 30–42 | Decision, Approve | "The fix moves more than the ten percent the CEO lets it move alone, so it asks. One click: same budget, more pipeline, logged in Snowflake." | Acts within limits · asks above them |
 | 42–54 | Terminal webinar load, app refresh | "New channel? Upload a CSV. Claude writes the SQL, a validator reconciles every dollar, and a new agent joins the team." | New channel = one CSV |
-| 54–60 | End card + repo URL | "Barnum. The CEO steers; the agent runs marketing." | github.com/katipally/CMO-Agent |
+| 54–60 | End card + repo URL | "Barnum. The CEO steers; the agent runs marketing." | github.com/katipally/Barnum |
 
 ---
 

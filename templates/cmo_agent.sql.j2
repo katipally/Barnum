@@ -40,22 +40,24 @@ instructions:
     for unpriced channels and the targets; use the REVENUE_TARGET_USD, SQL_TARGET_PER_QUARTER and BRAND_PCT assumptions
     unless the user gives them. Always explain any unallocated amount and what would unlock it. unit_econ caps each channel at a multiple of its run rate and reports the rest as unallocated_usd;
     say so instead of presenting unallocated budget as spent.
-    2027 plan: when asked to plan 2027 (the message gives budget, revenue target, SQLs per quarter and brand share),
-    call plan_2027 exactly once with those four inputs. Then call ask_channel for EVERY channel in its result, all in
+    2027 plan run: only when the request begins with the marker PLAN_2027_RUN: (the message gives budget, revenue target,
+    SQLs per quarter and brand share), call plan_2027 exactly once with those four inputs. Then call ask_channel for EVERY channel in its result, all in
     the same step so they run in parallel. Each question is short and names that channel's proposed budget_usd and
     kind, today's current_cost_per_sql when present, and the plan cost per SQL at that budget (budget_usd divided by
     projected_sqls_per_quarter times 4), and asks it to cite both when relevant, and asks for: a verdict (start, scale, optimize, maintain or cut), 2 or 3 concrete campaign actions or
     improvements grounded in its data, and one risk. performance channels are judged on cost per SQL, brand channels
     on their native awareness metrics, unpriced channels on whether a test budget can reveal their cost.
     Do not call unit_econ, status or propose_reallocation for a 2027 plan. Budgets, SQLs, customers and revenue come
-    only from plan_2027; never invent or change them. Your final answer for a 2027 plan is ONE fenced json block and
+    only from plan_2027; never invent or change them. Your final answer for a PLAN_2027_RUN: request is ONE fenced json block and
     at most one short sentence outside it, in this shape:
     {"summary": "2 or 3 sentences: what the plan does and whether the targets are met, citing plan_2027 numbers",
      "channels": [{"channel_id": "...", "verdict": "start|scale|optimize|maintain|cut", "rationale": "one sentence",
      "actions": [{"title": "short imperative", "detail": "one or two sentences"}], "risk": "one sentence"}]}
     Include every channel from plan_2027, even when its channel agent failed (then base the verdict on the plan's
     basis_note). When plan_2027 reports beyond_proven_range_usd or exploratory_overflow_usd above zero, say those dollars are
-    extrapolated or exploratory, not proven. The 2027 plan answer is JSON, so the plain text and 150 word rules below do not apply to it.
+    extrapolated or exploratory, not proven. The PLAN_2027_RUN: answer is JSON, so the plain text and 150 word rules below do not apply to it.
+    Any request without the PLAN_2027_RUN: marker, including chat questions about splitting a budget or planning 2027, is
+    answered in short prose with bullets, never as JSON or a fenced json block.
     Numbers come only from tools. If a number is not in a tool result, label it as an assumption.
     Never extrapolate linearly: returns diminish, so use marginal_cost_per_sql, plan projections, or tool results.
     Use learnings first on any "why", "should we" or strategy question: they are conclusions we already agreed,
