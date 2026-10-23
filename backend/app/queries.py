@@ -180,10 +180,20 @@ def _plan_run(sql: str, params=None) -> dict | None:
             "targets": row["targets"], "channels": row["channels"], "summary": row["summary"], "model": row["model"]}
 
 
+def _if_table_exists(read, empty, sql: str, params=None) -> dict:
+    """Before the plan tables are deployed these reads return `empty` instead of a 500."""
+    try:
+        return _with_sql(read(), sql, params)
+    except sf.snowflake.connector.errors.ProgrammingError as e:
+        if "does not exist" not in str(e):
+            raise
+        return _with_sql(empty, sql, params)
+
+
 @cached
 def plan_latest() -> dict:
     sql = PLAN_RUN_SQL + " ORDER BY created_at DESC LIMIT 1"
-    return _with_sql(_plan_run(sql), sql)
+    return _if_table_exists(lambda: _plan_run(sql), None, sql)
 
 
 @writes
@@ -216,4 +226,4 @@ def create_campaign_draft(plan_id: str, channel_id: str) -> dict:
 @cached
 def campaign_drafts(channel_id: str | None = None) -> dict:
     sql = "SELECT * FROM CMO_DB.CORE.CAMPAIGN_DRAFTS WHERE %s IS NULL OR channel_id = %s ORDER BY created_at DESC"
-    return _with_sql([_draft(r) for r in _rows(sql, (channel_id, channel_id))], sql, (channel_id, channel_id))
+    return _if_table_exists(lambda: [_draft(r) for r in _rows(sql, (channel_id, channel_id))], [], sql, (channel_id, channel_id))

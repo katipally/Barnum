@@ -39,11 +39,13 @@ Events, in order of arrival:
            notes: [str]}}
 ```
 
+`projected_native` is `{metric: value}` with numeric values (for example `{"impressions": 4106667}`) for brand channels with a cost curve, else `null`. `gap` and `gap_usd` are positive for a shortfall and `0` when the target is met, never negative.
+
 `budget_needed_for_targets_usd` is null when no budget reaches the targets under the scale caps (`limited_by` says why). `needed_customers` and `needed_sqls_per_year` are additive fields inside `targets.revenue`.
 
 ## GET /plan/2027/latest
 
-`{data: {plan_id, created_at, inputs, totals, targets, channels: [channel_plan], summary, model} | null, sql}`
+`{data: {plan_id, created_at, inputs, totals, targets, channels: [channel_plan], summary, model} | null, sql}`. `data` is `null` when no plan is saved or the plan tables are not deployed yet; `GET /campaigns` returns `[]` in the same case.
 
 ## POST /campaigns/draft
 

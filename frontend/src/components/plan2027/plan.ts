@@ -92,16 +92,8 @@ export const VERDICT_STYLE: Record<PlanVerdict, string> = {
   cut: "text-bad border-bad/40",
 };
 
-const isRec = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null;
-const pick = (r: Record<string, unknown>, keys: string[], type: "string" | "number") => keys.map((k) => r[k]).find((x) => typeof x === type);
-
-// The contract leaves the brand KPI's shape open: accept a number, a string or {value, label}.
-export function nativeText(v: unknown): string | null {
-  if (typeof v === "number") return groupDigits(v);
-  if (typeof v === "string") return v.trim() || null;
-  if (!isRec(v)) return null;
-  const value = pick(v, ["value", "projected", "amount"], "number") ?? pick(v, ["value", "projected", "amount"], "string");
-  const label = pick(v, ["kpi", "label", "metric", "name", "unit"], "string");
-  if (value === undefined) return null;
-  return `${typeof value === "number" ? groupDigits(value) : value}${label ? ` ${label}` : ""}`;
+// projected_native is {metric: value} or null, e.g. {impressions: 4106667}.
+export function nativeText(v: Record<string, number> | null): string | null {
+  const parts = Object.entries(v ?? {}).filter(([, n]) => Number.isFinite(n)).map(([k, n]) => `${groupDigits(n)} ${k.replace(/_/g, " ")}`);
+  return parts.length ? parts.join(", ") : null;
 }

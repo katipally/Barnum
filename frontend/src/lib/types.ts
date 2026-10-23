@@ -273,7 +273,7 @@ export interface PlanChannel {
   current_annual_spend_usd: number | null;
   projected_sqls_per_quarter: number | null;
   projected_customers: number | null;
-  projected_native: unknown; // brand KPI; shape not fixed by the contract, rendered defensively
+  projected_native: Record<string, number> | null; // {metric: value}, e.g. {impressions: 4106667}
   estimated: boolean;
   basis_note: string | null;
   // filled by the channel agent; absent while the channel is still being planned

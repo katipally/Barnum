@@ -76,7 +76,7 @@ function planChannels(groups: Group[], inputs: PlanInputs): PlanChannel[] {
       current_annual_spend_usd: Math.round(g.annualSpend),
       projected_sqls_per_quarter: sqlsYear === null ? null : sqlsYear / 4,
       projected_customers: sqlsYear === null ? null : sqlsYear * WIN_RATE,
-      projected_native: g.kind === "brand" && units !== null ? { kpi: g.label, value: Math.round(units) } : null,
+      projected_native: g.kind === "brand" && units !== null ? { [g.label]: Math.round(units) } : null,
       estimated: true,
       basis_note: g.cost ? `Sample estimate from the sample data, ${money(g.cost)} per ${g.label}.` : "Sample estimate. No results measured yet.",
     };
