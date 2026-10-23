@@ -1,0 +1,81 @@
+{
+ "channels": {
+  "linkedin": {
+   "name": "linkedin",
+   "weekly_spend": 182.3028019928846,
+   "weekly_sqls": 0.0156428625,
+   "exponent": 0.52,
+   "mql_to_sql": 0.15,
+   "lag_weeks": 1,
+   "carryover": 0.0,
+   "imputed": false,
+   "source": "CORE.CHANNEL_SUMMARY"
+  },
+  "billboard": {
+   "name": "billboard",
+   "weekly_spend": 576.9230769230769,
+   "weekly_sqls": 0.32307692307692304,
+   "exponent": 0.52,
+   "mql_to_sql": 0.14999999999999997,
+   "lag_weeks": 8,
+   "carryover": 0.5,
+   "imputed": false,
+   "source": "CORE.CHANNEL_SUMMARY"
+  },
+  "conferences": {
+   "name": "conferences",
+   "weekly_spend": 530.4190348384616,
+   "weekly_sqls": 0.3094626807692308,
+   "exponent": 0.52,
+   "mql_to_sql": 0.15,
+   "lag_weeks": 4,
+   "carryover": 0.3,
+   "imputed": true,
+   "source": "CORE.CHANNEL_SUMMARY"
+  },
+  "google": {
+   "name": "google",
+   "weekly_spend": 2560.7948308303844,
+   "weekly_sqls": 2.797665793269231,
+   "exponent": 0.52,
+   "mql_to_sql": 0.15,
+   "lag_weeks": 0,
+   "carryover": 0.0,
+   "imputed": false,
+   "source": "CORE.CHANNEL_SUMMARY"
+  }
+ },
+ "residuals": [
+  3.0,
+  1.753246753246753,
+  1.3636363636363635,
+  0.9740259740259739,
+  0.7792207792207791,
+  0.9740259740259739,
+  0.3896103896103896,
+  1.9480519480519478,
+  0.5844155844155844,
+  0.7792207792207791,
+  0.3896103896103896,
+  0.5844155844155844,
+  0.3,
+  0.3,
+  0.7792207792207791
+ ],
+ "weekly_budget": 3850.4397445848076,
+ "start_alloc": {
+  "linkedin": 182.3028019928846,
+  "billboard": 576.9230769230769,
+  "conferences": 530.4190348384616,
+  "google": 2560.7948308303844
+ },
+ "notes": [
+  "geo: skipped (no spend or no SQLs in CHANNEL_SUMMARY)",
+  "outbound: skipped (no spend or no SQLs in CHANNEL_SUMMARY)",
+  "email_threads: skipped (no spend or no SQLs in CHANNEL_SUMMARY)",
+  "seo: skipped (no spend or no SQLs in CHANNEL_SUMMARY)",
+  "conferences: spend imputed at $1,714/SQL (seed PRD table)",
+  "noise: 15 real weekly residuals, CV 0.73",
+  "billboard: lag 8 weeks measured from FUNNEL_FACT"
+ ]
+}
