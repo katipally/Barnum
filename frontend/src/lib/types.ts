@@ -241,3 +241,60 @@ export interface SteeringUpdate {
   guardrails?: Partial<Pick<Guardrails, "budgetTotal" | "autonomyPct" | "brandFloorPct">>;
   objectivePriorities?: { id: string; priority: number }[];
 }
+
+// ---- Deep dives: saved conversations with the agent, optionally written up as an artifact ----
+
+export interface DeepDiveMessage {
+  role: "user" | "agent";
+  text: string;
+  at: string; // ISO time
+}
+
+// The write-up of a deep dive. The agent reads these before answering, so later answers build on them.
+export interface DeepDiveArtifact {
+  question: string; // what was challenged, one line
+  answer: string; // the conclusion, one or two sentences
+  findings: string[]; // evidence, each with a number
+  recommendation: string;
+  openQuestions: string[];
+  confidence: "low" | "medium" | "high";
+  writtenAt: string;
+  messageCount: number; // messages the write-up covers; fewer than the thread means it is out of date
+}
+
+export interface DeepDive {
+  id: string;
+  caseId: CaseId;
+  title: string;
+  createdAt: string;
+  updatedAt: string;
+  messages: DeepDiveMessage[];
+  artifact?: DeepDiveArtifact;
+}
+
+export interface DeepDiveSummary {
+  id: string;
+  title: string;
+  updatedAt: string;
+  messageCount: number;
+  answer?: string; // the artifact's conclusion, when written up
+  stale: boolean; // written up, but the conversation has moved on since
+}
+
+export interface DeepDiveList {
+  deepDives: DeepDiveSummary[];
+  starters: string[]; // suggested questions to dig into, from this company's data
+}
+
+// ---- Data sources the agent works from ----
+
+export interface DataSource {
+  id: string;
+  name: string;
+  kind: "warehouse" | "channel" | "crm" | "plan" | "notes" | "other";
+  status: "connected" | "sample" | "paused" | "not_connected";
+  provides: string; // one plain sentence
+  usedFor: string[]; // numbers or channels it feeds
+  detail?: string; // tables, schema, mapping version
+  updatedAt?: string;
+}

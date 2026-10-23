@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { cx } from "@/components/ui";
 import { useCaseId } from "@/lib/case";
 import { useCases } from "@/components/shell/useCases";
@@ -12,6 +13,7 @@ export function AskDrawer() {
   const caseId = useCaseId();
   const cases = useCases();
   const caseName = cases?.find((c) => c.id === caseId)?.name;
+  const [conversation, setConversation] = useState(0);
 
   return (
     <>
@@ -47,7 +49,7 @@ export function AskDrawer() {
             Close <kbd className="ml-1 font-mono text-[11px] text-faint">Esc</kbd>
           </button>
         </header>
-        <ChatPanel key={caseId} caseId={caseId} caseName={caseName} />
+        <ChatPanel key={`${caseId}-${conversation}`} caseId={caseId} caseName={caseName} onNew={() => setConversation((n) => n + 1)} />
       </aside>
     </>
   );

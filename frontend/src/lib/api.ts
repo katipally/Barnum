@@ -6,7 +6,11 @@ import type {
   CaseId,
   CaseSummary,
   CompanyInput,
+  DataSource,
   Decision,
+  DeepDive,
+  DeepDiveArtifact,
+  DeepDiveList,
   Metric,
   StrategyMap,
   SteeringUpdate,
@@ -42,9 +46,22 @@ export const api = {
       headers: { "content-type": "application/json" },
       body: JSON.stringify(update),
     }).then(json<WeeklyBrief>),
-  // Streams plain text chunks of the CMO agent's answer.
-  ask: async (c: CaseId, question: string, onChunk: (text: string) => void) => {
-    const res = await fetch(`/api/companies/${c}/ask`, {
+  sources: (c: CaseId) => fetch(`/api/companies/${c}/sources`).then(json<DataSource[]>),
+  deepDives: (c: CaseId) => fetch(`/api/companies/${c}/deep-dives`).then(json<DeepDiveList>),
+  deepDive: (c: CaseId, id: string) => fetch(`/api/companies/${c}/deep-dives/${id}`).then(json<DeepDive>),
+  createDeepDive: (c: CaseId, title?: string) =>
+    fetch(`/api/companies/${c}/deep-dives`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ title }),
+    }).then(json<DeepDive>),
+  deleteDeepDive: (c: CaseId, id: string) =>
+    fetch(`/api/companies/${c}/deep-dives/${id}`, { method: "DELETE" }).then(json<{ ok: true }>),
+  writeUp: (c: CaseId, id: string) =>
+    fetch(`/api/companies/${c}/deep-dives/${id}/write-up`, { method: "POST" }).then(json<DeepDiveArtifact>),
+  // Streams plain text chunks of the CMO agent's answer; with a deep dive id the exchange is saved there.
+  ask: async (c: CaseId, question: string, onChunk: (text: string) => void, deepDiveId?: string) => {
+    const res = await fetch(deepDiveId ? `/api/companies/${c}/deep-dives/${deepDiveId}/ask` : `/api/companies/${c}/ask`, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ question }),
