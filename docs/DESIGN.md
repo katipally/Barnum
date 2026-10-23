@@ -101,18 +101,18 @@ Account check (done): ATTENDEE_ROLE has CORTEX_USER, CREATE DATABASE, ROLE, WARE
 | GET /memos, POST /memos/{id}/approve or reject | SQL | updates ALLOCATION, DECISION_LOG |
 | POST /simulate?days=14 | proc | new rows, triggers re-review |
 
-**Stack:** Python 3.12, FastAPI, snowflake-connector-python (PAT), httpx (Agent Run SSE), jinja2, pydantic. Config lives in a gitignored `.env`.
+**Stack:** Python 3.12, FastAPI, snowflake-connector-python (PAT), httpx (Agent Run SSE), jinja2, pydantic. Credentials come from the existing `~/.snowflake/connections.toml` PAT connection, so no secret lives in the repo.
 
 ## 7. Repo layout
 ```
 CMO-Agent/
   docs/DESIGN.md
-  sql/00_setup.sql  sql/core/*.sql
-  templates/  channel_agent.yaml.j2  channel_sv.yaml.j2  reconcile.sql.j2
-  backend/app/ main.py orchestrator.py snowflake.py
-               channels/ ingest.py profile.py mapper.py validator.py provision.py
-  seed/ csv/ (google, linkedin, ooh, events, badge_scans, crm) generate.py
-  tests/  smoke.sh
+  sql/        00_setup  10_core  20_unit_econ  30_decisions  40_cmo_agent
+  templates/  channel.sql.j2 (MAP, semantic view, REPORT, RECONCILE, AGENT)  cmo_agent.sql.j2
+  backend/app/ main.py orchestrator.py queries.py simulate.py snowflake.py setup.py
+               channels/ ingest.py (upload + profile) mapping.py (propose + validate) provision.py
+  seed/ csv/ (google, linkedin, ooh, events, badge_scans, crm, webinars) generate.py load.py
+  tests/  test_numbers.py  smoke.sh
 ```
 
 ## 8. Build order (5 hours, demo freeze at 4:15)
