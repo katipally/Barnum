@@ -9,7 +9,7 @@ from .. import snowflake as sf
 from . import ingest, mapping
 
 TEMPLATE = Path(__file__).resolve().parents[3] / "templates" / "channel.sql.j2"
-MODEL = os.getenv("CMO_CHANNEL_MODEL", "claude-sonnet-4-5")
+MODEL = os.getenv("CMO_CHANNEL_MODEL", "claude-sonnet-5")
 
 _env = jinja2.Environment(undefined=jinja2.StrictUndefined, autoescape=False)
 _env.filters["sq"] = lambda v: str(v or "").replace("'", "''")          # inside '...' SQL literals
@@ -26,11 +26,11 @@ def latest_mapping(cid: str, version: int | None = None) -> dict:
     return r | {"mapping": json.loads(r["mapping"]), "validation": json.loads(r["validation"])}
 
 
-def render(ch: dict, m: dict) -> str:
+def render(ch: dict, m: dict, agent: str = "AGENT", agent_only: bool = False) -> str:
     return _env.from_string(TEMPLATE.read_text()).render(
         s=ch["schema_name"], cid=ch["channel_id"], display=ch["display_name"], description=ch["description"],
         map_select=mapping.map_select(ch["channel_id"], m["select_sql"]), raw_spend_sql=m["raw_spend_sql"],
-        model=MODEL, warehouse=sf.WAREHOUSE)
+        model=MODEL, warehouse=sf.WAREHOUSE, agent=sf.ident(agent), agent_only=agent_only)
 
 
 def approve(cid: str, version: int | None = None) -> dict:
@@ -49,6 +49,16 @@ def approve(cid: str, version: int | None = None) -> dict:
     sf.execute("CALL CMO_DB.CORE.REBUILD_FUNNEL()")
     reconcile = json.loads(sf.query(f"CALL CMO_DB.{ch['schema_name']}.RECONCILE()")[0]["reconcile"])
     return {"approved": True, "version": rec["version"], "reconcile": reconcile, "validation": check}
+
+
+def deploy_agent(cid: str, agent: str = "AGENT") -> str:
+    """Redeploy only the channel's agent from the approved mapping, e.g. a side-by-side AGENT_V2."""
+    ch = ingest.get_channel(cid)
+    if not ch["map_version"]:
+        raise ValueError(f"{cid} has no approved mapping yet")
+    sf.conn().execute_string(render(ch, latest_mapping(cid, ch["map_version"])["mapping"], agent, agent_only=True),
+                             remove_comments=True)
+    return f"CMO_DB.{ch['schema_name']}.{sf.ident(agent)}"
 
 
 def set_active(cid: str, active: bool) -> dict:
