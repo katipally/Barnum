@@ -165,6 +165,8 @@ def upload(cid: str, filename: str, data: bytes, replace: bool = False) -> dict:
     if ch["status"] == "active" and (result["added_columns"] or result["new_table"]):
         sf.execute("UPDATE CMO_DB.CORE.CHANNEL_REGISTRY SET status = 'needs_mapping', updated_at = CURRENT_TIMESTAMP() "
                    "WHERE channel_id = %s", (cid,))
+    elif ch["status"] == "active":
+        sf.execute("CALL CMO_DB.CORE.REBUILD_FUNNEL()")
     return result | {"status": get_channel(cid)["status"]}
 
 

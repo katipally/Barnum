@@ -8,6 +8,7 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
 from . import orchestrator, queries
+from . import snowflake as sf
 from .channels import ingest, mapping, provision
 
 PAGE_LOAD_READS = (queries.strip, queries.channels, queries.memos, queries.assumptions)
@@ -158,7 +159,9 @@ def channel_campaigns(cid: str):
 
 @app.post("/crm/files")
 async def upload_crm(files: list[UploadFile] = File(...), replace: bool = False):
-    return [ingest.load_csv("CORE", f.filename, await f.read(), replace) for f in files]
+    out = [ingest.load_csv("CORE", f.filename, await f.read(), replace) for f in files]
+    sf.execute("CALL CMO_DB.CORE.REBUILD_FUNNEL()")
+    return out
 
 
 # ---- Now: where every channel stands ------------------------------------------

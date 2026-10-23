@@ -82,20 +82,23 @@ SELECT NULL::DATE date, NULL::STRING channel, NULL::STRING campaign, NULL::FLOAT
        NULL::FLOAT won, NULL::FLOAT won_acv_usd, NULL::STRING creative_text, NULL::STRING audience, NULL::OBJECT metrics
 WHERE FALSE;
 
+-- Materialized copy of FUNNEL_RAW, refreshed by REBUILD_FUNNEL. Downstream views read this so queries skip the MAP union stack.
+CREATE TABLE IF NOT EXISTS CMO_DB.CORE.FUNNEL_SNAPSHOT AS SELECT * FROM CMO_DB.CORE.FUNNEL_RAW;
+
 -- SQLs a channel cannot measure are estimated from the rate seen in channels that measure both stages.
 CREATE OR REPLACE VIEW CMO_DB.CORE.MQL_TO_SQL_RATE AS
 SELECT COALESCE((SELECT num FROM CMO_DB.CORE.ASSUMPTIONS WHERE key = 'MQL_TO_SQL_OVERRIDE'),
                 SUM(sqls) / NULLIF(SUM(mqls), 0)) AS rate,
        IFF((SELECT num FROM CMO_DB.CORE.ASSUMPTIONS WHERE key = 'MQL_TO_SQL_OVERRIDE') IS NOT NULL, 'assumed (ASSUMPTIONS)',
            'learned from ' || COALESCE(LISTAGG(DISTINCT channel, ', '), 'no channel')) AS source
-FROM CMO_DB.CORE.FUNNEL_RAW WHERE sqls IS NOT NULL AND mqls IS NOT NULL;
+FROM CMO_DB.CORE.FUNNEL_SNAPSHOT WHERE sqls IS NOT NULL AND mqls IS NOT NULL;
 
 CREATE OR REPLACE VIEW CMO_DB.CORE.FUNNEL_FACT AS
 SELECT f.date, f.channel, f.campaign, f.spend_usd, f.mqls,
        COALESCE(f.sqls, f.mqls * r.rate) AS sqls,
        f.sqls IS NULL AND f.mqls IS NOT NULL AND r.rate IS NOT NULL AS sqls_estimated,
        f.opps, f.pipeline_usd, f.won, f.won_acv_usd, f.creative_text, f.audience, f.metrics
-FROM CMO_DB.CORE.FUNNEL_RAW f CROSS JOIN CMO_DB.CORE.MQL_TO_SQL_RATE r;
+FROM CMO_DB.CORE.FUNNEL_SNAPSHOT f CROSS JOIN CMO_DB.CORE.MQL_TO_SQL_RATE r;
 
 CREATE OR REPLACE PROCEDURE CMO_DB.CORE.REBUILD_FUNNEL()
 RETURNS STRING
@@ -111,6 +114,7 @@ BEGIN
     body := 'SELECT NULL::DATE date, NULL::STRING channel, NULL::STRING campaign, NULL::FLOAT spend_usd, NULL::FLOAT mqls, NULL::FLOAT sqls, NULL::FLOAT opps, NULL::FLOAT pipeline_usd, NULL::FLOAT won, NULL::FLOAT won_acv_usd, NULL::STRING creative_text, NULL::STRING audience, NULL::OBJECT metrics WHERE FALSE';
   END IF;
   EXECUTE IMMEDIATE 'CREATE OR REPLACE VIEW CMO_DB.CORE.FUNNEL_RAW AS ' || body;
-  RETURN 'FUNNEL_RAW rebuilt';
+  CREATE OR REPLACE TABLE CMO_DB.CORE.FUNNEL_SNAPSHOT AS SELECT * FROM CMO_DB.CORE.FUNNEL_RAW;
+  RETURN 'FUNNEL_RAW rebuilt, FUNNEL_SNAPSHOT refreshed';
 END;
 $$;
