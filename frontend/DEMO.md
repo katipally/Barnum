@@ -1,4 +1,4 @@
-# Agentic CMO: demo kit
+# Barnum: demo kit
 
 This file has everything for presenting: setup, a 3-minute live script, a 1-minute video script, likely judge questions and a one-paragraph pitch. All of it is built on the live backend over Snowflake `CMO_DB`, using Datasaur Foundry's Q4. The numbers below come from the running API on 2026-10-23, and `tests/test_numbers.py` checks them. They are **demo values**, so say so once on stage.
 
@@ -52,12 +52,12 @@ About 130 words of voice-over. Record from a live run after `/demo/reset`.
 
 | Seconds | Screen | Voice-over | Caption |
 |---|---|---|---|
-| 0–6 | Brief page | "Every CEO asks what the next marketing dollar buys. Agentic CMO answers with decisions, not dashboards." | Decisions, not dashboards |
+| 0–6 | Brief page | "Every CEO asks what the next marketing dollar buys. Barnum answers with decisions, not dashboards." | Decisions, not dashboards |
 | 6–18 | Goals strip, channel list | "It runs inside Snowflake: one Claude agent per channel, each reading its own raw data and reporting in one currency, cost per qualified lead." | One agent per channel · one currency |
 | 18–30 | LinkedIn vs Conferences | "First finding: LinkedIn has the cheapest leads and some of the most expensive pipeline. Only nine percent of its leads become sales-qualified." | Cheapest leads ≠ cheapest pipeline |
 | 30–42 | Decision, Approve | "The fix moves more than the ten percent the CEO lets it move alone, so it asks. One click: same budget, more pipeline, logged in Snowflake." | Acts within limits · asks above them |
 | 42–54 | Terminal webinar load, app refresh | "New channel? Upload a CSV. Claude writes the SQL, a validator reconciles every dollar, and a new agent joins the team." | New channel = one CSV |
-| 54–60 | End card + repo URL | "Agentic CMO. The CEO steers; the agent runs marketing." | github.com/katipally/CMO-Agent |
+| 54–60 | End card + repo URL | "Barnum. The CEO steers; the agent runs marketing." | github.com/katipally/CMO-Agent |
 
 ---
 
@@ -99,4 +99,4 @@ Run it read-only for one real quarter as a shadow CMO and compare its memos with
 
 ## D. One-paragraph pitch
 
-Every CEO asks what the next marketing dollar buys, and today the answer is a dashboard and a meeting. Agentic CMO is a marketing executive that lives in Snowflake. One Claude orchestrator manages one isolated Cortex Agent per channel, and each turns its platform's raw data into a single currency: cost per sales-qualified lead. On that basis it finds what dashboards hide. LinkedIn has the cheapest leads and some of the most expensive pipeline. The agent reallocates the remaining budget along each channel's response curve. It acts alone within a limit the CEO sets and asks above it, with every number coming from SQL and every decision logged. A new channel is just a CSV: Claude writes the mapping, a validator reconciles every dollar, and a new agent joins the team.
+Every CEO asks what the next marketing dollar buys, and today the answer is a dashboard and a meeting. Barnum is a marketing executive that lives in Snowflake. One Claude orchestrator manages one isolated Cortex Agent per channel, and each turns its platform's raw data into a single currency: cost per sales-qualified lead. On that basis it finds what dashboards hide. LinkedIn has the cheapest leads and some of the most expensive pipeline. The agent reallocates the remaining budget along each channel's response curve. It acts alone within a limit the CEO sets and asks above it, with every number coming from SQL and every decision logged. A new channel is just a CSV: Claude writes the mapping, a validator reconciles every dollar, and a new agent joins the team.

@@ -1,6 +1,6 @@
 # Build contract (parallel agents read this first)
 
-Agentic CMO: a CMO agent that turns CEO business goals into a revenue tree, marketing objectives and
+Barnum: a CMO agent that turns CEO business goals into a revenue tree, marketing objectives and
 actions, evaluates them weekly, and asks the CEO only for the decisions that matter. Hackathon rule:
 **dashboard must not be the main feature** — the agent's recommendations and the CEO's decisions are.
 The UI is the surface for the agent.

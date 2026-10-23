@@ -62,7 +62,7 @@ export function Sidebar() {
   );
 }
 
-// Bottom-of-rail card that opens the Ask the CMO drawer.
+// Bottom-of-rail card that opens the Ask Barnum drawer.
 function AskPromo() {
   const { toggle } = useAskCmo();
   return (
@@ -75,7 +75,7 @@ function AskPromo() {
         <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden className="text-accent">
           <path d="M8 1.5 9.6 6.4 14.5 8 9.6 9.6 8 14.5 6.4 9.6 1.5 8 6.4 6.4Z" fill="currentColor" />
         </svg>
-        Ask the CMO agent
+        Ask Barnum
       </span>
       <span className="mt-1 block text-xs leading-relaxed text-muted">
         Why it decided, what happens if you say no. Press{" "}
