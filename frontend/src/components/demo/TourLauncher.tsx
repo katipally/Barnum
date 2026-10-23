@@ -16,7 +16,7 @@ function ExitChip({ index, total }: { index: number; total: number }) {
     <button
       type="button"
       onClick={() => tour.exit()}
-      className="inline-flex items-center gap-1.5 rounded-md border border-gold/40 px-2.5 py-1.5 text-sm text-gold transition hover:border-gold/70"
+      className="inline-flex items-center gap-1.5 rounded-md border border-accent/40 px-2.5 py-1.5 text-sm text-accent transition hover:border-accent/70"
     >
       <span className="tabular whitespace-nowrap">
         Exit tour {index + 1}/{total}

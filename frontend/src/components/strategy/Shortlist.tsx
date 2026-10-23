@@ -20,12 +20,12 @@ export function Shortlist({
 
   return (
     <div className="space-y-4">
-      <h3 className="text-sm text-gold">Where I&apos;d look first</h3>
+      <h3 className="text-sm text-accent">Where I&apos;d look first</h3>
       {items.map(({ title, a }) => (
         <button
           key={a.id}
           onClick={() => onSelect(a.id)}
-          className="-mx-2 block w-[calc(100%+1rem)] rounded-md px-2 py-2 text-left transition hover:bg-surface-2 focus:outline-none focus-visible:ring-1 focus-visible:ring-gold/60"
+          className="-mx-2 block w-[calc(100%+1rem)] rounded-md px-2 py-2 text-left transition hover:bg-surface-2 focus:outline-none focus-visible:ring-1 focus-visible:ring-accent/60"
         >
           <span className="block text-xs text-faint">{title}</span>
           <span className="mt-1 block text-sm text-ink">{a.label}</span>

@@ -85,7 +85,7 @@ function ThreadBody({ caseId, initial, starters, onSaved, onDeleted }: Omit<Prop
     <div className="space-y-6">
       {artifact && <ArtifactCard artifact={artifact} stale={stale} />}
 
-      <section className="rounded-xl border border-line bg-surface">
+      <section className="panel">
         <header className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-3">
           <h2 className="text-sm font-medium text-ink">{messages.length ? "Our conversation" : "Start a deep dive"}</h2>
           <div className="flex items-center gap-2">

@@ -8,7 +8,7 @@ type NodeState = { selected: boolean; dimmed: boolean };
 const GOAL_WORD: Record<Status, string> = { on_track: "On track", at_risk: "Needs attention", off_track: "Off track" };
 
 const nodeBase =
-  "w-full rounded-lg border bg-surface px-3 py-2.5 text-left transition focus:outline-none focus-visible:ring-1 focus-visible:ring-gold/60";
+  "w-full rounded-lg border bg-surface px-3 py-2.5 text-left transition focus:outline-none focus-visible:ring-1 focus-visible:ring-accent/60";
 
 function stateClass({ selected, dimmed }: NodeState) {
   return cx(selected ? "border-line-strong bg-surface-2" : "border-line hover:border-line-strong", dimmed && "opacity-30");

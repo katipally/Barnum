@@ -58,9 +58,9 @@ function StrategyBody({ data, minTestWeeks }: { data: StrategyMap; minTestWeeks:
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_340px]">
       <section data-tour="strategy-map" className="min-w-0 space-y-6">
-        <div>
+        <div className="panel p-5">
           <div className="mb-2 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 px-1">
-            <h2 className="text-[13px] font-medium tracking-wide text-muted">Every channel, biggest budget first</h2>
+            <h2 className="text-[17px] font-normal text-ink">Every channel, biggest budget first</h2>
             <span className="text-xs text-faint">Bar = budget · filled part = spent so far</span>
           </div>
           <ChannelList

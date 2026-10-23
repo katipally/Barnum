@@ -14,9 +14,9 @@ export function AppShell({ children }: { children: ReactNode }) {
     <AskCmoProvider>
       <div className="min-h-screen bg-bg text-ink">
         <Sidebar />
-        <div className="flex min-h-screen min-w-0 flex-col min-[900px]:pl-56">
+        <div className="flex min-h-screen min-w-0 flex-col min-[900px]:pl-64">
           <TopBar />
-          <main className="mx-auto w-full max-w-[1280px] flex-1 px-4 py-6 sm:px-6 lg:px-8">
+          <main className="mx-auto w-full max-w-[1320px] flex-1 px-4 py-6 sm:px-6 lg:px-10">
             {ready ? children : <div aria-busy className="min-h-[50vh]" />}
           </main>
         </div>

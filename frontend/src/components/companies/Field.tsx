@@ -4,7 +4,7 @@ import { cx } from "@/components/ui";
 // Labelled form controls with inline hint and error text.
 
 export const CONTROL =
-  "w-full rounded-md border bg-surface px-3 py-2 text-sm text-ink placeholder:text-faint outline-none transition focus:border-gold/60 focus:ring-1 focus:ring-gold/30";
+  "w-full rounded-md border bg-surface px-3 py-2 text-sm text-ink placeholder:text-faint outline-none transition focus:border-accent/60 focus:ring-1 focus:ring-accent/30";
 
 export function controlClass(error?: string) {
   return cx(CONTROL, error ? "border-bad/60" : "border-line-strong");

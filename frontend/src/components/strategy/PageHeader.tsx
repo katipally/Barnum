@@ -18,16 +18,18 @@ export function PageHeader({
 }) {
   return (
     <header className="mb-8">
-      <p className="text-xs tracking-wide text-gold">
+      <p className="flex flex-wrap items-center gap-2 text-sm text-muted">
         {page}
         {company && (
-          <span>
-            {" "}
-            · {company.name} · {company.periodLabel}, week {company.week} of {company.weeksInPeriod}
-          </span>
+          <>
+            <span className="chip">{company.name}</span>
+            <span className="chip">
+              {company.periodLabel} · week {company.week} of {company.weeksInPeriod}
+            </span>
+          </>
         )}
       </p>
-      <h1 className="mt-3 text-[26px] font-medium leading-tight tracking-tight text-ink sm:text-[30px]">{question}</h1>
+      <h1 className="mt-3 text-[30px] font-light leading-tight tracking-tight text-ink sm:text-[38px]">{question}</h1>
       {answer === undefined ? (
         <Skeleton className="mt-4 h-6 max-w-[560px]" />
       ) : (

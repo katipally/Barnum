@@ -53,7 +53,7 @@ export function GoalHeader({ brief, gap }: { brief: WeeklyBrief; gap: TreeNode[]
   return (
     <div>
       <PageHeader page={PAGE_NAME} company={c} question={PAGE_QUESTION} answer={answer} />
-      <div className="rounded-xl border border-line bg-surface p-5">
+      <div className="panel p-5">
         <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
           <p className="text-base text-ink">
             Goal: {unset ? "not set yet" : <span className="tabular">{num(root.target, root.unit)}</span>} in <PlainLabel p={label} lower /> by{" "}
@@ -63,7 +63,7 @@ export function GoalHeader({ brief, gap }: { brief: WeeklyBrief; gap: TreeNode[]
         </div>
         {unset ? (
           <p className="mt-2 text-sm text-muted">
-            <Link href={withCase("/goals", c.id)} className="underline decoration-line-strong underline-offset-4 hover:text-ink hover:decoration-gold">
+            <Link href={withCase("/goals", c.id)} className="underline decoration-line-strong underline-offset-4 hover:text-ink hover:decoration-accent">
               Set a target in Goals and limits
             </Link>{" "}
             and this page shows which part is behind.

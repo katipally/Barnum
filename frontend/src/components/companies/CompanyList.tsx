@@ -80,7 +80,7 @@ export function CompanyList() {
         ) : (
           <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-5">
             <p className="text-sm text-muted">No companies yet. Add yours and I&apos;ll plan against your own goal.</p>
-            <Link href={withCase("/companies/new", caseId)} className="text-sm text-gold hover:underline">
+            <Link href={withCase("/companies/new", caseId)} className="text-sm text-accent hover:underline">
               Add company
             </Link>
           </div>

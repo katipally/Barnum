@@ -8,7 +8,7 @@ import { IconChat, IconCheck, IconSend, IconX } from "./icons";
 
 export const NOT_NOW = "Not now";
 
-const FOCUS = "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:ring-offset-2 focus-visible:ring-offset-surface";
+const FOCUS = "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 focus-visible:ring-offset-surface";
 
 export function isDismissed(d: Pick<Decision, "status" | "note">) {
   return d.status === "rejected" && d.note === NOT_NOW;
@@ -63,14 +63,14 @@ export function DecisionActions({ decision: d, onApprove }: { decision: Decision
             onChange={(e) => setDraft(e.target.value)}
             aria-label={`Your own response to: ${d.title}`}
             placeholder="Or answer in your own words… (e.g. do half, wait two weeks)"
-            className="w-full rounded-md border border-line bg-transparent py-1.5 pl-3 pr-9 text-sm text-ink transition placeholder:text-faint hover:border-line-strong focus:border-gold/50 focus:outline-none focus:ring-1 focus:ring-gold/30"
+            className="w-full rounded-md border border-line bg-transparent py-1.5 pl-3 pr-9 text-sm text-ink transition placeholder:text-faint hover:border-line-strong focus:border-accent/50 focus:outline-none focus:ring-1 focus:ring-accent/30"
           />
           <button
             type="submit"
             aria-label="Send reply"
             disabled={!draft.trim()}
             className={cx(
-              "absolute right-1 top-1/2 grid h-6 w-6 -translate-y-1/2 place-items-center rounded text-gold transition hover:bg-gold-soft disabled:pointer-events-none disabled:text-faint disabled:opacity-0",
+              "absolute right-1 top-1/2 grid h-6 w-6 -translate-y-1/2 place-items-center rounded text-accent transition hover:bg-accent-soft disabled:pointer-events-none disabled:text-faint disabled:opacity-0",
               FOCUS,
             )}
           >

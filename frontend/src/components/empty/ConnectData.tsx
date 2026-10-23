@@ -62,7 +62,7 @@ function sources(stage: CompanyCase["stage"]): Source[] {
 // The data sources the agent works from, all honestly "not connected" until the data team wires them up.
 export function ConnectData({ stage, className }: { stage: CompanyCase["stage"]; className?: string }) {
   return (
-    <section className={cx("rounded-xl border border-line bg-surface", className)}>
+    <section className={cx("panel", className)}>
       <header className="border-b border-line px-4 py-3">
         <h3 className="text-sm font-medium text-ink">Connect your data</h3>
         <p className="mt-1 text-sm text-muted">

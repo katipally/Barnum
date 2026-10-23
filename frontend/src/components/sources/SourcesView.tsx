@@ -60,7 +60,7 @@ export function SourcesView() {
           return (
             <section key={g.kind}>
               <h2 className="mb-3 text-[13px] font-medium tracking-wide text-muted">{g.title}</h2>
-              <ul className="divide-y divide-line rounded-xl border border-line bg-surface">
+              <ul className="divide-y divide-line panel">
                 {rows.map((s) => (
                   <SourceRow key={s.id} source={s} />
                 ))}

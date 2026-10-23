@@ -16,8 +16,8 @@ export function ChatBubble({ message }: { message: ChatMessage }) {
   const waiting = message.status === "streaming" && !message.text;
   return (
     <div>
-      <div className="mb-1.5 flex items-center gap-2 text-[11px] font-medium tracking-wide text-gold">
-        <span aria-hidden className="h-1.5 w-1.5 rotate-45 bg-gold" />
+      <div className="mb-1.5 flex items-center gap-2 text-[11px] font-medium tracking-wide text-accent">
+        <span aria-hidden className="h-1.5 w-1.5 rotate-45 bg-accent" />
         CMO agent
       </div>
       <div className={cx("text-sm leading-relaxed text-ink/90", message.status === "error" && "text-bad")}>

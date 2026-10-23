@@ -121,7 +121,7 @@ function DiveRow({ dive, active, onOpen }: { dive: DeepDiveSummary; active: bool
       >
         <span className="line-clamp-2 text-sm text-ink">{dive.title}</span>
         <span className="mt-1 flex items-center gap-2 text-xs text-faint">
-          <span className={cx(dive.answer && !dive.stale && "text-gold", dive.stale && "text-warn")}>{state}</span>
+          <span className={cx(dive.answer && !dive.stale && "text-accent", dive.stale && "text-warn")}>{state}</span>
           <span aria-hidden>·</span>
           <span>{shortDate(dive.updatedAt)}</span>
         </span>

@@ -7,10 +7,10 @@ const CONFIDENCE = { low: "Low confidence", medium: "Medium confidence", high: "
 // The write-up of a deep dive: what was challenged, what we concluded, and what the agent will build on.
 export function ArtifactCard({ artifact, stale }: { artifact: DeepDiveArtifact; stale: boolean }) {
   return (
-    <article className="rounded-xl border border-gold/30 bg-surface">
+    <article className="rounded-xl border border-accent/30 bg-surface">
       <header className="border-b border-line px-5 py-4">
-        <div className="mb-2 flex items-center gap-2 text-[11px] font-medium tracking-wide text-gold">
-          <span aria-hidden className="h-1.5 w-1.5 rotate-45 bg-gold" />
+        <div className="mb-2 flex items-center gap-2 text-[11px] font-medium tracking-wide text-accent">
+          <span aria-hidden className="h-1.5 w-1.5 rotate-45 bg-accent" />
           Write-up
         </div>
         <p className="text-sm text-muted">{artifact.question}</p>

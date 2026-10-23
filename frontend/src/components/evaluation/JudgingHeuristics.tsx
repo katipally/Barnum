@@ -42,7 +42,7 @@ export function JudgingHeuristics() {
   return (
     <details className="group mt-12 border-t border-line pt-5">
       <summary className="cursor-pointer list-none text-sm text-muted hover:text-ink">
-        <span className="text-gold">How I decide if something is on track</span>
+        <span className="text-accent">How I decide if something is on track</span>
         <span className="ml-2 text-xs text-faint group-open:hidden">Show</span>
         <span className="ml-2 hidden text-xs text-faint group-open:inline">Hide</span>
       </summary>
