@@ -7,3 +7,6 @@ node_modules/
 .DS_Store
 connections.toml
 *.p8
+
+# eval harness: cached LLM responses
+evals/.llm_cache/

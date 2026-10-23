@@ -93,13 +93,20 @@ async def run_agent(schema: str, agent: str, question: str, client: httpx.AsyncC
     return {"text": texts[-1] if texts else "", "raw": data}  # earlier text blocks are pre-tool narration; the last is the answer
 
 
-async def stream_agent(schema: str, agent: str, messages: list[dict]) -> AsyncIterator[tuple[str, dict]]:
-    """Streaming run. Yields (event_name, data) parsed from the agent's SSE stream."""
+async def stream_agent(schema: str, agent: str, messages: list[dict], thread_id: int | None = None,
+                       parent_message_id: int = 0) -> AsyncIterator[tuple[str, dict]]:
+    """Streaming run, optionally inside a thread. Yields (event_name, data) parsed from the agent's SSE stream,
+    starting with ("request", {"request_id"}) taken from the response header (feedback refers to it)."""
     body = {"messages": messages, "stream": True}
+    if thread_id is not None:
+        body |= {"thread_id": thread_id, "parent_message_id": parent_message_id}
     headers = _headers() | {"Accept": "text/event-stream"}
     async with httpx.AsyncClient(timeout=300) as client:
         async with client.stream("POST", _agent_url(schema, agent), json=body, headers=headers) as r:
-            r.raise_for_status()
+            if r.is_error:
+                await r.aread()
+                raise AgentError(r.status_code, r.text[:500])
+            yield "request", {"request_id": r.headers.get("X-Snowflake-Request-Id")}
             event = "message"
             async for line in r.aiter_lines():
                 if line.startswith("event:"):
@@ -111,3 +118,42 @@ async def stream_agent(schema: str, agent: str, messages: list[dict]) -> AsyncIt
                     except ValueError:  # end-of-stream markers such as [DONE]
                         continue
                     yield event, data if isinstance(data, dict) else {"value": data}
+
+
+class AgentError(Exception):
+    def __init__(self, status: int, body: str):
+        super().__init__(f"agent run failed ({status}): {body}")
+        self.status = status
+
+
+# ---- Threads + feedback ---------------------------------------------------
+
+async def create_thread() -> int:
+    async with httpx.AsyncClient(timeout=30) as client:
+        r = await client.post(f"{_base_url()}/cortex/threads", json={"origin_application": "agentic_cmo"}, headers=_headers())
+        r.raise_for_status()
+        data = r.json()
+        return int(data["thread_id"] if isinstance(data, dict) else data)
+
+
+async def last_assistant_message(thread_id: int) -> int:
+    """Latest stored assistant message, the only valid parent for the next turn; 0 if the thread has none."""
+    async with httpx.AsyncClient(timeout=30) as client:
+        r = await client.get(f"{_base_url()}/cortex/threads/{thread_id}", params={"page_size": 20}, headers=_headers())
+        r.raise_for_status()
+        ids = [m["message_id"] for m in r.json().get("messages", []) if m.get("role") == "assistant"]
+        return max(ids, default=0)
+
+
+async def send_feedback(schema: str, agent: str, request_id: str | None, positive: bool, message: str | None,
+                        categories: list[str], thread_id: int | None = None) -> None:
+    """Feedback on one run (by its request id), or on the agent as a whole when request_id is None."""
+    body = {"positive": positive, "feedback_message": message or "", "categories": categories}
+    if request_id:
+        body["orig_request_id"] = request_id
+    if thread_id is not None:
+        body["thread_id"] = thread_id
+    async with httpx.AsyncClient(timeout=30) as client:
+        r = await client.post(f"{_base_url()}/databases/{DB}/schemas/{schema}/agents/{agent}:feedback",
+                              json=body, headers=_headers())
+        r.raise_for_status()

@@ -43,7 +43,7 @@ def raw_tables(schema: str) -> list[dict]:
     return out
 
 
-def render(ch: dict, m: dict) -> str:
+def render(ch: dict, m: dict, agent: str = "AGENT", agent_only: bool = False) -> str:
     measured = [f for f, on in m["measures"].items() if on]
     return _env.from_string(TEMPLATE.read_text()).render(
         s=ch["schema_name"], cid=ch["channel_id"], display=ch["display_name"], description=ch["description"],
@@ -51,7 +51,7 @@ def render(ch: dict, m: dict) -> str:
         raw_tables=raw_tables(ch["schema_name"]), metric_notes=m["metric_notes"],
         measured=", ".join(measured) or "no shared funnel fields",
         unmeasured=", ".join(f for f in mapping.MEASURES if f not in measured) or "nothing",
-        model=MODEL, warehouse=sf.WAREHOUSE)
+        model=MODEL, warehouse=sf.WAREHOUSE, agent=sf.ident(agent), agent_only=agent_only)
 
 
 def approve(cid: str, version: int | None = None) -> dict:
@@ -72,6 +72,16 @@ def approve(cid: str, version: int | None = None) -> dict:
     sf.execute("CALL CMO_DB.CORE.REBUILD_FUNNEL()")
     reconcile = json.loads(sf.query(f"CALL CMO_DB.{ch['schema_name']}.RECONCILE()")[0]["reconcile"])
     return {"approved": True, "version": rec["version"], "reconcile": reconcile, "validation": check}
+
+
+def deploy_agent(cid: str, agent: str = "AGENT") -> str:
+    """Redeploy only the channel's agent from the approved mapping, e.g. a side-by-side AGENT_V2."""
+    ch = ingest.get_channel(cid)
+    if not ch["map_version"]:
+        raise ValueError(f"{cid} has no approved mapping yet")
+    sf.conn().execute_string(render(ch, latest_mapping(cid, ch["map_version"])["mapping"], agent, agent_only=True),
+                             remove_comments=True)
+    return f"CMO_DB.{ch['schema_name']}.{sf.ident(agent)}"
 
 
 def set_active(cid: str, active: bool) -> dict:

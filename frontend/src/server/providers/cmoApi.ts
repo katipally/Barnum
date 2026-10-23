@@ -3,6 +3,7 @@
 import type {
   Action,
   AgentLogEntry,
+  AgentThread,
   AskEvent,
   CampaignDraft,
   CaseData,
@@ -287,23 +288,37 @@ export async function fetchLive(): Promise<CaseData> {
 }
 
 // Plain /ask calls (no deep dive) keep their conversation here (single-user demo); deep dives pass their own turns.
+// Both run on a Snowflake thread when the backend offers one; the history is still sent: it seeds a new thread
+// and is the fallback when the thread is gone.
 type AgentMessage = { role: "user" | "assistant"; content: { type: "text"; text: string }[] };
 const HISTORY_TURNS = 8;
 const HISTORY_IDLE_MS = 30 * 60 * 1000;
 let history: AgentMessage[] = [];
+let plainThread: AgentThread | null = null;
 let lastAskAt = 0;
 
 const msg = (role: AgentMessage["role"], text: string): AgentMessage => ({ role, content: [{ type: "text", text }] });
 
-async function* askLive(question: string, turns?: AgentTurn[]): AsyncIterable<string | AskEvent> {
+export interface LiveThreadOpts {
+  thread?: AgentThread | null;
+  /** Called once the answer is done: the thread to continue next time, or null when the backend fell back to history. */
+  onThread?: (thread: AgentThread | null) => void;
+}
+
+export async function* askLive(question: string, turns?: AgentTurn[], opts?: LiveThreadOpts): AsyncIterable<string | AskEvent> {
   const own = !turns;
-  if (own && Date.now() - lastAskAt > HISTORY_IDLE_MS) history = [];
+  if (own && Date.now() - lastAskAt > HISTORY_IDLE_MS) [history, plainThread] = [[], null];
   lastAskAt = Date.now();
   const sent = turns ? turns.map((t) => msg(t.role, t.text)) : history;
+  const thread = own ? plainThread : opts?.thread;
   const res = await fetch(`${base()}/ask`, {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({ question, history: sent }),
+    body: JSON.stringify({
+      question,
+      history: sent,
+      ...(thread ? { thread_id: thread.id, parent_message_id: thread.parentMessageId ?? null } : { new_thread: true }),
+    }),
   });
   if (!res.ok || !res.body) throw new Error(`CMO agent unavailable (${res.status})`);
   const reader = res.body.getReader();
@@ -336,6 +351,8 @@ async function* askLive(question: string, turns?: AgentTurn[]): AsyncIterable<st
             tool_use_id?: string;
             seconds?: number;
             ok?: boolean;
+            thread_id?: number | null;
+            message_id?: number | null;
           };
           // cmo_delta: teammate's orchestrator /ask; token: the earlier backend.
           if ((event === "cmo_delta" || event === "token") && payload.text) {
@@ -355,6 +372,9 @@ async function* askLive(question: string, turns?: AgentTurn[]): AsyncIterable<st
           } else if (event === "done") {
             if (payload.model) yield { type: "meta", model: payload.model };
             complete = true;
+            const next = payload.thread_id ? { id: payload.thread_id, parentMessageId: payload.message_id ?? undefined } : null;
+            if (own) plainThread = next;
+            else opts?.onThread?.(next);
             return;
           }
         }
@@ -536,8 +556,13 @@ export const cmoApiProvider: CmoProvider = {
   },
   isLive: (caseId: CaseId) => caseId === LIVE_ID,
   plan2027: livePlan2027,
-  async decide(_caseId, decisionId, status) {
-    const res = await fetch(`${base()}/memos/${encodeURIComponent(decisionId)}/${status === "approved" ? "approve" : "reject"}`, { method: "POST" });
+  async decide(_caseId, decisionId, status, note) {
+    // The note goes to the agent as feedback on the run that wrote the memo.
+    const res = await fetch(`${base()}/memos/${encodeURIComponent(decisionId)}/${status === "approved" ? "approve" : "reject"}`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ note: note ?? null }),
+    });
     if (!res.ok) throw new Error(`CMO API decide: ${res.status} ${await res.text()}`);
     await refresh(); // the next read must show the decision, not the cached pending card
   },

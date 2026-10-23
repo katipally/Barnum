@@ -1,0 +1,1337 @@
+{
+ "money": {
+  "duration": 3.297,
+  "words": [
+   {
+    "w": "Every",
+    "start": 0,
+    "end": 0.302
+   },
+   {
+    "w": "business",
+    "start": 0.348,
+    "end": 0.685
+   },
+   {
+    "w": "exists",
+    "start": 0.743,
+    "end": 1.057
+   },
+   {
+    "w": "for",
+    "start": 1.091,
+    "end": 1.196
+   },
+   {
+    "w": "one",
+    "start": 1.265,
+    "end": 1.393
+   },
+   {
+    "w": "reason.",
+    "start": 1.428,
+    "end": 1.811
+   },
+   {
+    "w": "To",
+    "start": 2.276,
+    "end": 2.392
+   },
+   {
+    "w": "make",
+    "start": 2.45,
+    "end": 2.612
+   },
+   {
+    "w": "money.",
+    "start": 2.659,
+    "end": 3.297
+   }
+  ]
+ },
+ "customers": {
+  "duration": 4.226,
+  "words": [
+   {
+    "w": "Money",
+    "start": 0,
+    "end": 0.279
+   },
+   {
+    "w": "comes",
+    "start": 0.337,
+    "end": 0.546
+   },
+   {
+    "w": "from",
+    "start": 0.58,
+    "end": 0.708
+   },
+   {
+    "w": "customers.",
+    "start": 0.778,
+    "end": 1.556
+   },
+   {
+    "w": "And",
+    "start": 1.962,
+    "end": 2.113
+   },
+   {
+    "w": "customers",
+    "start": 2.183,
+    "end": 2.659
+   },
+   {
+    "w": "come",
+    "start": 2.717,
+    "end": 2.879
+   },
+   {
+    "w": "from",
+    "start": 2.902,
+    "end": 3.019
+   },
+   {
+    "w": "marketing.",
+    "start": 3.077,
+    "end": 4.226
+   }
+  ]
+ },
+ "question": {
+  "duration": 9.288,
+  "words": [
+   {
+    "w": "Marketing",
+    "start": 0,
+    "end": 0.476
+   },
+   {
+    "w": "is",
+    "start": 0.522,
+    "end": 0.592
+   },
+   {
+    "w": "spending",
+    "start": 0.627,
+    "end": 0.952
+   },
+   {
+    "w": "money",
+    "start": 1.022,
+    "end": 1.207
+   },
+   {
+    "w": "today,",
+    "start": 1.254,
+    "end": 1.788
+   },
+   {
+    "w": "to",
+    "start": 1.974,
+    "end": 2.09
+   },
+   {
+    "w": "win",
+    "start": 2.183,
+    "end": 2.357
+   },
+   {
+    "w": "customers",
+    "start": 2.426,
+    "end": 2.891
+   },
+   {
+    "w": "tomorrow.",
+    "start": 2.937,
+    "end": 3.506
+   },
+   {
+    "w": "So",
+    "start": 3.843,
+    "end": 3.994
+   },
+   {
+    "w": "every",
+    "start": 4.063,
+    "end": 4.261
+   },
+   {
+    "w": "marketing",
+    "start": 4.331,
+    "end": 4.702
+   },
+   {
+    "w": "decision",
+    "start": 4.76,
+    "end": 5.178
+   },
+   {
+    "w": "comes",
+    "start": 5.248,
+    "end": 5.503
+   },
+   {
+    "w": "down",
+    "start": 5.561,
+    "end": 5.793
+   },
+   {
+    "w": "to",
+    "start": 5.84,
+    "end": 5.909
+   },
+   {
+    "w": "one",
+    "start": 6.049,
+    "end": 6.246
+   },
+   {
+    "w": "question.",
+    "start": 6.281,
+    "end": 6.873
+   },
+   {
+    "w": "Where",
+    "start": 7.338,
+    "end": 7.593
+   },
+   {
+    "w": "should",
+    "start": 7.628,
+    "end": 7.814
+   },
+   {
+    "w": "the",
+    "start": 7.837,
+    "end": 7.906
+   },
+   {
+    "w": "next",
+    "start": 7.964,
+    "end": 8.173
+   },
+   {
+    "w": "dollar",
+    "start": 8.208,
+    "end": 8.487
+   },
+   {
+    "w": "go?",
+    "start": 8.545,
+    "end": 9.288
+   }
+  ]
+ },
+ "menu": {
+  "duration": 12.771,
+  "words": [
+   {
+    "w": "And",
+    "start": 0,
+    "end": 0.197
+   },
+   {
+    "w": "the",
+    "start": 0.244,
+    "end": 0.313
+   },
+   {
+    "w": "menu",
+    "start": 0.372,
+    "end": 0.627
+   },
+   {
+    "w": "is",
+    "start": 0.65,
+    "end": 0.708
+   },
+   {
+    "w": "overwhelming.",
+    "start": 0.766,
+    "end": 1.544
+   },
+   {
+    "w": "Conferences.",
+    "start": 1.881,
+    "end": 2.926
+   },
+   {
+    "w": "Billboards.",
+    "start": 3.111,
+    "end": 3.762
+   },
+   {
+    "w": "Google",
+    "start": 3.82,
+    "end": 4.156
+   },
+   {
+    "w": "Ads.",
+    "start": 4.191,
+    "end": 4.772
+   },
+   {
+    "w": "Cold",
+    "start": 5.027,
+    "end": 5.352
+   },
+   {
+    "w": "email.",
+    "start": 5.41,
+    "end": 5.991
+   },
+   {
+    "w": "LinkedIn.",
+    "start": 6.327,
+    "end": 7.129
+   },
+   {
+    "w": "S.E.O.",
+    "start": 7.384,
+    "end": 8.336
+   },
+   {
+    "w": "And",
+    "start": 8.742,
+    "end": 8.916
+   },
+   {
+    "w": "now,",
+    "start": 8.998,
+    "end": 9.52
+   },
+   {
+    "w": "answers",
+    "start": 9.648,
+    "end": 10.252
+   },
+   {
+    "w": "from",
+    "start": 10.379,
+    "end": 10.577
+   },
+   {
+    "w": "A.I.",
+    "start": 10.704,
+    "end": 11.273
+   },
+   {
+    "w": "assistants.",
+    "start": 11.297,
+    "end": 12.771
+   }
+  ]
+ },
+ "languages": {
+  "duration": 12.028,
+  "words": [
+   {
+    "w": "Every",
+    "start": 0,
+    "end": 0.325
+   },
+   {
+    "w": "channel",
+    "start": 0.383,
+    "end": 0.673
+   },
+   {
+    "w": "speaks",
+    "start": 0.708,
+    "end": 0.952
+   },
+   {
+    "w": "a",
+    "start": 0.987,
+    "end": 1.01
+   },
+   {
+    "w": "different",
+    "start": 1.045,
+    "end": 1.277
+   },
+   {
+    "w": "language.",
+    "start": 1.312,
+    "end": 1.8
+   },
+   {
+    "w": "Badge",
+    "start": 2.264,
+    "end": 2.601
+   },
+   {
+    "w": "scans.",
+    "start": 2.624,
+    "end": 3.181
+   },
+   {
+    "w": "Impressions.",
+    "start": 3.204,
+    "end": 3.982
+   },
+   {
+    "w": "Clicks.",
+    "start": 4.319,
+    "end": 4.957
+   },
+   {
+    "w": "Replies.",
+    "start": 5.294,
+    "end": 6.118
+   },
+   {
+    "w": "Leads.",
+    "start": 6.455,
+    "end": 7.047
+   },
+   {
+    "w": "Rankings.",
+    "start": 7.384,
+    "end": 8.081
+   },
+   {
+    "w": "Some",
+    "start": 8.545,
+    "end": 8.8
+   },
+   {
+    "w": "pay",
+    "start": 8.835,
+    "end": 8.975
+   },
+   {
+    "w": "off",
+    "start": 9.033,
+    "end": 9.149
+   },
+   {
+    "w": "in",
+    "start": 9.195,
+    "end": 9.253
+   },
+   {
+    "w": "days.",
+    "start": 9.323,
+    "end": 9.868
+   },
+   {
+    "w": "Others",
+    "start": 10.275,
+    "end": 10.612
+   },
+   {
+    "w": "take",
+    "start": 10.658,
+    "end": 10.867
+   },
+   {
+    "w": "months.",
+    "start": 10.913,
+    "end": 12.028
+   }
+  ]
+ },
+ "trap": {
+  "duration": 8.591,
+  "words": [
+   {
+    "w": "So",
+    "start": 0,
+    "end": 0.163
+   },
+   {
+    "w": "decisions",
+    "start": 0.232,
+    "end": 0.731
+   },
+   {
+    "w": "get",
+    "start": 0.778,
+    "end": 0.929
+   },
+   {
+    "w": "made",
+    "start": 0.998,
+    "end": 1.231
+   },
+   {
+    "w": "by",
+    "start": 1.265,
+    "end": 1.382
+   },
+   {
+    "w": "gut",
+    "start": 1.509,
+    "end": 1.788
+   },
+   {
+    "w": "feeling,",
+    "start": 1.869,
+    "end": 2.461
+   },
+   {
+    "w": "by",
+    "start": 2.752,
+    "end": 2.891
+   },
+   {
+    "w": "the",
+    "start": 2.937,
+    "end": 3.007
+   },
+   {
+    "w": "loudest",
+    "start": 3.077,
+    "end": 3.413
+   },
+   {
+    "w": "voice,",
+    "start": 3.471,
+    "end": 4.04
+   },
+   {
+    "w": "or",
+    "start": 4.331,
+    "end": 4.458
+   },
+   {
+    "w": "by",
+    "start": 4.516,
+    "end": 4.621
+   },
+   {
+    "w": "whatever",
+    "start": 4.679,
+    "end": 5.004
+   },
+   {
+    "w": "number",
+    "start": 5.074,
+    "end": 5.399
+   },
+   {
+    "w": "is",
+    "start": 5.526,
+    "end": 5.654
+   },
+   {
+    "w": "easiest",
+    "start": 5.782,
+    "end": 6.235
+   },
+   {
+    "w": "to",
+    "start": 6.258,
+    "end": 6.316
+   },
+   {
+    "w": "count.",
+    "start": 6.385,
+    "end": 6.745
+   },
+   {
+    "w": "That's",
+    "start": 7.21,
+    "end": 7.477
+   },
+   {
+    "w": "the",
+    "start": 7.512,
+    "end": 7.581
+   },
+   {
+    "w": "trap.",
+    "start": 7.628,
+    "end": 8.591
+   }
+  ]
+ },
+ "linkedin": {
+  "duration": 4.505,
+  "words": [
+   {
+    "w": "LinkedIn",
+    "start": 0,
+    "end": 0.406
+   },
+   {
+    "w": "brings",
+    "start": 0.453,
+    "end": 0.673
+   },
+   {
+    "w": "in",
+    "start": 0.72,
+    "end": 0.778
+   },
+   {
+    "w": "the",
+    "start": 0.813,
+    "end": 0.882
+   },
+   {
+    "w": "cheapest",
+    "start": 0.917,
+    "end": 1.242
+   },
+   {
+    "w": "leads.",
+    "start": 1.3,
+    "end": 1.776
+   },
+   {
+    "w": "And",
+    "start": 2.113,
+    "end": 2.264
+   },
+   {
+    "w": "some",
+    "start": 2.31,
+    "end": 2.461
+   },
+   {
+    "w": "of",
+    "start": 2.496,
+    "end": 2.543
+   },
+   {
+    "w": "the",
+    "start": 2.577,
+    "end": 2.647
+   },
+   {
+    "w": "most",
+    "start": 2.694,
+    "end": 2.891
+   },
+   {
+    "w": "expensive",
+    "start": 2.949,
+    "end": 3.425
+   },
+   {
+    "w": "customers.",
+    "start": 3.46,
+    "end": 4.505
+   }
+  ]
+ },
+ "currency": {
+  "duration": 8.916,
+  "words": [
+   {
+    "w": "The",
+    "start": 0,
+    "end": 0.139
+   },
+   {
+    "w": "fix",
+    "start": 0.209,
+    "end": 0.441
+   },
+   {
+    "w": "starts",
+    "start": 0.499,
+    "end": 0.789
+   },
+   {
+    "w": "from",
+    "start": 0.824,
+    "end": 0.964
+   },
+   {
+    "w": "first",
+    "start": 1.045,
+    "end": 1.277
+   },
+   {
+    "w": "principles.",
+    "start": 1.335,
+    "end": 2.067
+   },
+   {
+    "w": "Translate",
+    "start": 2.403,
+    "end": 2.961
+   },
+   {
+    "w": "every",
+    "start": 3.03,
+    "end": 3.309
+   },
+   {
+    "w": "channel",
+    "start": 3.367,
+    "end": 3.692
+   },
+   {
+    "w": "into",
+    "start": 3.75,
+    "end": 3.901
+   },
+   {
+    "w": "one",
+    "start": 3.994,
+    "end": 4.156
+   },
+   {
+    "w": "currency,",
+    "start": 4.191,
+    "end": 4.818
+   },
+   {
+    "w": "close",
+    "start": 5.004,
+    "end": 5.306
+   },
+   {
+    "w": "to",
+    "start": 5.341,
+    "end": 5.399
+   },
+   {
+    "w": "money:",
+    "start": 5.48,
+    "end": 5.933
+   },
+   {
+    "w": "the",
+    "start": 6.269,
+    "end": 6.374
+   },
+   {
+    "w": "cost",
+    "start": 6.444,
+    "end": 6.792
+   },
+   {
+    "w": "of",
+    "start": 6.838,
+    "end": 6.908
+   },
+   {
+    "w": "a",
+    "start": 6.954,
+    "end": 6.978
+   },
+   {
+    "w": "qualified",
+    "start": 7.047,
+    "end": 7.628
+   },
+   {
+    "w": "sales",
+    "start": 7.686,
+    "end": 8.022
+   },
+   {
+    "w": "lead.",
+    "start": 8.092,
+    "end": 8.916
+   }
+  ]
+ },
+ "curve": {
+  "duration": 6.409,
+  "words": [
+   {
+    "w": "Then",
+    "start": 0,
+    "end": 0.221
+   },
+   {
+    "w": "ask",
+    "start": 0.279,
+    "end": 0.464
+   },
+   {
+    "w": "what",
+    "start": 0.511,
+    "end": 0.627
+   },
+   {
+    "w": "the",
+    "start": 0.662,
+    "end": 0.731
+   },
+   {
+    "w": "next",
+    "start": 0.813,
+    "end": 1.045
+   },
+   {
+    "w": "dollar",
+    "start": 1.08,
+    "end": 1.358
+   },
+   {
+    "w": "buys.",
+    "start": 1.416,
+    "end": 1.985
+   },
+   {
+    "w": "Because",
+    "start": 2.276,
+    "end": 2.589
+   },
+   {
+    "w": "every",
+    "start": 2.67,
+    "end": 2.972
+   },
+   {
+    "w": "channel",
+    "start": 3.03,
+    "end": 3.344
+   },
+   {
+    "w": "gets",
+    "start": 3.39,
+    "end": 3.553
+   },
+   {
+    "w": "more",
+    "start": 3.611,
+    "end": 3.75
+   },
+   {
+    "w": "expensive,",
+    "start": 3.785,
+    "end": 4.47
+   },
+   {
+    "w": "the",
+    "start": 4.76,
+    "end": 4.865
+   },
+   {
+    "w": "more",
+    "start": 4.923,
+    "end": 5.074
+   },
+   {
+    "w": "you",
+    "start": 5.108,
+    "end": 5.19
+   },
+   {
+    "w": "pour",
+    "start": 5.259,
+    "end": 5.457
+   },
+   {
+    "w": "in.",
+    "start": 5.538,
+    "end": 6.409
+   }
+  ]
+ },
+ "loop": {
+  "duration": 9.102,
+  "words": [
+   {
+    "w": "Move",
+    "start": 0,
+    "end": 0.337
+   },
+   {
+    "w": "money",
+    "start": 0.383,
+    "end": 0.592
+   },
+   {
+    "w": "from",
+    "start": 0.639,
+    "end": 0.778
+   },
+   {
+    "w": "where",
+    "start": 0.824,
+    "end": 0.987
+   },
+   {
+    "w": "the",
+    "start": 1.01,
+    "end": 1.08
+   },
+   {
+    "w": "next",
+    "start": 1.126,
+    "end": 1.3
+   },
+   {
+    "w": "customer",
+    "start": 1.347,
+    "end": 1.8
+   },
+   {
+    "w": "is",
+    "start": 1.927,
+    "end": 2.125
+   },
+   {
+    "w": "expensive,",
+    "start": 2.183,
+    "end": 2.902
+   },
+   {
+    "w": "to",
+    "start": 3.193,
+    "end": 3.309
+   },
+   {
+    "w": "where",
+    "start": 3.379,
+    "end": 3.576
+   },
+   {
+    "w": "it",
+    "start": 3.611,
+    "end": 3.669
+   },
+   {
+    "w": "is",
+    "start": 3.704,
+    "end": 3.785
+   },
+   {
+    "w": "cheap.",
+    "start": 3.843,
+    "end": 4.331
+   },
+   {
+    "w": "Small",
+    "start": 5.062,
+    "end": 5.445
+   },
+   {
+    "w": "steps.",
+    "start": 5.515,
+    "end": 6.13
+   },
+   {
+    "w": "Measure.",
+    "start": 6.293,
+    "end": 6.908
+   },
+   {
+    "w": "Repeat.",
+    "start": 7.094,
+    "end": 7.755
+   },
+   {
+    "w": "Every",
+    "start": 7.976,
+    "end": 8.266
+   },
+   {
+    "w": "week.",
+    "start": 8.324,
+    "end": 9.102
+   }
+  ]
+ },
+ "agents": {
+  "duration": 8.127,
+  "words": [
+   {
+    "w": "That",
+    "start": 0,
+    "end": 0.244
+   },
+   {
+    "w": "loop",
+    "start": 0.302,
+    "end": 0.488
+   },
+   {
+    "w": "is",
+    "start": 0.534,
+    "end": 0.604
+   },
+   {
+    "w": "the",
+    "start": 0.65,
+    "end": 0.72
+   },
+   {
+    "w": "job",
+    "start": 0.766,
+    "end": 0.987
+   },
+   {
+    "w": "of",
+    "start": 1.057,
+    "end": 1.103
+   },
+   {
+    "w": "a",
+    "start": 1.161,
+    "end": 1.184
+   },
+   {
+    "w": "C.M.O.",
+    "start": 1.254,
+    "end": 1.892
+   },
+   {
+    "w": "Repetitive,",
+    "start": 1.962,
+    "end": 2.728
+   },
+   {
+    "w": "data",
+    "start": 3.193,
+    "end": 3.529
+   },
+   {
+    "w": "heavy,",
+    "start": 3.599,
+    "end": 4.133
+   },
+   {
+    "w": "and",
+    "start": 4.389,
+    "end": 4.563
+   },
+   {
+    "w": "never",
+    "start": 4.644,
+    "end": 4.865
+   },
+   {
+    "w": "finished.",
+    "start": 4.923,
+    "end": 5.375
+   },
+   {
+    "w": "A",
+    "start": 5.782,
+    "end": 5.863
+   },
+   {
+    "w": "perfect",
+    "start": 6.026,
+    "end": 6.467
+   },
+   {
+    "w": "job",
+    "start": 6.525,
+    "end": 6.827
+   },
+   {
+    "w": "for",
+    "start": 6.896,
+    "end": 7.012
+   },
+   {
+    "w": "agents.",
+    "start": 7.082,
+    "end": 8.127
+   }
+  ]
+ },
+ "org": {
+  "duration": 11.796,
+  "words": [
+   {
+    "w": "One",
+    "start": 0,
+    "end": 0.29
+   },
+   {
+    "w": "agent",
+    "start": 0.325,
+    "end": 0.65
+   },
+   {
+    "w": "per",
+    "start": 0.72,
+    "end": 0.894
+   },
+   {
+    "w": "channel",
+    "start": 0.964,
+    "end": 1.358
+   },
+   {
+    "w": "speaks",
+    "start": 1.544,
+    "end": 1.869
+   },
+   {
+    "w": "that",
+    "start": 1.904,
+    "end": 2.032
+   },
+   {
+    "w": "channel's",
+    "start": 2.078,
+    "end": 2.426
+   },
+   {
+    "w": "language.",
+    "start": 2.485,
+    "end": 3.03
+   },
+   {
+    "w": "A",
+    "start": 3.495,
+    "end": 3.587
+   },
+   {
+    "w": "C.M.O.",
+    "start": 3.68,
+    "end": 4.261
+   },
+   {
+    "w": "agent",
+    "start": 4.296,
+    "end": 4.656
+   },
+   {
+    "w": "decides",
+    "start": 4.702,
+    "end": 5.166
+   },
+   {
+    "w": "where",
+    "start": 5.213,
+    "end": 5.422
+   },
+   {
+    "w": "the",
+    "start": 5.457,
+    "end": 5.526
+   },
+   {
+    "w": "money",
+    "start": 5.561,
+    "end": 5.724
+   },
+   {
+    "w": "goes.",
+    "start": 5.77,
+    "end": 6.339
+   },
+   {
+    "w": "And",
+    "start": 6.676,
+    "end": 6.815
+   },
+   {
+    "w": "the",
+    "start": 6.861,
+    "end": 6.931
+   },
+   {
+    "w": "C.E.O.",
+    "start": 6.978,
+    "end": 7.848
+   },
+   {
+    "w": "sets",
+    "start": 7.883,
+    "end": 8.115
+   },
+   {
+    "w": "the",
+    "start": 8.173,
+    "end": 8.243
+   },
+   {
+    "w": "goal,",
+    "start": 8.301,
+    "end": 8.766
+   },
+   {
+    "w": "and",
+    "start": 9.021,
+    "end": 9.172
+   },
+   {
+    "w": "how",
+    "start": 9.242,
+    "end": 9.358
+   },
+   {
+    "w": "much",
+    "start": 9.416,
+    "end": 9.601
+   },
+   {
+    "w": "the",
+    "start": 9.66,
+    "end": 9.741
+   },
+   {
+    "w": "agent",
+    "start": 9.822,
+    "end": 10.124
+   },
+   {
+    "w": "may",
+    "start": 10.17,
+    "end": 10.298
+   },
+   {
+    "w": "move",
+    "start": 10.379,
+    "end": 10.6
+   },
+   {
+    "w": "on",
+    "start": 10.635,
+    "end": 10.704
+   },
+   {
+    "w": "its",
+    "start": 10.751,
+    "end": 10.867
+   },
+   {
+    "w": "own.",
+    "start": 10.925,
+    "end": 11.796
+   }
+  ]
+ },
+ "decide": {
+  "duration": 6.455,
+  "words": [
+   {
+    "w": "Small",
+    "start": 0,
+    "end": 0.43
+   },
+   {
+    "w": "moves,",
+    "start": 0.488,
+    "end": 0.859
+   },
+   {
+    "w": "it",
+    "start": 0.906,
+    "end": 1.045
+   },
+   {
+    "w": "makes",
+    "start": 1.126,
+    "end": 1.37
+   },
+   {
+    "w": "by",
+    "start": 1.416,
+    "end": 1.533
+   },
+   {
+    "w": "itself.",
+    "start": 1.591,
+    "end": 2.148
+   },
+   {
+    "w": "Big",
+    "start": 2.682,
+    "end": 2.914
+   },
+   {
+    "w": "ones",
+    "start": 2.984,
+    "end": 3.158
+   },
+   {
+    "w": "come",
+    "start": 3.216,
+    "end": 3.402
+   },
+   {
+    "w": "to",
+    "start": 3.437,
+    "end": 3.495
+   },
+   {
+    "w": "you,",
+    "start": 3.564,
+    "end": 3.889
+   },
+   {
+    "w": "with",
+    "start": 3.959,
+    "end": 4.133
+   },
+   {
+    "w": "the",
+    "start": 4.168,
+    "end": 4.238
+   },
+   {
+    "w": "evidence.",
+    "start": 4.296,
+    "end": 4.841
+   },
+   {
+    "w": "One",
+    "start": 5.306,
+    "end": 5.573
+   },
+   {
+    "w": "click.",
+    "start": 5.631,
+    "end": 6.455
+   }
+  ]
+ },
+ "end": {
+  "duration": 4.737,
+  "words": [
+   {
+    "w": "Agentic",
+    "start": 0,
+    "end": 0.708
+   },
+   {
+    "w": "C.M.O.",
+    "start": 0.766,
+    "end": 1.44
+   },
+   {
+    "w": "The",
+    "start": 1.498,
+    "end": 1.625
+   },
+   {
+    "w": "C.E.O.",
+    "start": 1.672,
+    "end": 2.183
+   },
+   {
+    "w": "steers.",
+    "start": 2.206,
+    "end": 2.879
+   },
+   {
+    "w": "The",
+    "start": 3.216,
+    "end": 3.344
+   },
+   {
+    "w": "agent",
+    "start": 3.402,
+    "end": 3.669
+   },
+   {
+    "w": "runs",
+    "start": 3.704,
+    "end": 3.889
+   },
+   {
+    "w": "marketing.",
+    "start": 3.947,
+    "end": 4.737
+   }
+  ]
+ }
+}

@@ -8,6 +8,7 @@ import { dataDir } from "./companies";
 import { HttpError } from "./errors";
 import { NOTES_PREFIX } from "./agentNotes";
 import { getProvider, type AgentTurn } from "./provider";
+import { askLive, cmoApiProvider } from "./providers/cmoApi";
 
 const MAX_PER_COMPANY = 100;
 const MAX_MESSAGES = 60;
@@ -141,12 +142,20 @@ export async function assertCanAsk(caseId: CaseId, id: string): Promise<void> {
   checkCanAsk(await getDeepDive(caseId, id));
 }
 
+/** Live deep dives keep their conversation in a Snowflake thread; the history seeds it and is the fallback. */
+function ask(d: DeepDive, question: string, data: () => Promise<CaseData>, history: AgentTurn[]): AsyncIterable<string | AskEvent> {
+  const provider = getProvider();
+  if (provider !== cmoApiProvider || !provider.isLive?.(d.caseId)) return provider.ask(d.caseId, question, data, history);
+  return askLive(question, history, { thread: d.thread, onThread: (t) => (d.thread = t ?? undefined) });
+}
+
 /** Streams the agent's answer and saves both sides of the exchange to the deep dive. */
 export async function* askInDeepDive(caseId: CaseId, id: string, question: string, data: () => Promise<CaseData>): AsyncGenerator<string | AskEvent> {
   const d = await getDeepDive(caseId, id);
   checkCanAsk(d);
   answering.add(id);
   let answer = "";
+  const threadBefore = d.thread;
   try {
     const last = d.messages.at(-1);
     if (last?.role === "user" && last.text === question) d.messages.pop(); // a retry replaces the unanswered turn
@@ -155,7 +164,7 @@ export async function* askInDeepDive(caseId: CaseId, id: string, question: strin
     d.messages.push({ role: "user", text: question, at: now() });
     d.updatedAt = now();
     await save();
-    for await (const chunk of getProvider().ask(caseId, question, data, history)) {
+    for await (const chunk of ask(d, question, data, history)) {
       if (typeof chunk === "string") answer += chunk;
       else if (chunk.type === "text") answer += chunk.text;
       yield chunk;
@@ -165,8 +174,8 @@ export async function* askInDeepDive(caseId: CaseId, id: string, question: strin
     if (answer.trim()) {
       d.messages.push({ role: "agent", text: answer.trim(), at: now() });
       d.updatedAt = now();
-      await save();
     }
+    if (answer.trim() || d.thread !== threadBefore) await save();
   }
 }
 

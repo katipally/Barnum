@@ -1,0 +1,12 @@
+[
+  { "id": "money", "act": 1, "text": "A business makes money from customers. And customers come from marketing." },
+  { "id": "question", "act": 1, "text": "So every marketing decision is one question: where does the next dollar go?" },
+  { "id": "menu", "act": 1, "text": "Conferences, billboards, Google Ads, LinkedIn, S.E.O. Each with its own language, and its own clock." },
+  { "id": "trap", "act": 1, "text": "So we pick by gut, or by the easiest number. LinkedIn: cheapest leads, pricey customers." },
+  { "id": "currency", "act": 2, "text": "First principles: put every channel in one currency. Cost per qualified sales lead." },
+  { "id": "loop", "act": 2, "text": "Ask what the next dollar buys. Move money in small steps. Measure. Repeat weekly." },
+  { "id": "agents", "act": 2, "text": "In Snowflake, one agent per channel reads only its own data. A C.M.O. agent allocates." },
+  { "id": "guard", "act": 2, "text": "Numbers come from S.Q.L., never the model. Small moves, it makes alone. Big ones go to the C.E.O., with evidence." },
+  { "id": "product", "act": 3, "text": "Move fourteen thousand from LinkedIn to conferences? Approve. Six percent more qualified leads, same budget." },
+  { "id": "end", "act": 3, "text": "Agentic C.M.O. The C.E.O. steers. The agent runs marketing." }
+]

@@ -12,7 +12,9 @@ import { Term } from "@/components/ui/Term";
 import { DecidedLine, DecisionActions, DismissButton, NOT_NOW } from "@/components/decisions/DecisionActions";
 import { isAwaiting, isUnset } from "@/components/empty/state";
 import { AwaitingMemo, heroGoal } from "./AwaitingMemo";
+import { HillClimbStrip } from "@/components/evals/HillClimbStrip";
 import { HowItWorks } from "./HowItWorks";
+import { MondayBrief } from "./MondayBrief";
 import { attainment, gapPath, inSentence, STATUS_WORD } from "./model";
 import { Spark } from "./Spark";
 import { LabelTerm } from "./terms";
@@ -41,6 +43,12 @@ function Memo({ caseId }: { caseId: CaseId }) {
   }
   return (
     <article className="py-2">
+      <div id="decisions" className="mb-6 scroll-mt-20">
+        <Panel title="What I need from you" hint="Bigger calls that need your yes or no" tour="decisions">
+          <NeedsYou brief={brief} caseId={caseId} onDone={reload} />
+        </Panel>
+      </div>
+      <HillClimbStrip />
       <HowItWorks />
       <MemoHeader c={brief.case} />
 
@@ -48,6 +56,8 @@ function Memo({ caseId }: { caseId: CaseId }) {
         <Objectives scores={brief.scorecard} />
         <NeedsYouCard brief={brief} />
       </div>
+
+      <MondayBrief caseId={caseId} />
 
       <Hero root={brief.tree} brief={brief} />
 
@@ -57,12 +67,6 @@ function Memo({ caseId }: { caseId: CaseId }) {
         </Panel>
         <Panel title="What I did on my own" hint="Within your limit" tour="autonomy-log">
           <AgentDid log={brief.log} brief={brief} />
-        </Panel>
-      </div>
-
-      <div id="decisions" className="mt-5 scroll-mt-20">
-        <Panel title="What I need from you" hint="Bigger calls that need your yes or no" tour="decisions">
-          <NeedsYou brief={brief} caseId={caseId} onDone={reload} />
         </Panel>
       </div>
 

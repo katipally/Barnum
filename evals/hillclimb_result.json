@@ -1,0 +1,4150 @@
+{
+ "experiments": [
+  {
+   "i": 0,
+   "gen": 0,
+   "params": {
+    "JUDGE_MIN_WEEKS": 1,
+    "STOP_LOSS_X": 1.5,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 0.0,
+    "NOISE_PERSIST_WEEKS": 1,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 3,
+    "MIN_MOVE_PCT": 0.0
+   },
+   "regret": 2.050755687301104,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": false,
+    "react-to-competitor": false,
+    "no-overreaction": false,
+    "salami-slicing": true
+   },
+   "failed": 3,
+   "objective": 5.050755687301104,
+   "test_regret": 1.958205958149373,
+   "accepted": true,
+   "best_objective": 5.050755687301104,
+   "best_test": 1.958205958149373,
+   "best_failed": 3
+  },
+  {
+   "i": 1,
+   "gen": 1,
+   "params": {
+    "JUDGE_MIN_WEEKS": 1,
+    "STOP_LOSS_X": 1.5,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 0.5565,
+    "NOISE_PERSIST_WEEKS": 1,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 3,
+    "MIN_MOVE_PCT": 0.0
+   },
+   "regret": 2.0070913791799656,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": false,
+    "react-to-competitor": false,
+    "no-overreaction": false,
+    "salami-slicing": true
+   },
+   "failed": 3,
+   "objective": 5.007091379179966,
+   "accepted": false,
+   "best_objective": 3.756387525962697,
+   "best_test": 1.4894491851087475,
+   "best_failed": 2
+  },
+  {
+   "i": 2,
+   "gen": 1,
+   "params": {
+    "JUDGE_MIN_WEEKS": 1,
+    "STOP_LOSS_X": 1.5,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 0.0,
+    "NOISE_PERSIST_WEEKS": 1,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 3,
+    "MIN_MOVE_PCT": 0.0
+   },
+   "regret": 2.050755687301104,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": false,
+    "react-to-competitor": false,
+    "no-overreaction": false,
+    "salami-slicing": true
+   },
+   "failed": 3,
+   "objective": 5.050755687301104,
+   "accepted": false,
+   "best_objective": 3.756387525962697,
+   "best_test": 1.4894491851087475,
+   "best_failed": 2
+  },
+  {
+   "i": 3,
+   "gen": 1,
+   "params": {
+    "JUDGE_MIN_WEEKS": 1,
+    "STOP_LOSS_X": 1.5,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 0.0,
+    "NOISE_PERSIST_WEEKS": 1,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0
+   },
+   "regret": 1.95155766585425,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": false,
+    "react-to-competitor": false,
+    "no-overreaction": false,
+    "salami-slicing": true
+   },
+   "failed": 3,
+   "objective": 4.95155766585425,
+   "accepted": false,
+   "best_objective": 3.756387525962697,
+   "best_test": 1.4894491851087475,
+   "best_failed": 2
+  },
+  {
+   "i": 4,
+   "gen": 1,
+   "params": {
+    "JUDGE_MIN_WEEKS": 1,
+    "STOP_LOSS_X": 1.5,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 0.2723,
+    "NOISE_PERSIST_WEEKS": 1,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 3,
+    "MIN_MOVE_PCT": 0.0
+   },
+   "regret": 2.059735756458884,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": false,
+    "react-to-competitor": false,
+    "no-overreaction": false,
+    "salami-slicing": true
+   },
+   "failed": 3,
+   "objective": 5.059735756458884,
+   "accepted": false,
+   "best_objective": 3.756387525962697,
+   "best_test": 1.4894491851087475,
+   "best_failed": 2
+  },
+  {
+   "i": 5,
+   "gen": 1,
+   "params": {
+    "JUDGE_MIN_WEEKS": 1,
+    "STOP_LOSS_X": 1.5,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 0.0,
+    "NOISE_PERSIST_WEEKS": 1,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 2,
+    "MIN_MOVE_PCT": 0.0
+   },
+   "regret": 1.985299383307938,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": false,
+    "react-to-competitor": false,
+    "no-overreaction": false,
+    "salami-slicing": true
+   },
+   "failed": 3,
+   "objective": 4.985299383307938,
+   "accepted": false,
+   "best_objective": 3.756387525962697,
+   "best_test": 1.4894491851087475,
+   "best_failed": 2
+  },
+  {
+   "i": 6,
+   "gen": 1,
+   "params": {
+    "JUDGE_MIN_WEEKS": 1,
+    "STOP_LOSS_X": 1.2,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 0.0,
+    "NOISE_PERSIST_WEEKS": 1,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 3,
+    "MIN_MOVE_PCT": 0.0
+   },
+   "regret": 2.244375855842079,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": false,
+    "react-to-competitor": false,
+    "no-overreaction": false,
+    "salami-slicing": true
+   },
+   "failed": 3,
+   "objective": 5.24437585584208,
+   "accepted": false,
+   "best_objective": 3.756387525962697,
+   "best_test": 1.4894491851087475,
+   "best_failed": 2
+  },
+  {
+   "i": 7,
+   "gen": 1,
+   "params": {
+    "JUDGE_MIN_WEEKS": 1,
+    "STOP_LOSS_X": 1.5,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 0.9467,
+    "NOISE_PERSIST_WEEKS": 1,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 3,
+    "MIN_MOVE_PCT": 0.0
+   },
+   "regret": 1.756387525962697,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": false,
+    "salami-slicing": true
+   },
+   "failed": 2,
+   "objective": 3.756387525962697,
+   "accepted": true,
+   "best_objective": 3.756387525962697,
+   "best_test": 1.4894491851087475,
+   "best_failed": 2
+  },
+  {
+   "i": 8,
+   "gen": 1,
+   "params": {
+    "JUDGE_MIN_WEEKS": 1,
+    "STOP_LOSS_X": 2.0477,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 0.0,
+    "NOISE_PERSIST_WEEKS": 1,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 2,
+    "MIN_MOVE_PCT": 0.0
+   },
+   "regret": 1.985299383307938,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": false,
+    "react-to-competitor": false,
+    "no-overreaction": false,
+    "salami-slicing": true
+   },
+   "failed": 3,
+   "objective": 4.985299383307938,
+   "accepted": false,
+   "best_objective": 3.756387525962697,
+   "best_test": 1.4894491851087475,
+   "best_failed": 2
+  },
+  {
+   "i": 9,
+   "gen": 2,
+   "params": {
+    "JUDGE_MIN_WEEKS": 1,
+    "STOP_LOSS_X": 1.5,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 0.9467,
+    "NOISE_PERSIST_WEEKS": 1,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 3,
+    "MIN_MOVE_PCT": 0.0062
+   },
+   "regret": 1.7458010586540558,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": false,
+    "salami-slicing": true
+   },
+   "failed": 2,
+   "objective": 3.745801058654056,
+   "accepted": false,
+   "best_objective": 2.4167643450872207,
+   "best_test": 1.2101888964926324,
+   "best_failed": 1
+  },
+  {
+   "i": 10,
+   "gen": 2,
+   "params": {
+    "JUDGE_MIN_WEEKS": 1,
+    "STOP_LOSS_X": 2.2536,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 0.9467,
+    "NOISE_PERSIST_WEEKS": 1,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 3,
+    "MIN_MOVE_PCT": 0.0
+   },
+   "regret": 1.756387525962697,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": false,
+    "salami-slicing": true
+   },
+   "failed": 2,
+   "objective": 3.756387525962697,
+   "accepted": false,
+   "best_objective": 2.4167643450872207,
+   "best_test": 1.2101888964926324,
+   "best_failed": 1
+  },
+  {
+   "i": 11,
+   "gen": 2,
+   "params": {
+    "JUDGE_MIN_WEEKS": 3,
+    "STOP_LOSS_X": 1.683,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 0.9467,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 3,
+    "MIN_MOVE_PCT": 0.0
+   },
+   "regret": 1.4167643450872207,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.4167643450872207,
+   "accepted": true,
+   "best_objective": 2.4167643450872207,
+   "best_test": 1.2101888964926324,
+   "best_failed": 1
+  },
+  {
+   "i": 12,
+   "gen": 2,
+   "params": {
+    "JUDGE_MIN_WEEKS": 1,
+    "STOP_LOSS_X": 1.5,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 0.9467,
+    "NOISE_PERSIST_WEEKS": 1,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 3,
+    "MIN_MOVE_PCT": 0.0
+   },
+   "regret": 1.756387525962697,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": false,
+    "salami-slicing": true
+   },
+   "failed": 2,
+   "objective": 3.756387525962697,
+   "accepted": false,
+   "best_objective": 2.4167643450872207,
+   "best_test": 1.2101888964926324,
+   "best_failed": 1
+  },
+  {
+   "i": 13,
+   "gen": 2,
+   "params": {
+    "JUDGE_MIN_WEEKS": 2,
+    "STOP_LOSS_X": 1.5,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 0.3951,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 3,
+    "MIN_MOVE_PCT": 0.0
+   },
+   "regret": 1.502858355684908,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.502858355684908,
+   "accepted": false,
+   "best_objective": 2.4167643450872207,
+   "best_test": 1.2101888964926324,
+   "best_failed": 1
+  },
+  {
+   "i": 14,
+   "gen": 2,
+   "params": {
+    "JUDGE_MIN_WEEKS": 1,
+    "STOP_LOSS_X": 1.5,
+    "STOP_LOSS_GRACE_WEEKS": 2,
+    "NOISE_Z": 0.9467,
+    "NOISE_PERSIST_WEEKS": 1,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 3,
+    "MIN_MOVE_PCT": 0.0
+   },
+   "regret": 1.756387525962697,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": false,
+    "salami-slicing": true
+   },
+   "failed": 2,
+   "objective": 3.756387525962697,
+   "accepted": false,
+   "best_objective": 2.4167643450872207,
+   "best_test": 1.2101888964926324,
+   "best_failed": 1
+  },
+  {
+   "i": 15,
+   "gen": 2,
+   "params": {
+    "JUDGE_MIN_WEEKS": 1,
+    "STOP_LOSS_X": 1.5,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 0.9467,
+    "NOISE_PERSIST_WEEKS": 1,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 3,
+    "MIN_MOVE_PCT": 0.0
+   },
+   "regret": 1.756387525962697,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": false,
+    "salami-slicing": true
+   },
+   "failed": 2,
+   "objective": 3.756387525962697,
+   "accepted": false,
+   "best_objective": 2.4167643450872207,
+   "best_test": 1.2101888964926324,
+   "best_failed": 1
+  },
+  {
+   "i": 16,
+   "gen": 2,
+   "params": {
+    "JUDGE_MIN_WEEKS": 2,
+    "STOP_LOSS_X": 1.5,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 0.9467,
+    "NOISE_PERSIST_WEEKS": 1,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 2,
+    "MIN_MOVE_PCT": 0.0
+   },
+   "regret": 1.9306098089826063,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": false,
+    "salami-slicing": true
+   },
+   "failed": 2,
+   "objective": 3.9306098089826063,
+   "accepted": false,
+   "best_objective": 2.4167643450872207,
+   "best_test": 1.2101888964926324,
+   "best_failed": 1
+  },
+  {
+   "i": 17,
+   "gen": 3,
+   "params": {
+    "JUDGE_MIN_WEEKS": 3,
+    "STOP_LOSS_X": 1.683,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 0.9467,
+    "NOISE_PERSIST_WEEKS": 5,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 3,
+    "MIN_MOVE_PCT": 0.0
+   },
+   "regret": 1.67328931009371,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.6732893100937103,
+   "accepted": false,
+   "best_objective": 2.4167643450872207,
+   "best_test": 1.2101888964926324,
+   "best_failed": 1
+  },
+  {
+   "i": 18,
+   "gen": 3,
+   "params": {
+    "JUDGE_MIN_WEEKS": 3,
+    "STOP_LOSS_X": 1.4463,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 0.9467,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 3,
+    "MIN_MOVE_PCT": 0.0
+   },
+   "regret": 1.4189859409277472,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.4189859409277474,
+   "accepted": false,
+   "best_objective": 2.4167643450872207,
+   "best_test": 1.2101888964926324,
+   "best_failed": 1
+  },
+  {
+   "i": 19,
+   "gen": 3,
+   "params": {
+    "JUDGE_MIN_WEEKS": 3,
+    "STOP_LOSS_X": 1.683,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 0.9467,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 1,
+    "EVIDENCE_WINDOW_WEEKS": 3,
+    "MIN_MOVE_PCT": 0.0
+   },
+   "regret": 1.4167643450872207,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.4167643450872207,
+   "accepted": false,
+   "best_objective": 2.4167643450872207,
+   "best_test": 1.2101888964926324,
+   "best_failed": 1
+  },
+  {
+   "i": 20,
+   "gen": 3,
+   "params": {
+    "JUDGE_MIN_WEEKS": 3,
+    "STOP_LOSS_X": 1.683,
+    "STOP_LOSS_GRACE_WEEKS": 2,
+    "NOISE_Z": 0.9467,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 1,
+    "EVIDENCE_WINDOW_WEEKS": 3,
+    "MIN_MOVE_PCT": 0.0
+   },
+   "regret": 1.4167643450872207,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.4167643450872207,
+   "accepted": false,
+   "best_objective": 2.4167643450872207,
+   "best_test": 1.2101888964926324,
+   "best_failed": 1
+  },
+  {
+   "i": 21,
+   "gen": 3,
+   "params": {
+    "JUDGE_MIN_WEEKS": 3,
+    "STOP_LOSS_X": 1.683,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 0.9467,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 3,
+    "MIN_MOVE_PCT": 0.0
+   },
+   "regret": 1.4167643450872207,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.4167643450872207,
+   "accepted": false,
+   "best_objective": 2.4167643450872207,
+   "best_test": 1.2101888964926324,
+   "best_failed": 1
+  },
+  {
+   "i": 22,
+   "gen": 3,
+   "params": {
+    "JUDGE_MIN_WEEKS": 4,
+    "STOP_LOSS_X": 2.7229,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 0.9467,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 3,
+    "MIN_MOVE_PCT": 0.0
+   },
+   "regret": 1.4796381895260968,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.4796381895260966,
+   "accepted": false,
+   "best_objective": 2.4167643450872207,
+   "best_test": 1.2101888964926324,
+   "best_failed": 1
+  },
+  {
+   "i": 23,
+   "gen": 3,
+   "params": {
+    "JUDGE_MIN_WEEKS": 3,
+    "STOP_LOSS_X": 1.683,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 0.0533,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 3,
+    "MIN_MOVE_PCT": 0.0
+   },
+   "regret": 1.692989709835475,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": false,
+    "salami-slicing": true
+   },
+   "failed": 2,
+   "objective": 3.6929897098354747,
+   "accepted": false,
+   "best_objective": 2.4167643450872207,
+   "best_test": 1.2101888964926324,
+   "best_failed": 1
+  },
+  {
+   "i": 24,
+   "gen": 3,
+   "params": {
+    "JUDGE_MIN_WEEKS": 3,
+    "STOP_LOSS_X": 2.9642,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 0.9467,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 3,
+    "MIN_MOVE_PCT": 0.0
+   },
+   "regret": 1.4167643450872207,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.4167643450872207,
+   "accepted": false,
+   "best_objective": 2.4167643450872207,
+   "best_test": 1.2101888964926324,
+   "best_failed": 1
+  },
+  {
+   "i": 25,
+   "gen": 4,
+   "params": {
+    "JUDGE_MIN_WEEKS": 3,
+    "STOP_LOSS_X": 1.683,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 0.9467,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 4,
+    "MIN_MOVE_PCT": 0.0
+   },
+   "regret": 1.488612995260709,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.4886129952607092,
+   "accepted": false,
+   "best_objective": 2.266298097585387,
+   "best_test": 1.2146530552438384,
+   "best_failed": 1
+  },
+  {
+   "i": 26,
+   "gen": 4,
+   "params": {
+    "JUDGE_MIN_WEEKS": 3,
+    "STOP_LOSS_X": 1.683,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 0.9467,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0
+   },
+   "regret": 1.5052057121717992,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.505205712171799,
+   "accepted": false,
+   "best_objective": 2.266298097585387,
+   "best_test": 1.2146530552438384,
+   "best_failed": 1
+  },
+  {
+   "i": 27,
+   "gen": 4,
+   "params": {
+    "JUDGE_MIN_WEEKS": 3,
+    "STOP_LOSS_X": 1.683,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 0.9467,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 3,
+    "MIN_MOVE_PCT": 0.0
+   },
+   "regret": 1.4167643450872207,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.4167643450872207,
+   "accepted": false,
+   "best_objective": 2.266298097585387,
+   "best_test": 1.2146530552438384,
+   "best_failed": 1
+  },
+  {
+   "i": 28,
+   "gen": 4,
+   "params": {
+    "JUDGE_MIN_WEEKS": 3,
+    "STOP_LOSS_X": 1.683,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.1449,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 3,
+    "MIN_MOVE_PCT": 0.0
+   },
+   "regret": 1.424534597398648,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.4245345973986483,
+   "accepted": false,
+   "best_objective": 2.266298097585387,
+   "best_test": 1.2146530552438384,
+   "best_failed": 1
+  },
+  {
+   "i": 29,
+   "gen": 4,
+   "params": {
+    "JUDGE_MIN_WEEKS": 3,
+    "STOP_LOSS_X": 1.683,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 0.9467,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 3,
+    "MIN_MOVE_PCT": 0.0019
+   },
+   "regret": 1.3360772934290523,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.336077293429052,
+   "accepted": false,
+   "best_objective": 2.266298097585387,
+   "best_test": 1.2146530552438384,
+   "best_failed": 1
+  },
+  {
+   "i": 30,
+   "gen": 4,
+   "params": {
+    "JUDGE_MIN_WEEKS": 5,
+    "STOP_LOSS_X": 1.2,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 0.9467,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 3,
+    "MIN_MOVE_PCT": 0.0
+   },
+   "regret": 1.2662980975853866,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.266298097585387,
+   "accepted": true,
+   "best_objective": 2.266298097585387,
+   "best_test": 1.2146530552438384,
+   "best_failed": 1
+  },
+  {
+   "i": 31,
+   "gen": 4,
+   "params": {
+    "JUDGE_MIN_WEEKS": 3,
+    "STOP_LOSS_X": 1.683,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 0.9467,
+    "NOISE_PERSIST_WEEKS": 2,
+    "FLIP_COOLDOWN_WEEKS": 1,
+    "EVIDENCE_WINDOW_WEEKS": 2,
+    "MIN_MOVE_PCT": 0.0
+   },
+   "regret": 1.4546112422341124,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": false,
+    "salami-slicing": true
+   },
+   "failed": 2,
+   "objective": 3.4546112422341126,
+   "accepted": false,
+   "best_objective": 2.266298097585387,
+   "best_test": 1.2146530552438384,
+   "best_failed": 1
+  },
+  {
+   "i": 32,
+   "gen": 4,
+   "params": {
+    "JUDGE_MIN_WEEKS": 3,
+    "STOP_LOSS_X": 1.683,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 0.4958,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0
+   },
+   "regret": 1.6385556120259213,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.6385556120259213,
+   "accepted": false,
+   "best_objective": 2.266298097585387,
+   "best_test": 1.2146530552438384,
+   "best_failed": 1
+  },
+  {
+   "i": 33,
+   "gen": 5,
+   "params": {
+    "JUDGE_MIN_WEEKS": 3,
+    "STOP_LOSS_X": 1.8792,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 0.9467,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 3,
+    "MIN_MOVE_PCT": 0.0
+   },
+   "regret": 1.4167643450872207,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.4167643450872207,
+   "accepted": false,
+   "best_objective": 2.2072685214002172,
+   "best_test": 1.2098466494494449,
+   "best_failed": 1
+  },
+  {
+   "i": 34,
+   "gen": 5,
+   "params": {
+    "JUDGE_MIN_WEEKS": 5,
+    "STOP_LOSS_X": 1.2,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 0.9467,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 3,
+    "MIN_MOVE_PCT": 0.0029
+   },
+   "regret": 1.207268521400217,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.2072685214002172,
+   "accepted": true,
+   "best_objective": 2.2072685214002172,
+   "best_test": 1.2098466494494449,
+   "best_failed": 1
+  },
+  {
+   "i": 35,
+   "gen": 5,
+   "params": {
+    "JUDGE_MIN_WEEKS": 5,
+    "STOP_LOSS_X": 1.9457,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 0.9467,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 3,
+    "MIN_MOVE_PCT": 0.0
+   },
+   "regret": 1.2638828081611493,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.2638828081611493,
+   "accepted": false,
+   "best_objective": 2.2072685214002172,
+   "best_test": 1.2098466494494449,
+   "best_failed": 1
+  },
+  {
+   "i": 36,
+   "gen": 5,
+   "params": {
+    "JUDGE_MIN_WEEKS": 5,
+    "STOP_LOSS_X": 1.2,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 0.9467,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 3,
+    "MIN_MOVE_PCT": 0.0
+   },
+   "regret": 1.2662980975853866,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.266298097585387,
+   "accepted": false,
+   "best_objective": 2.2072685214002172,
+   "best_test": 1.2098466494494449,
+   "best_failed": 1
+  },
+  {
+   "i": 37,
+   "gen": 5,
+   "params": {
+    "JUDGE_MIN_WEEKS": 4,
+    "STOP_LOSS_X": 1.2,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 0.9467,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 3,
+    "MIN_MOVE_PCT": 0.0
+   },
+   "regret": 1.433847354809092,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.433847354809092,
+   "accepted": false,
+   "best_objective": 2.2072685214002172,
+   "best_test": 1.2098466494494449,
+   "best_failed": 1
+  },
+  {
+   "i": 38,
+   "gen": 5,
+   "params": {
+    "JUDGE_MIN_WEEKS": 5,
+    "STOP_LOSS_X": 1.2,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 0.9467,
+    "NOISE_PERSIST_WEEKS": 5,
+    "FLIP_COOLDOWN_WEEKS": 1,
+    "EVIDENCE_WINDOW_WEEKS": 3,
+    "MIN_MOVE_PCT": 0.0
+   },
+   "regret": 1.4976353054497054,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.4976353054497054,
+   "accepted": false,
+   "best_objective": 2.2072685214002172,
+   "best_test": 1.2098466494494449,
+   "best_failed": 1
+  },
+  {
+   "i": 39,
+   "gen": 5,
+   "params": {
+    "JUDGE_MIN_WEEKS": 5,
+    "STOP_LOSS_X": 1.2,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 0.9467,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 3,
+    "MIN_MOVE_PCT": 0.0
+   },
+   "regret": 1.2662980975853866,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.266298097585387,
+   "accepted": false,
+   "best_objective": 2.2072685214002172,
+   "best_test": 1.2098466494494449,
+   "best_failed": 1
+  },
+  {
+   "i": 40,
+   "gen": 5,
+   "params": {
+    "JUDGE_MIN_WEEKS": 5,
+    "STOP_LOSS_X": 1.2,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 0.9682,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 3,
+    "MIN_MOVE_PCT": 0.0
+   },
+   "regret": 1.2223849534175,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.2223849534175,
+   "accepted": false,
+   "best_objective": 2.2072685214002172,
+   "best_test": 1.2098466494494449,
+   "best_failed": 1
+  },
+  {
+   "i": 41,
+   "gen": 6,
+   "params": {
+    "JUDGE_MIN_WEEKS": 5,
+    "STOP_LOSS_X": 1.2,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 0.9467,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 1,
+    "EVIDENCE_WINDOW_WEEKS": 3,
+    "MIN_MOVE_PCT": 0.0029
+   },
+   "regret": 1.207268521400217,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.2072685214002172,
+   "accepted": false,
+   "best_objective": 2.1937363967933337,
+   "best_test": 1.2130600660648467,
+   "best_failed": 1
+  },
+  {
+   "i": 42,
+   "gen": 6,
+   "params": {
+    "JUDGE_MIN_WEEKS": 5,
+    "STOP_LOSS_X": 1.2,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 0.9467,
+    "NOISE_PERSIST_WEEKS": 2,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 3,
+    "MIN_MOVE_PCT": 0.0029
+   },
+   "regret": 1.390876516695829,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.390876516695829,
+   "accepted": false,
+   "best_objective": 2.1937363967933337,
+   "best_test": 1.2130600660648467,
+   "best_failed": 1
+  },
+  {
+   "i": 43,
+   "gen": 6,
+   "params": {
+    "JUDGE_MIN_WEEKS": 5,
+    "STOP_LOSS_X": 1.2413,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 0.9467,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 3,
+    "MIN_MOVE_PCT": 0.0
+   },
+   "regret": 1.2662980975853866,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.266298097585387,
+   "accepted": false,
+   "best_objective": 2.1937363967933337,
+   "best_test": 1.2130600660648467,
+   "best_failed": 1
+  },
+  {
+   "i": 44,
+   "gen": 6,
+   "params": {
+    "JUDGE_MIN_WEEKS": 5,
+    "STOP_LOSS_X": 1.2,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 0.9467,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 1,
+    "EVIDENCE_WINDOW_WEEKS": 3,
+    "MIN_MOVE_PCT": 0.0029
+   },
+   "regret": 1.207268521400217,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.2072685214002172,
+   "accepted": false,
+   "best_objective": 2.1937363967933337,
+   "best_test": 1.2130600660648467,
+   "best_failed": 1
+  },
+  {
+   "i": 45,
+   "gen": 6,
+   "params": {
+    "JUDGE_MIN_WEEKS": 5,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 0.9467,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 3,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.1937363967933334,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.1937363967933337,
+   "accepted": true,
+   "best_objective": 2.1937363967933337,
+   "best_test": 1.2130600660648467,
+   "best_failed": 1
+  },
+  {
+   "i": 46,
+   "gen": 6,
+   "params": {
+    "JUDGE_MIN_WEEKS": 5,
+    "STOP_LOSS_X": 1.2,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 0.08,
+    "NOISE_PERSIST_WEEKS": 1,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 3,
+    "MIN_MOVE_PCT": 0.0029
+   },
+   "regret": 2.066227230737892,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": false,
+    "react-to-competitor": false,
+    "no-overreaction": false,
+    "salami-slicing": true
+   },
+   "failed": 3,
+   "objective": 5.066227230737892,
+   "accepted": false,
+   "best_objective": 2.1937363967933337,
+   "best_test": 1.2130600660648467,
+   "best_failed": 1
+  },
+  {
+   "i": 47,
+   "gen": 6,
+   "params": {
+    "JUDGE_MIN_WEEKS": 5,
+    "STOP_LOSS_X": 1.2,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 0.9467,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 3,
+    "MIN_MOVE_PCT": 0.0033
+   },
+   "regret": 1.207268521400217,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.2072685214002172,
+   "accepted": false,
+   "best_objective": 2.1937363967933337,
+   "best_test": 1.2130600660648467,
+   "best_failed": 1
+  },
+  {
+   "i": 48,
+   "gen": 6,
+   "params": {
+    "JUDGE_MIN_WEEKS": 5,
+    "STOP_LOSS_X": 1.2,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.404,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 1,
+    "EVIDENCE_WINDOW_WEEKS": 3,
+    "MIN_MOVE_PCT": 0.0013
+   },
+   "regret": 1.231326569263126,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.2313265692631257,
+   "accepted": false,
+   "best_objective": 2.1937363967933337,
+   "best_test": 1.2130600660648467,
+   "best_failed": 1
+  },
+  {
+   "i": 49,
+   "gen": 7,
+   "params": {
+    "JUDGE_MIN_WEEKS": 5,
+    "STOP_LOSS_X": 1.904,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 0.9467,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 3,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.1932159873156798,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.19321598731568,
+   "accepted": false,
+   "best_objective": 2.148590237013911,
+   "best_test": 1.1976185611726404,
+   "best_failed": 1
+  },
+  {
+   "i": 50,
+   "gen": 7,
+   "params": {
+    "JUDGE_MIN_WEEKS": 5,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 0.9467,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 3,
+    "MIN_MOVE_PCT": 0.0053
+   },
+   "regret": 1.2050469255596903,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.2050469255596905,
+   "accepted": false,
+   "best_objective": 2.148590237013911,
+   "best_test": 1.1976185611726404,
+   "best_failed": 1
+  },
+  {
+   "i": 51,
+   "gen": 7,
+   "params": {
+    "JUDGE_MIN_WEEKS": 6,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.0113,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 3,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.148590237013911,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.148590237013911,
+   "accepted": true,
+   "best_objective": 2.148590237013911,
+   "best_test": 1.1976185611726404,
+   "best_failed": 1
+  },
+  {
+   "i": 52,
+   "gen": 7,
+   "params": {
+    "JUDGE_MIN_WEEKS": 5,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 0.7464,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 3,
+    "MIN_MOVE_PCT": 0.0063
+   },
+   "regret": 1.4021374268396274,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.4021374268396274,
+   "accepted": false,
+   "best_objective": 2.148590237013911,
+   "best_test": 1.1976185611726404,
+   "best_failed": 1
+  },
+  {
+   "i": 53,
+   "gen": 7,
+   "params": {
+    "JUDGE_MIN_WEEKS": 7,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 0.9467,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 3,
+    "MIN_MOVE_PCT": 0.0
+   },
+   "regret": 1.2691471339208567,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.269147133920857,
+   "accepted": false,
+   "best_objective": 2.148590237013911,
+   "best_test": 1.1976185611726404,
+   "best_failed": 1
+  },
+  {
+   "i": 54,
+   "gen": 7,
+   "params": {
+    "JUDGE_MIN_WEEKS": 5,
+    "STOP_LOSS_X": 3.4533,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 0.9467,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 3,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.2865956405111423,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.286595640511142,
+   "accepted": false,
+   "best_objective": 2.148590237013911,
+   "best_test": 1.1976185611726404,
+   "best_failed": 1
+  },
+  {
+   "i": 55,
+   "gen": 7,
+   "params": {
+    "JUDGE_MIN_WEEKS": 5,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 0.9467,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 3,
+    "MIN_MOVE_PCT": 0.0173
+   },
+   "regret": 1.2050469255596903,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.2050469255596905,
+   "accepted": false,
+   "best_objective": 2.148590237013911,
+   "best_test": 1.1976185611726404,
+   "best_failed": 1
+  },
+  {
+   "i": 56,
+   "gen": 7,
+   "params": {
+    "JUDGE_MIN_WEEKS": 5,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 2,
+    "NOISE_Z": 0.9467,
+    "NOISE_PERSIST_WEEKS": 4,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 2,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.3634322142761193,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.363432214276119,
+   "accepted": false,
+   "best_objective": 2.148590237013911,
+   "best_test": 1.1976185611726404,
+   "best_failed": 1
+  },
+  {
+   "i": 57,
+   "gen": 8,
+   "params": {
+    "JUDGE_MIN_WEEKS": 5,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.0113,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.3085478065080818,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": true,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 0,
+   "objective": 1.3085478065080818,
+   "accepted": true,
+   "best_objective": 1.3085478065080818,
+   "best_test": 1.2528540145634075,
+   "best_failed": 0
+  },
+  {
+   "i": 58,
+   "gen": 8,
+   "params": {
+    "JUDGE_MIN_WEEKS": 6,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.3518,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 3,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.2150747242381408,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.215074724238141,
+   "accepted": false,
+   "best_objective": 1.3085478065080818,
+   "best_test": 1.2528540145634075,
+   "best_failed": 0
+  },
+  {
+   "i": 59,
+   "gen": 8,
+   "params": {
+    "JUDGE_MIN_WEEKS": 6,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.0718,
+    "NOISE_PERSIST_WEEKS": 4,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 4,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.4540322437916602,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.4540322437916604,
+   "accepted": false,
+   "best_objective": 1.3085478065080818,
+   "best_test": 1.2528540145634075,
+   "best_failed": 0
+  },
+  {
+   "i": 60,
+   "gen": 8,
+   "params": {
+    "JUDGE_MIN_WEEKS": 6,
+    "STOP_LOSS_X": 1.3313,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.0113,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 2,
+    "MIN_MOVE_PCT": 0.0061
+   },
+   "regret": 1.3265054156756386,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.326505415675639,
+   "accepted": false,
+   "best_objective": 1.3085478065080818,
+   "best_test": 1.2528540145634075,
+   "best_failed": 0
+  },
+  {
+   "i": 61,
+   "gen": 8,
+   "params": {
+    "JUDGE_MIN_WEEKS": 6,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.0113,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 2,
+    "MIN_MOVE_PCT": 0.0
+   },
+   "regret": 1.2643419533873623,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.2643419533873623,
+   "accepted": false,
+   "best_objective": 1.3085478065080818,
+   "best_test": 1.2528540145634075,
+   "best_failed": 0
+  },
+  {
+   "i": 62,
+   "gen": 8,
+   "params": {
+    "JUDGE_MIN_WEEKS": 6,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.0113,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 3,
+    "MIN_MOVE_PCT": 0.0
+   },
+   "regret": 1.155629772831652,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.1556297728316522,
+   "accepted": false,
+   "best_objective": 1.3085478065080818,
+   "best_test": 1.2528540145634075,
+   "best_failed": 0
+  },
+  {
+   "i": 63,
+   "gen": 8,
+   "params": {
+    "JUDGE_MIN_WEEKS": 5,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.0113,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 3,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.1565902753671524,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.1565902753671526,
+   "accepted": false,
+   "best_objective": 1.3085478065080818,
+   "best_test": 1.2528540145634075,
+   "best_failed": 0
+  },
+  {
+   "i": 64,
+   "gen": 8,
+   "params": {
+    "JUDGE_MIN_WEEKS": 6,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 2,
+    "NOISE_Z": 1.0113,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 3,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.148590237013911,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.148590237013911,
+   "accepted": false,
+   "best_objective": 1.3085478065080818,
+   "best_test": 1.2528540145634075,
+   "best_failed": 0
+  },
+  {
+   "i": 65,
+   "gen": 9,
+   "params": {
+    "JUDGE_MIN_WEEKS": 3,
+    "STOP_LOSS_X": 1.2787,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.0113,
+    "NOISE_PERSIST_WEEKS": 5,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.5142095952645027,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.5142095952645027,
+   "accepted": false,
+   "best_objective": 1.2936740452403739,
+   "best_test": 1.2330715056391244,
+   "best_failed": 0
+  },
+  {
+   "i": 66,
+   "gen": 9,
+   "params": {
+    "JUDGE_MIN_WEEKS": 6,
+    "STOP_LOSS_X": 2.8426,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.0113,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 3,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.2345922318698388,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.234592231869839,
+   "accepted": false,
+   "best_objective": 1.2936740452403739,
+   "best_test": 1.2330715056391244,
+   "best_failed": 0
+  },
+  {
+   "i": 67,
+   "gen": 9,
+   "params": {
+    "JUDGE_MIN_WEEKS": 5,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.0113,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0
+   },
+   "regret": 1.3075860195283744,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": true,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 0,
+   "objective": 1.3075860195283744,
+   "accepted": false,
+   "best_objective": 1.2936740452403739,
+   "best_test": 1.2330715056391244,
+   "best_failed": 0
+  },
+  {
+   "i": 68,
+   "gen": 9,
+   "params": {
+    "JUDGE_MIN_WEEKS": 5,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.0113,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0
+   },
+   "regret": 1.3075860195283744,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": true,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 0,
+   "objective": 1.3075860195283744,
+   "accepted": false,
+   "best_objective": 1.2936740452403739,
+   "best_test": 1.2330715056391244,
+   "best_failed": 0
+  },
+  {
+   "i": 69,
+   "gen": 9,
+   "params": {
+    "JUDGE_MIN_WEEKS": 5,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 0.9101,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.2936740452403739,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": true,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 0,
+   "objective": 1.2936740452403739,
+   "accepted": true,
+   "best_objective": 1.2936740452403739,
+   "best_test": 1.2330715056391244,
+   "best_failed": 0
+  },
+  {
+   "i": 70,
+   "gen": 9,
+   "params": {
+    "JUDGE_MIN_WEEKS": 5,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.5983,
+    "NOISE_PERSIST_WEEKS": 2,
+    "FLIP_COOLDOWN_WEEKS": 1,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.3233382223135308,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.323338222313531,
+   "accepted": false,
+   "best_objective": 1.2936740452403739,
+   "best_test": 1.2330715056391244,
+   "best_failed": 0
+  },
+  {
+   "i": 71,
+   "gen": 9,
+   "params": {
+    "JUDGE_MIN_WEEKS": 5,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 0.6715,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.5228582443767276,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.5228582443767276,
+   "accepted": false,
+   "best_objective": 1.2936740452403739,
+   "best_test": 1.2330715056391244,
+   "best_failed": 0
+  },
+  {
+   "i": 72,
+   "gen": 9,
+   "params": {
+    "JUDGE_MIN_WEEKS": 3,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.284,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0026
+   },
+   "regret": 1.594419819282071,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": true,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 0,
+   "objective": 1.594419819282071,
+   "accepted": false,
+   "best_objective": 1.2936740452403739,
+   "best_test": 1.2330715056391244,
+   "best_failed": 0
+  },
+  {
+   "i": 73,
+   "gen": 10,
+   "params": {
+    "JUDGE_MIN_WEEKS": 5,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 0.9101,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 1,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.2797403228158237,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": true,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 0,
+   "objective": 1.2797403228158237,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 74,
+   "gen": 10,
+   "params": {
+    "JUDGE_MIN_WEEKS": 5,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.3231,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.422762707714653,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": true,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 0,
+   "objective": 1.422762707714653,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 75,
+   "gen": 10,
+   "params": {
+    "JUDGE_MIN_WEEKS": 5,
+    "STOP_LOSS_X": 2.5544,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.5438,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 4,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.2948311488843247,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.2948311488843247,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 76,
+   "gen": 10,
+   "params": {
+    "JUDGE_MIN_WEEKS": 5,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 0.9101,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 7,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.4431057996286758,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": true,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 0,
+   "objective": 1.4431057996286758,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 77,
+   "gen": 10,
+   "params": {
+    "JUDGE_MIN_WEEKS": 5,
+    "STOP_LOSS_X": 1.2,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 0.9101,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 6,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.583935474138539,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.583935474138539,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 78,
+   "gen": 10,
+   "params": {
+    "JUDGE_MIN_WEEKS": 5,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 0.9101,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 4,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.3671186456480302,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": true,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 0,
+   "objective": 1.3671186456480302,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 79,
+   "gen": 10,
+   "params": {
+    "JUDGE_MIN_WEEKS": 6,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.6373,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.1957588379319832,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": true,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 0,
+   "objective": 1.1957588379319832,
+   "accepted": true,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 80,
+   "gen": 10,
+   "params": {
+    "JUDGE_MIN_WEEKS": 3,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 0.9101,
+    "NOISE_PERSIST_WEEKS": 1,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0119
+   },
+   "regret": 1.8218864926720173,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": false,
+    "react-to-competitor": false,
+    "no-overreaction": false,
+    "salami-slicing": true
+   },
+   "failed": 3,
+   "objective": 4.821886492672017,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 81,
+   "gen": 11,
+   "params": {
+    "JUDGE_MIN_WEEKS": 6,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.6373,
+    "NOISE_PERSIST_WEEKS": 4,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.3198441434655175,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.3198441434655175,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 82,
+   "gen": 11,
+   "params": {
+    "JUDGE_MIN_WEEKS": 6,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 1,
+    "NOISE_Z": 1.6373,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.1957588379319832,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": true,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 0,
+   "objective": 1.1957588379319832,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 83,
+   "gen": 11,
+   "params": {
+    "JUDGE_MIN_WEEKS": 6,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.6373,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 6,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.4371686620181299,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": true,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 0,
+   "objective": 1.4371686620181299,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 84,
+   "gen": 11,
+   "params": {
+    "JUDGE_MIN_WEEKS": 6,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 2,
+    "NOISE_Z": 1.6373,
+    "NOISE_PERSIST_WEEKS": 4,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.3198441434655197,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.3198441434655197,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 85,
+   "gen": 11,
+   "params": {
+    "JUDGE_MIN_WEEKS": 6,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.6373,
+    "NOISE_PERSIST_WEEKS": 1,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.4219848875771446,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.4219848875771444,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 86,
+   "gen": 11,
+   "params": {
+    "JUDGE_MIN_WEEKS": 4,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 1,
+    "NOISE_Z": 1.5548,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.48962035867931,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": true,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 0,
+   "objective": 1.48962035867931,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 87,
+   "gen": 11,
+   "params": {
+    "JUDGE_MIN_WEEKS": 6,
+    "STOP_LOSS_X": 3.4469,
+    "STOP_LOSS_GRACE_WEEKS": 1,
+    "NOISE_Z": 1.6373,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 3,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.3783482533308062,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.378348253330806,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 88,
+   "gen": 11,
+   "params": {
+    "JUDGE_MIN_WEEKS": 6,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.6373,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0073
+   },
+   "regret": 1.220593084334479,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": true,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 0,
+   "objective": 1.220593084334479,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 89,
+   "gen": 12,
+   "params": {
+    "JUDGE_MIN_WEEKS": 6,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.6373,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 4,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.2630191084802318,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": true,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 0,
+   "objective": 1.2630191084802318,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 90,
+   "gen": 12,
+   "params": {
+    "JUDGE_MIN_WEEKS": 4,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.6373,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.3901920023334498,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.3901920023334498,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 91,
+   "gen": 12,
+   "params": {
+    "JUDGE_MIN_WEEKS": 6,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.6373,
+    "NOISE_PERSIST_WEEKS": 1,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.4219848875771446,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.4219848875771444,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 92,
+   "gen": 12,
+   "params": {
+    "JUDGE_MIN_WEEKS": 6,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 2.2783,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.473835876553598,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.473835876553598,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 93,
+   "gen": 12,
+   "params": {
+    "JUDGE_MIN_WEEKS": 6,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.3467,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0
+   },
+   "regret": 1.432829909458467,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": true,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 0,
+   "objective": 1.432829909458467,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 94,
+   "gen": 12,
+   "params": {
+    "JUDGE_MIN_WEEKS": 4,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.6373,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0121
+   },
+   "regret": 1.4700544917222786,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.4700544917222786,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 95,
+   "gen": 12,
+   "params": {
+    "JUDGE_MIN_WEEKS": 6,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.6521,
+    "NOISE_PERSIST_WEEKS": 5,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0079
+   },
+   "regret": 1.4963195783574257,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.4963195783574257,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 96,
+   "gen": 12,
+   "params": {
+    "JUDGE_MIN_WEEKS": 6,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.5578,
+    "NOISE_PERSIST_WEEKS": 2,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0065
+   },
+   "regret": 1.3452725135849486,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": true,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 0,
+   "objective": 1.3452725135849486,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 97,
+   "gen": 13,
+   "params": {
+    "JUDGE_MIN_WEEKS": 6,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.6373,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 1,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.1993531761832592,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": true,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 0,
+   "objective": 1.1993531761832592,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 98,
+   "gen": 13,
+   "params": {
+    "JUDGE_MIN_WEEKS": 6,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.6813,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0005
+   },
+   "regret": 1.2069771067379185,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.2069771067379182,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 99,
+   "gen": 13,
+   "params": {
+    "JUDGE_MIN_WEEKS": 6,
+    "STOP_LOSS_X": 2.7444,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 2.4646,
+    "NOISE_PERSIST_WEEKS": 1,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.13900636123828,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.13900636123828,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 100,
+   "gen": 13,
+   "params": {
+    "JUDGE_MIN_WEEKS": 6,
+    "STOP_LOSS_X": 1.9843,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.6373,
+    "NOISE_PERSIST_WEEKS": 4,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0051
+   },
+   "regret": 1.3339476901224254,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.333947690122425,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 101,
+   "gen": 13,
+   "params": {
+    "JUDGE_MIN_WEEKS": 7,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.6373,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0001
+   },
+   "regret": 1.2093448111480618,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": true,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 0,
+   "objective": 1.2093448111480618,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 102,
+   "gen": 13,
+   "params": {
+    "JUDGE_MIN_WEEKS": 7,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.6373,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.2110423922187965,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": true,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 0,
+   "objective": 1.2110423922187965,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 103,
+   "gen": 13,
+   "params": {
+    "JUDGE_MIN_WEEKS": 6,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.6373,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 1,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.1993531761832592,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": true,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 0,
+   "objective": 1.1993531761832592,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 104,
+   "gen": 13,
+   "params": {
+    "JUDGE_MIN_WEEKS": 6,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.6373,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 4,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.2630191084802318,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": true,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 0,
+   "objective": 1.2630191084802318,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 105,
+   "gen": 14,
+   "params": {
+    "JUDGE_MIN_WEEKS": 6,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.6373,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0167
+   },
+   "regret": 1.3095959362460126,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": true,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 0,
+   "objective": 1.3095959362460126,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 106,
+   "gen": 14,
+   "params": {
+    "JUDGE_MIN_WEEKS": 6,
+    "STOP_LOSS_X": 1.8091,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.5875,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.2674582609450515,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": true,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 0,
+   "objective": 1.2674582609450515,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 107,
+   "gen": 14,
+   "params": {
+    "JUDGE_MIN_WEEKS": 6,
+    "STOP_LOSS_X": 1.5858,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.6373,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0024
+   },
+   "regret": 1.203776100445766,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": true,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 0,
+   "objective": 1.203776100445766,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 108,
+   "gen": 14,
+   "params": {
+    "JUDGE_MIN_WEEKS": 6,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.6373,
+    "NOISE_PERSIST_WEEKS": 4,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.3198441434655175,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.3198441434655175,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 109,
+   "gen": 14,
+   "params": {
+    "JUDGE_MIN_WEEKS": 5,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 2.5,
+    "NOISE_PERSIST_WEEKS": 5,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.7888002345666154,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.788800234566615,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 110,
+   "gen": 14,
+   "params": {
+    "JUDGE_MIN_WEEKS": 6,
+    "STOP_LOSS_X": 1.5278,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.6373,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0
+   },
+   "regret": 1.1980527949036426,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": true,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 0,
+   "objective": 1.1980527949036426,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 111,
+   "gen": 14,
+   "params": {
+    "JUDGE_MIN_WEEKS": 8,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.6373,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.2095800775073569,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": true,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 0,
+   "objective": 1.2095800775073569,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 112,
+   "gen": 14,
+   "params": {
+    "JUDGE_MIN_WEEKS": 6,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.6373,
+    "NOISE_PERSIST_WEEKS": 2,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 3,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.2514534787353524,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.2514534787353524,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 113,
+   "gen": 15,
+   "params": {
+    "JUDGE_MIN_WEEKS": 5,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.6373,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.2105691038000335,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": true,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 0,
+   "objective": 1.2105691038000335,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 114,
+   "gen": 15,
+   "params": {
+    "JUDGE_MIN_WEEKS": 4,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 2.3157,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 4,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.6783506884564958,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.678350688456496,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 115,
+   "gen": 15,
+   "params": {
+    "JUDGE_MIN_WEEKS": 5,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.6373,
+    "NOISE_PERSIST_WEEKS": 4,
+    "FLIP_COOLDOWN_WEEKS": 4,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.3232248819953747,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.3232248819953747,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 116,
+   "gen": 15,
+   "params": {
+    "JUDGE_MIN_WEEKS": 6,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.6373,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0043
+   },
+   "regret": 1.2086753231704102,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": true,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 0,
+   "objective": 1.2086753231704102,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 117,
+   "gen": 15,
+   "params": {
+    "JUDGE_MIN_WEEKS": 6,
+    "STOP_LOSS_X": 1.2,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.6373,
+    "NOISE_PERSIST_WEEKS": 5,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.484644051606955,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.484644051606955,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 118,
+   "gen": 15,
+   "params": {
+    "JUDGE_MIN_WEEKS": 6,
+    "STOP_LOSS_X": 1.6604,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.6373,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 4,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.2924320289272682,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.2924320289272684,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 119,
+   "gen": 15,
+   "params": {
+    "JUDGE_MIN_WEEKS": 6,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.6373,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0111
+   },
+   "regret": 1.2981413127956367,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": true,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 0,
+   "objective": 1.2981413127956367,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 120,
+   "gen": 15,
+   "params": {
+    "JUDGE_MIN_WEEKS": 7,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.6373,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 7,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.3159123646198176,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": true,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 0,
+   "objective": 1.3159123646198176,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 121,
+   "gen": 16,
+   "params": {
+    "JUDGE_MIN_WEEKS": 6,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.8869,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.1823231151416338,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.182323115141634,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 122,
+   "gen": 16,
+   "params": {
+    "JUDGE_MIN_WEEKS": 6,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.6373,
+    "NOISE_PERSIST_WEEKS": 2,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.003
+   },
+   "regret": 1.3719059379830634,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.3719059379830636,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 123,
+   "gen": 16,
+   "params": {
+    "JUDGE_MIN_WEEKS": 6,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.6373,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0058
+   },
+   "regret": 1.220593084334479,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": true,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 0,
+   "objective": 1.220593084334479,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 124,
+   "gen": 16,
+   "params": {
+    "JUDGE_MIN_WEEKS": 6,
+    "STOP_LOSS_X": 2.0945,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.6373,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 4,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0
+   },
+   "regret": 1.1954498098996102,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.1954498098996105,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 125,
+   "gen": 16,
+   "params": {
+    "JUDGE_MIN_WEEKS": 6,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.8076,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0084
+   },
+   "regret": 1.2148210161869542,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.214821016186954,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 126,
+   "gen": 16,
+   "params": {
+    "JUDGE_MIN_WEEKS": 4,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 2,
+    "NOISE_Z": 0.0645,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.8528260979845048,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": false,
+    "salami-slicing": true
+   },
+   "failed": 2,
+   "objective": 3.852826097984505,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 127,
+   "gen": 16,
+   "params": {
+    "JUDGE_MIN_WEEKS": 8,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.6373,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0081
+   },
+   "regret": 1.232697043876272,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": true,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 0,
+   "objective": 1.232697043876272,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 128,
+   "gen": 16,
+   "params": {
+    "JUDGE_MIN_WEEKS": 6,
+    "STOP_LOSS_X": 1.2,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.6373,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 4,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.2993227767488444,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.2993227767488444,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 129,
+   "gen": 17,
+   "params": {
+    "JUDGE_MIN_WEEKS": 6,
+    "STOP_LOSS_X": 2.5477,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.6373,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.2086569303783388,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.2086569303783388,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 130,
+   "gen": 17,
+   "params": {
+    "JUDGE_MIN_WEEKS": 6,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 1,
+    "NOISE_Z": 1.6373,
+    "NOISE_PERSIST_WEEKS": 1,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.4219848875771446,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.4219848875771444,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 131,
+   "gen": 17,
+   "params": {
+    "JUDGE_MIN_WEEKS": 6,
+    "STOP_LOSS_X": 2.7214,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.4058,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 4,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.3983541151500738,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.398354115150074,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 132,
+   "gen": 17,
+   "params": {
+    "JUDGE_MIN_WEEKS": 6,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.549,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0036
+   },
+   "regret": 1.3059670564357486,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": true,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 0,
+   "objective": 1.3059670564357486,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 133,
+   "gen": 17,
+   "params": {
+    "JUDGE_MIN_WEEKS": 6,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 1,
+    "NOISE_Z": 1.6373,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 3,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.3776052508552383,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.3776052508552383,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 134,
+   "gen": 17,
+   "params": {
+    "JUDGE_MIN_WEEKS": 6,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.6373,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 3,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.2019289050428694,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": true,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 0,
+   "objective": 1.2019289050428694,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 135,
+   "gen": 17,
+   "params": {
+    "JUDGE_MIN_WEEKS": 6,
+    "STOP_LOSS_X": 2.3127,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.6373,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0
+   },
+   "regret": 1.211595540714485,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.2115955407144847,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 136,
+   "gen": 17,
+   "params": {
+    "JUDGE_MIN_WEEKS": 6,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 2,
+    "NOISE_Z": 1.6373,
+    "NOISE_PERSIST_WEEKS": 1,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.4360707285572865,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.4360707285572865,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 137,
+   "gen": 18,
+   "params": {
+    "JUDGE_MIN_WEEKS": 6,
+    "STOP_LOSS_X": 1.2,
+    "STOP_LOSS_GRACE_WEEKS": 2,
+    "NOISE_Z": 1.6373,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.1965082050125915,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": true,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 0,
+   "objective": 1.1965082050125915,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 138,
+   "gen": 18,
+   "params": {
+    "JUDGE_MIN_WEEKS": 4,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.6373,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.3901920023334498,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.3901920023334498,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 139,
+   "gen": 18,
+   "params": {
+    "JUDGE_MIN_WEEKS": 6,
+    "STOP_LOSS_X": 1.2,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.6373,
+    "NOISE_PERSIST_WEEKS": 2,
+    "FLIP_COOLDOWN_WEEKS": 3,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.4028667513265174,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.4028667513265174,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 140,
+   "gen": 18,
+   "params": {
+    "JUDGE_MIN_WEEKS": 5,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.6373,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 7,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.2829421771704674,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": true,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 0,
+   "objective": 1.2829421771704674,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 141,
+   "gen": 18,
+   "params": {
+    "JUDGE_MIN_WEEKS": 8,
+    "STOP_LOSS_X": 2.1379,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.6373,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 4,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.2054557185083123,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 2.205455718508312,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 142,
+   "gen": 18,
+   "params": {
+    "JUDGE_MIN_WEEKS": 6,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 2,
+    "NOISE_Z": 1.6373,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 0,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0079
+   },
+   "regret": 1.2177757637117421,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": true,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 0,
+   "objective": 1.2177757637117421,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 143,
+   "gen": 18,
+   "params": {
+    "JUDGE_MIN_WEEKS": 6,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 0,
+    "NOISE_Z": 1.6373,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 2,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0
+   },
+   "regret": 1.1982777707430612,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": true,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 0,
+   "objective": 1.1982777707430612,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  },
+  {
+   "i": 144,
+   "gen": 18,
+   "params": {
+    "JUDGE_MIN_WEEKS": 6,
+    "STOP_LOSS_X": 1.8119,
+    "STOP_LOSS_GRACE_WEEKS": 1,
+    "NOISE_Z": 1.6373,
+    "NOISE_PERSIST_WEEKS": 3,
+    "FLIP_COOLDOWN_WEEKS": 3,
+    "EVIDENCE_WINDOW_WEEKS": 5,
+    "MIN_MOVE_PCT": 0.0014
+   },
+   "regret": 1.2019289050428694,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": true,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 0,
+   "objective": 1.2019289050428694,
+   "accepted": false,
+   "best_objective": 1.1957588379319832,
+   "best_test": 1.3722161915035727,
+   "best_failed": 0
+  }
+ ],
+ "refs": {
+  "shipped v1": {
+   "regret": 1.5040383244387292,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": false,
+    "react-to-competitor": true,
+    "no-overreaction": false,
+    "salami-slicing": false
+   },
+   "failed": 3,
+   "objective": 4.50403832443873,
+   "test_regret": 1.736215010173399
+  },
+  "shipped v2": {
+   "regret": 1.3597116396120914,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": true,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 0,
+   "objective": 1.3597116396120914,
+   "test_regret": 1.060870482564317
+  },
+  "status quo": {
+   "regret": 4.309742856396762,
+   "traps": {
+    "linkedin-mql-trap": true,
+    "billboard-patience": true,
+    "react-to-competitor": false,
+    "no-overreaction": true,
+    "salami-slicing": true
+   },
+   "failed": 1,
+   "objective": 5.309742856396762,
+   "test_regret": 4.309742856396762
+  },
+  "cheap MQLs": {
+   "regret": 2.164903604570516,
+   "traps": {
+    "linkedin-mql-trap": false,
+    "billboard-patience": false,
+    "react-to-competitor": true,
+    "no-overreaction": false,
+    "salami-slicing": false
+   },
+   "failed": 4,
+   "objective": 6.164903604570516,
+   "test_regret": 2.51910102893955
+  }
+ },
+ "best_params": {
+  "JUDGE_MIN_WEEKS": 6,
+  "STOP_LOSS_X": 1.8119,
+  "STOP_LOSS_GRACE_WEEKS": 0,
+  "NOISE_Z": 1.6373,
+  "NOISE_PERSIST_WEEKS": 3,
+  "FLIP_COOLDOWN_WEEKS": 2,
+  "EVIDENCE_WINDOW_WEEKS": 5,
+  "MIN_MOVE_PCT": 0.0014
+ },
+ "trap_penalty": 1.0,
+ "bench": {
+  "worlds": 5,
+  "train_seeds": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6
+  ],
+  "test_seeds": [
+   7,
+   8,
+   9,
+   10,
+   11,
+   12
+  ],
+  "weeks": 26
+ }
+}

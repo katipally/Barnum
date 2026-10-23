@@ -1,13 +1,14 @@
 """Agentic CMO API. Run: uvicorn backend.app.main:app --reload"""
+import asyncio
 import threading
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, File, HTTPException, Request, UploadFile
+from fastapi import BackgroundTasks, FastAPI, File, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
-from . import orchestrator, queries
+from . import brief, evals_summary, orchestrator, queries
 from . import snowflake as sf
 from .channels import ingest, mapping, provision
 
@@ -35,6 +36,7 @@ async def lifespan(_):
 
 app = FastAPI(title="Agentic CMO", version="0.1.0", lifespan=lifespan)
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+app.include_router(brief.router)
 
 
 @app.middleware("http")
@@ -244,26 +246,36 @@ def list_memos(status: str | None = None):
     return queries.memos(status)
 
 
+class DecideIn(BaseModel):
+    note: str | None = Field(None, description="The CEO's reason; sent with the decision as agent feedback")
+
+
 @app.post("/memos/{memo_id}/{decision}")
-def decide_memo(memo_id: str, decision: str):
+async def decide_memo(memo_id: str, decision: str, background: BackgroundTasks, body: DecideIn | None = None):
     status = {"approve": "approved", "reject": "rejected"}.get(decision)
     if not status:
         raise HTTPException(404, "use /approve or /reject")
-    res = queries.decide(memo_id, status)
+    res = await asyncio.to_thread(queries.decide, memo_id, status)
     if "error" in res:
         raise HTTPException(409, res["error"])
+    # Feedback on the run that wrote the memo; after the response so the decision itself stays fast.
+    background.add_task(orchestrator.memo_feedback, memo_id, status, body.note if body else None)
     return res
 
 
 class AskIn(BaseModel):
     question: str
-    history: list[dict] = Field(default_factory=list, description="Prior messages in Agent Run format")
+    history: list[dict] = Field(default_factory=list, description="Prior messages in Agent Run format; "
+                                "used when no thread is given, folded into a new thread's first turn, and as the fallback")
+    thread_id: int | None = Field(None, description="Agent Run thread to continue (returned in the done event)")
+    parent_message_id: int | None = Field(None, description="Last assistant message_id from the done event; looked up if omitted")
+    new_thread: bool = Field(False, description="Start a thread when thread_id is empty")
 
 
 @app.post("/ask")
 def ask(body: AskIn):
-    messages = body.history + [{"role": "user", "content": [{"type": "text", "text": body.question}]}]
-    return _sse(orchestrator.guarded(orchestrator.ask(messages)))
+    return _sse(orchestrator.guarded(orchestrator.ask(body.question, body.history, body.thread_id,
+                                                      body.parent_message_id, body.new_thread)))
 
 
 # ---- settings + demo ---------------------------------------------------------
@@ -287,6 +299,12 @@ def put_assumption(key: str, body: AssumptionIn):
 def decisions_reset():
     """Clears memos and approved plans; uploaded data is untouched."""
     return {"status": queries.reset_decisions()}
+
+
+@app.get("/evals/hillclimb")
+def evals_hillclimb():
+    """The agent's own eval history: decision-logic versions, prompt versions, golden-question score."""
+    return evals_summary.hillclimb()
 
 
 @app.get("/health")
