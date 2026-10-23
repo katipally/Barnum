@@ -24,41 +24,154 @@ Built on Snowflake Cortex Agents, Cortex Analyst, `AI_COMPLETE` and Claude.
 
 ## Quickstart
 
-Requires Python 3.12, [uv](https://docs.astral.sh/uv/), and a Snowflake connection in `~/.snowflake/connections.toml` using a programmatic access token:
+```
+ you ---> Next.js (3000) ---> FastAPI (8000) ---PAT---> Snowflake CMO_DB
+                                                         |- CMO_AGENT (Cortex Agent, Claude)
+ Claude Desktop ---OAuth---> managed MCP server ---------|- CH_<X>.AGENT per channel
+                                                         '- Cortex Analyst semantic views
+
+ steps:  1 Snowflake prerequisites -> 2 connections.toml -> 3 install + setup
+         -> 4 add a channel (needs data) -> 5 API + frontend -> 6 Ask the CMO
+```
+
+The repo ships no data. Setup builds an empty CMO, and the numbers appear after you add at least one channel in step 4.
+
+You need Python 3.12 with [uv](https://docs.astral.sh/uv/), Node 20+, and a Snowflake account with Cortex Agents and the Claude models available. You do not need Cortex Code (the `coco` CLI); it was only used to build this repo.
+
+### 1. Snowflake prerequisites
+
+Run once as `ACCOUNTADMIN`. Use your own user name and a role name you like:
+
+```sql
+USE ROLE ACCOUNTADMIN;
+CREATE ROLE IF NOT EXISTS CMO_ROLE;
+GRANT CREATE DATABASE  ON ACCOUNT TO ROLE CMO_ROLE;
+GRANT CREATE WAREHOUSE ON ACCOUNT TO ROLE CMO_ROLE;
+GRANT DATABASE ROLE SNOWFLAKE.CORTEX_USER       TO ROLE CMO_ROLE;   -- AI_COMPLETE, Analyst
+GRANT DATABASE ROLE SNOWFLAKE.CORTEX_AGENT_USER TO ROLE CMO_ROLE;   -- create and run agents
+GRANT ROLE CMO_ROLE TO USER <YOU>;
+
+-- Claude runs through cross-region inference unless your region hosts it.
+ALTER ACCOUNT SET CORTEX_ENABLED_CROSS_REGION = 'ANY_REGION';       -- or a narrower scope, e.g. 'AWS_US'
+```
+
+If your account restricts models, `claude-opus-5-5` (or whatever you set in the env table below) must be allowed. Check `SHOW PARAMETERS LIKE 'CORTEX_MODELS_ALLOWLIST' IN ACCOUNT`.
+
+Create a programmatic access token (PAT) for the API calls and the connector. The secret is shown once:
+
+```sql
+ALTER USER <YOU> ADD PROGRAMMATIC ACCESS TOKEN CMO_PAT
+  ROLE_RESTRICTION = 'CMO_ROLE' DAYS_TO_EXPIRY = 30;
+```
+
+PATs need a network policy. For a person user, the token is created without one but only authenticates once the user is under a network policy. Attach one that allows your IP, or follow the bypass options in the [PAT docs](https://docs.snowflake.com/en/user-guide/programmatic-access-tokens):
+
+```sql
+CREATE NETWORK RULE <DB>.<SCHEMA>.CMO_IPS TYPE = IPV4 MODE = INGRESS VALUE_LIST = ('<YOUR_IP>/32');
+CREATE NETWORK POLICY CMO_POLICY ALLOWED_NETWORK_RULE_LIST = ('<DB>.<SCHEMA>.CMO_IPS');
+ALTER USER <YOU> SET NETWORK_POLICY = CMO_POLICY;
+```
+
+Setup itself creates `CMO_DB` and an XSMALL `CMO_WH` (auto-suspend 60s).
+
+### 2. Connection profile
+
+`~/.snowflake/connections.toml` (keep it out of git; `connections.toml` is ignored here):
 
 ```toml
-[hackathon]
-account = "ORG-ACCOUNT"
-user = "YOU"
+[cmo]
+account = "ORG-ACCOUNT"      # org-account form. For other URLs add: host = "<full host>"
+user = "<YOU>"               # the LOGIN_NAME
 authenticator = "PROGRAMMATIC_ACCESS_TOKEN"
-token = "<pat>"
-role = "YOUR_ROLE"        # needs SNOWFLAKE.CORTEX_USER, CREATE DATABASE, CREATE WAREHOUSE
-warehouse = "YOUR_WH"
+token = "<pat secret>"
+role = "CMO_ROLE"
 ```
+
+The backend reads the profile named by `CMO_CONNECTION` (default `hackathon`), so either name yours `hackathon` or `export CMO_CONNECTION=cmo`. The same `token` calls the Agent Run REST API at `https://<account host>/api/v2`, so key-pair or browser auth will not work for the agents. `warehouse` in the profile is optional; the backend switches to `CMO_WH` once it exists.
+
+### 3. Install and set up
 
 ```bash
+git clone https://github.com/katipally/CMO-Agent && cd CMO-Agent
 uv sync
-uv run python -m backend.app.setup        # CMO_DB, CMO_WH, core SQL, CMO agent (idempotent)
-uv run python -m seed.load_real ../test-data   # the 8 real exports (kept outside the repo) through the plugin path
-uv run uvicorn backend.app.main:app --port 8000
+export CMO_CONNECTION=cmo
+uv run python -m backend.app.setup     # runs sql/*.sql, deploys CMO_AGENT and the MCP server. Idempotent.
 ```
 
-Environment: `CMO_CONNECTION` (default `hackathon`), `CMO_WAREHOUSE` (`CMO_WH`), `CMO_MODEL` (CMO agent), `CMO_CHANNEL_MODEL` (channel agents), `CMO_MAPPER_MODEL` (mapping). All three model variables default to `claude-opus-5-5`. Cross-region inference must reach the chosen model.
+### 4. Add your first channel
 
-Real exports are messy, so every upload passes through a normalizer: any encoding or BOM, comma or tab, report preambles, `1,129.58`, `6.65%`, mixed date formats. Column headers become SQL-safe names.
+Use any CSV export. Messy files are fine (see below). The `description` is the main hint Claude gets, so say what one row is and which columns are leads, qualified leads and cost.
+
+```bash
+uv run uvicorn backend.app.main:app --port 8000      # leave running; use a second shell for the rest
+B=http://127.0.0.1:8000
+curl -X POST $B/channels -H 'content-type: application/json' -d '{"channel_id":"webinars","display_name":"Webinars","plan_usd":8000,"window_start":"2026-01-01","window_end":"2026-06-30","description":"One row per session with cost; qualified_leads are MQLs, sales_accepted are SQLs."}'
+curl -X POST "$B/channels/webinars/files" -F files=@my_webinars.csv
+curl -X POST $B/channels/webinars/mapping/propose
+curl -X POST $B/channels/webinars/mapping/approve
+```
+
+Expected CSV shape: one header row, one table per file, any encoding, comma or tab. Spend, leads and qualified leads columns are optional; a channel that lacks one reports NULL for it. More detail in "Add a channel with your own data" below.
+
+`uv run python -m seed.load_real <dir>` is not a sample loader. It replays the author's eight private exports by file name (Google Ads, LinkedIn Ads, billboards, outbound email, SEO, GEO, conferences, reply threads). Copy a `CHANNELS` entry in `seed/load_real.py` if you want a scripted version for your own files.
+
+### 5. Start the frontend
+
+```bash
+cd frontend
+cp .env.example .env.local     # set CMO_API_COMPANY_ID / NAME to anything you like, e.g. acme / "Acme Inc"
+npm install
+npm run dev                    # http://localhost:3000/?company=<CMO_API_COMPANY_ID>
+```
+
+Without `CMO_PROVIDER=cmo-api` the app shows only mock sample companies.
+
+### 6. Ask the CMO
+
+Open `/?company=<id>`, press Ask the CMO and try "Which channel has the lowest cost per SQL?". Or call the API: `curl -N -X POST $B/ask -H 'content-type: application/json' -d '{"question":"Where does the quarter stand?"}'`.
+
+### Backend environment (all optional)
+
+| Variable | Default | Effect |
+|---|---|---|
+| `CMO_CONNECTION` | `hackathon` | profile in `connections.toml` |
+| `SNOWFLAKE_HOME` | `~/.snowflake` | folder holding `connections.toml` |
+| `CMO_WAREHOUSE` | `CMO_WH` | warehouse the backend and agent tools use |
+| `CMO_MODEL` | `claude-opus-5-5` | CMO agent, read by `python -m backend.app.setup` |
+| `CMO_CHANNEL_MODEL` | `claude-opus-5-5` | channel agents, read at approve time |
+| `CMO_MAPPER_MODEL` | `claude-opus-5-5` | `AI_COMPLETE` mapping proposals |
+| `CMO_MAPPER_FALLBACK` | `claude-opus-4-5` | tried if the mapper model fails; empty disables |
+| `CMO_CACHE_TTL_S` | `300` | seconds the API caches read queries |
+
+The frontend variables are in `frontend/.env.example` and `frontend/README.md`.
+
+### Claude Desktop (optional)
+
+`sql/50_mcp.sql` creates the managed MCP server `CMO_DB.CORE.CMO_MCP` (the CMO agent plus the funnel semantic view). To connect Claude Desktop or Claude.ai, create an OAuth integration for a role that can use the agent (the role that ran setup owns everything), as in the [Snowflake MCP docs](https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-agents-mcp):
+
+```sql
+CREATE SECURITY INTEGRATION CMO_MCP_OAUTH TYPE = OAUTH OAUTH_CLIENT = CUSTOM ENABLED = TRUE
+  OAUTH_CLIENT_TYPE = 'PUBLIC' OAUTH_REDIRECT_URI = 'https://claude.ai/api/mcp/auth_callback'
+  OAUTH_USE_SECONDARY_ROLES = NONE ALLOWED_ROLES_LIST = ('CMO_ROLE');   -- needs CREATE INTEGRATION
+SELECT SYSTEM$SHOW_OAUTH_CLIENT_SECRETS('CMO_MCP_OAUTH');                 -- client id
+```
+
+Then Settings, Connectors, Add custom connector, with the URL `https://<account-host>/api/v2/databases/CMO_DB/schemas/CORE/mcp-servers/CMO_MCP` and the client id. Use hyphens, not underscores, in the host. The user also needs a default role and default warehouse.
+
+### Troubleshooting
+
+| Symptom | Fix |
+|---|---|
+| model not available, or `AI_COMPLETE` / agent deploy fails on the model | Set `CORTEX_ENABLED_CROSS_REGION`, check the allowlist, or point `CMO_MODEL`, `CMO_CHANNEL_MODEL`, `CMO_MAPPER_MODEL` at a Claude model your account lists |
+| `PAT_INVALID` or network policy errors | The user needs a network policy that includes your IP (or a bypass), and `token` must be the PAT secret, not its name |
+| connection profile 'hackathon' not found | Profile name mismatch: set `CMO_CONNECTION` |
+| 401 from Agent Run but SQL works | Profile is not PAT auth, or `account` does not give the right host: add `host` |
+| first answer takes 20 to 60 seconds | Cold `CMO_WH`, agent warm-up and the fan-out to channel agents. Later reads hit the cache |
+| UI shows no live company | `CMO_PROVIDER=cmo-api`, `CMO_API_URL` reachable, and `?company=` equals `CMO_API_COMPANY_ID` |
 
 ## Add a channel with your own data
 
-```bash
-B=http://127.0.0.1:8000
-curl -X POST $B/channels -H 'content-type: application/json' -d '{
-  "channel_id": "webinars", "display_name": "Webinars", "plan_usd": 8000,
-  "window_start": "2026-01-01", "window_end": "2026-06-30",
-  "description": "One row per session with platform and promo cost; qualified_leads are MQLs, sales_accepted are SQLs."}'
-curl -X POST "$B/channels/webinars/files" -F files=@my_webinars.csv     # repeatable; ?replace=true to swap
-curl -X POST $B/channels/webinars/mapping/propose                       # Claude writes, validator checks
-curl -X POST $B/channels/webinars/mapping/approve                       # provisions the agent stack, goes live
-```
+Quickstart step 4 has the four calls. Real exports are messy, so every upload passes through a normalizer: any encoding or BOM, comma or tab, report preambles, `1,129.58`, `6.65%`, mixed date formats. Column headers become SQL-safe names. `POST /channels/{id}/files?replace=true` swaps a file.
 
 What happens:
 
@@ -106,20 +219,10 @@ SSE events: `strip`, `delegation {channel, state, text, seconds}`, `memo`, `stat
 - **Not budget-bought.** Outbound, email reply threads, conferences, SEO and GEO have no spend (conferences have no booth cost in the export). They are reported on their own native outcomes and are never allocated budget.
 - **Assumptions.** ACV, margin, win rate and sales cost in `ASSUMPTIONS` are placeholders. Swap them via `PUT /assumptions/{key}` before showing anyone outside the team.
 
-## Use it from Claude
-
-`sql/50_mcp.sql` exposes the CMO agent and the funnel through the Snowflake-managed MCP server:
-
-```
-https://<account-host>/api/v2/databases/CMO_DB/schemas/CORE/mcp-servers/CMO_MCP
-```
-
-Add it to Claude Desktop or Claude.ai as a custom connector. For OAuth, use a security integration with a PUBLIC client type; see the Snowflake-managed MCP server docs.
-
 ## Tests
 
 ```bash
-uv run pytest tests -q     # measured values checked against the real exports in ../test-data, against the live CMO_DB
+uv run pytest tests -q     # measured values from the author's private exports; skipped unless those 8 channels are active in CMO_DB
 tests/smoke.sh 3           # full flow 3 times in a row against a running API (resets decisions)
 ```
 

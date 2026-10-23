@@ -35,7 +35,15 @@ def raw():
 
 
 @pytest.fixture(scope="module", autouse=True)
-def clean():
+def author_data():
+    """EXPECTED values are the author's private exports; skip on any other account."""
+    active = {c["channel_id"] for c in queries.active_channels()}
+    if not set(EXPECTED) <= active:
+        pytest.skip(f"needs the 8 channels from seed.load_real, missing: {sorted(set(EXPECTED) - active)}")
+
+
+@pytest.fixture(scope="module", autouse=True)
+def clean(author_data):
     queries.reset_decisions()
     yield
     queries.reset_decisions()
