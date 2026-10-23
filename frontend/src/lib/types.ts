@@ -204,6 +204,20 @@ export interface WeeklyBrief {
   budgetPacing: number; // spent / (total * week/weeksInPeriod)
 }
 
+// The CMO agent's own write-up of the week (CMO_DB.CORE.WEEKLY_BRIEFS); live company only.
+export interface MondayBrief {
+  createdAt: string;
+  source: "cmo_agent" | "ai_complete";
+  text: string;
+  pendingMemos: number;
+}
+
+// writing = the agent is writing a newer brief (the latest predates Monday 07:00 PT, or a refresh was asked for).
+export interface MondayBriefState {
+  brief: MondayBrief | null;
+  writing: boolean;
+}
+
 export interface StrategyMap {
   case: CompanyCase;
   objectives: (MarketingObjective & { status: Status })[];
@@ -262,6 +276,12 @@ export interface DeepDiveArtifact {
   messageCount: number; // messages the write-up covers; fewer than the thread means it is out of date
 }
 
+// A Snowflake Agent Run thread: the agent keeps the conversation, so later turns send only the new question.
+export interface AgentThread {
+  id: number;
+  parentMessageId?: number; // last stored assistant message; the backend looks it up when missing
+}
+
 export interface DeepDive {
   id: string;
   caseId: CaseId;
@@ -270,6 +290,7 @@ export interface DeepDive {
   updatedAt: string;
   messages: DeepDiveMessage[];
   artifact?: DeepDiveArtifact;
+  thread?: AgentThread; // live companies only
 }
 
 export interface DeepDiveSummary {
@@ -297,4 +318,57 @@ export interface DataSource {
   usedFor: string[]; // numbers or channels it feeds
   detail?: string; // tables, schema, mapping version
   updatedAt?: string;
+}
+
+// ---- The agent's own evals (CMO_DB.EVALS), for the hill-climbing strip ----
+
+export interface EvalVersion {
+  version: string; // "v1", "v1.1", ...
+  name: string;
+  regret_pct: number; // qualified leads lost vs the best possible plan, 0..1
+  traps_passed: number;
+  traps_total: number;
+  traps: Record<string, boolean>;
+  run_at: string;
+}
+
+export interface PromptEval {
+  version: string;
+  regret_pct: number;
+  limit_breaches: number;
+  decisions: number;
+  run_at: string;
+}
+
+// One candidate in the automated hill climb; `best*` are the best-so-far values after it.
+export interface ClimbExperiment {
+  i: number;
+  regret: number; // % on the training seeds
+  failed: number; // traps fallen into
+  objective: number; // regret + trap penalty
+  accepted: boolean;
+  best: number;
+  best_test: number; // held-out regret of the best-so-far candidate
+  best_failed: number;
+}
+
+export interface AgentClimb {
+  experiments: ClimbExperiment[];
+  refs: { name: string; regret: number; failed: number; objective: number }[];
+  run_at: string;
+  trap_penalty: number;
+  traps_total: number;
+}
+
+export interface AgentEvals {
+  climb?: AgentClimb | null;
+  decision: EvalVersion[];
+  prompts: PromptEval[];
+  golden: {
+    run: string;
+    passed: number;
+    total: number;
+    scored_at: string;
+    no_write_tools: { passed: number; total: number } | null; // safety metric, when the run scored it
+  } | null;
 }

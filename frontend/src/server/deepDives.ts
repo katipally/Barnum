@@ -8,6 +8,7 @@ import { dataDir } from "./companies";
 import { HttpError } from "./errors";
 import { NOTES_PREFIX } from "./agentNotes";
 import { getProvider, type AgentTurn } from "./provider";
+import { askLive, cmoApiProvider } from "./providers/cmoApi";
 
 const MAX_PER_COMPANY = 100;
 const MAX_MESSAGES = 60;
@@ -141,19 +142,27 @@ export async function assertCanAsk(caseId: CaseId, id: string): Promise<void> {
   checkCanAsk(await getDeepDive(caseId, id));
 }
 
+/** Live deep dives keep their conversation in a Snowflake thread; the history seeds it and is the fallback. */
+function ask(d: DeepDive, question: string, data: CaseData, history: AgentTurn[]): AsyncIterable<string> {
+  const provider = getProvider();
+  if (provider !== cmoApiProvider || !provider.isLive?.(d.caseId)) return provider.ask(d.caseId, question, data, history);
+  return askLive(question, history, { thread: d.thread, onThread: (t) => (d.thread = t ?? undefined) });
+}
+
 /** Streams the agent's answer and saves both sides of the exchange to the deep dive. */
 export async function* askInDeepDive(caseId: CaseId, id: string, question: string, data: CaseData): AsyncGenerator<string> {
   const d = await getDeepDive(caseId, id);
   checkCanAsk(d);
   answering.add(id);
   let answer = "";
+  const threadBefore = d.thread;
   try {
     const history = [...(await notes(caseId, id)), ...toTurns(d.messages)];
     if (!d.messages.length) d.title = titleFrom(question);
     d.messages.push({ role: "user", text: question, at: now() });
     d.updatedAt = now();
     await save();
-    for await (const chunk of getProvider().ask(caseId, question, data, history)) {
+    for await (const chunk of ask(d, question, data, history)) {
       answer += chunk;
       yield chunk;
     }
@@ -162,8 +171,8 @@ export async function* askInDeepDive(caseId: CaseId, id: string, question: strin
     if (answer.trim()) {
       d.messages.push({ role: "agent", text: answer.trim(), at: now() });
       d.updatedAt = now();
-      await save();
     }
+    if (answer.trim() || d.thread !== threadBefore) await save();
   }
 }
 

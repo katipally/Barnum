@@ -3,6 +3,7 @@
 // Typed client for the server layer. UI code talks to the backend only through these functions.
 import { useCallback, useEffect, useState } from "react";
 import type {
+  AgentEvals,
   CaseId,
   CaseSummary,
   CompanyInput,
@@ -12,6 +13,7 @@ import type {
   DeepDiveArtifact,
   DeepDiveList,
   Metric,
+  MondayBriefState,
   StrategyMap,
   SteeringUpdate,
   WeeklyBrief,
@@ -23,6 +25,7 @@ async function json<T>(res: Response): Promise<T> {
 }
 
 export const api = {
+  agentEvals: () => fetch("/api/agent/evals").then(json<AgentEvals>),
   cases: () => fetch("/api/companies").then(json<CaseSummary[]>),
   createCompany: (input: CompanyInput) =>
     fetch("/api/companies", {
@@ -32,6 +35,8 @@ export const api = {
     }).then(json<CaseSummary>),
   deleteCompany: (c: CaseId) => fetch(`/api/companies/${c}`, { method: "DELETE" }).then(json<{ ok: true }>),
   brief: (c: CaseId) => fetch(`/api/companies/${c}/brief`).then(json<WeeklyBrief>),
+  mondayBrief: (c: CaseId) => fetch(`/api/companies/${c}/monday-brief`).then(json<MondayBriefState | null>),
+  refreshMondayBrief: (c: CaseId) => fetch(`/api/companies/${c}/monday-brief`, { method: "POST" }).then(json<MondayBriefState | null>),
   strategy: (c: CaseId) => fetch(`/api/companies/${c}/strategy`).then(json<StrategyMap>),
   metrics: (c: CaseId) => fetch(`/api/companies/${c}/metrics`).then(json<Metric[]>),
   decide: (c: CaseId, id: string, status: "approved" | "rejected", note?: string) =>
