@@ -79,7 +79,7 @@ export async function decide(
   let moved: number | undefined;
   if (dec.amount && dec.amount > 0 && (from || to)) {
     // Never take back money a source action has already spent.
-    moved = from ? Math.min(dec.amount, Math.max(0, from.budget - from.spent)) : dec.amount;
+    moved = from ? Math.min(dec.amount, Math.max(0, from.budget - (from.spent ?? 0))) : dec.amount;
     if (from) from.budget -= moved;
     if (to) {
       to.budget += moved;

@@ -10,7 +10,7 @@ export function FunnelBudgetBar({ actions, active }: { actions: Action[]; active
     budget: actions.filter((a) => a.funnelStage === stage).reduce((s, a) => s + a.budget, 0),
   }));
   const total = byStage.reduce((s, x) => s + x.budget, 0);
-  const spent = actions.reduce((s, a) => s + a.spent, 0);
+  const spent = actions.reduce((s, a) => s + (a.spent ?? 0), 0);
 
   return (
     <div className="space-y-2">

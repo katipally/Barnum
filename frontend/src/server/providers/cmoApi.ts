@@ -4,6 +4,8 @@ import type {
   Action,
   AgentLogEntry,
   AgentThread,
+  AskEvent,
+  CampaignDraft,
   CaseData,
   CaseId,
   CaseSummary,
@@ -12,12 +14,17 @@ import type {
   Contribution,
   Decision,
   Metric,
+  Plan2027Load,
+  PlanEvent,
+  PlanInputs,
+  SavedPlan,
   TreeNode,
 } from "@/lib/types";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { money } from "@/lib/format";
-import type { AgentTurn, CmoProvider } from "../provider";
+import type { AgentTurn, CmoProvider, Plan2027Provider } from "../provider";
+import { DEFAULT_PLAN_INPUTS } from "../plan-mock";
 import { mockProvider } from "./mock";
 
 const base = () => (process.env.CMO_API_URL ?? "").replace(/\/$/, "");
@@ -27,18 +34,19 @@ const SOURCE = "Snowflake: CMO_DB.CORE";
 
 type Num = number | null;
 interface Strip {
-  budget_usd: Num; spent_usd: Num; mqls: Num; sqls: Num; cost_per_mql: Num; cost_per_sql: Num;
-  cac_full_usd: Num; payback_months: Num; projected_sqls_remaining: Num;
+  measured_spend_usd: Num; annual_run_rate_usd: Num; plan_budget_usd: Num; plan_projected_sqls: Num;
+  mqls: Num; sqls: Num; cost_per_mql: Num; cost_per_sql: Num; cac_full_usd: Num; payback_months: Num;
+  mql_to_sql_rate: Num; mql_to_sql_source?: string | null; sqls_estimated: boolean | null; channels_without_spend: string[] | null;
 }
 interface Channel {
-  channel_id: string; display_name: string; spend_usd: Num; plan_usd: Num; mqls: Num; sqls: Num;
-  cost_per_mql: Num; cost_per_sql: Num; mql_to_sql: Num; marginal_cost_per_sql: Num; remaining_usd: Num;
+  channel_id: string; display_name: string; spend_usd: Num; annual_spend_usd?: Num; annual_sqls?: Num; window_days?: Num; plan_usd: Num; mqls: Num; sqls: Num;
+  sqls_estimated: boolean | null; cost_per_mql: Num; cost_per_sql: Num; mql_to_sql: Num; marginal_cost_per_sql: Num;
 }
 interface Memo {
   memo_id: string; created_at: string; title: string; finding: string; recommendation: string; status: string;
   decided_at?: string | null;
   deltas: Record<string, { current_usd: number; recommended_usd: number; delta_usd: number; sqls_before: number; sqls_after: number }>;
-  impact: { remaining_budget_usd?: number; moved_usd?: number; sqls_before?: number; sqls_after?: number; sql_gain?: number; autonomy_limit_usd?: number };
+  impact: { budget_usd?: number | null; run_rate_usd?: number | null; moved_usd?: number; sqls_before?: number; sqls_after?: number; sql_gain?: number; unallocated_usd?: number | null; autonomy_limit_usd?: number; estimated_channels?: string[] | null };
 }
 
 const TIMEOUT_MS = Number(process.env.CMO_API_TIMEOUT_MS ?? 20000);
@@ -60,18 +68,33 @@ const num = (a: Record<string, unknown>, k: string, d = 0) => (typeof a[k] === "
 
 // Funnel stage by channel kind; unknown channels count as consideration.
 function stageOf(id: string): Action["funnelStage"] {
-  if (/billboard|ooh|tv|radio|podcast|display|youtube/.test(id)) return "awareness";
-  if (/google|search|retarget/.test(id)) return "conversion";
+  if (/billboard|ooh|tv|radio|podcast|display|youtube|seo|geo/.test(id)) return "awareness";
+  if (/google|search|retarget|outbound/.test(id)) return "conversion";
   return "consideration";
 }
 
 function period(a: Record<string, unknown>) {
-  const label = String(a.PERIOD ?? "Q4_2026").replace(/_/g, " ");
-  const start = new Date(String(a.PERIOD_START ?? "2026-10-01"));
-  const end = new Date(String(a.PERIOD_END ?? "2026-12-31"));
-  const weeksInPeriod = Math.max(1, Math.ceil((end.getTime() - start.getTime()) / 6048e5));
-  const week = Math.min(weeksInPeriod, Math.max(1, Math.ceil((Date.now() - start.getTime()) / 6048e5)));
-  return { label, end: end.toISOString().slice(0, 10), weeksInPeriod, week };
+  const text = String(a.PERIOD ?? "").trim();
+  const months = Number(/^NEXT_(\d+)M$/i.exec(text)?.[1]);
+  const readable = text.replace(/_/g, " ").toLowerCase();
+  const label = months ? `Next ${months} month${months === 1 ? "" : "s"}` : readable ? readable[0].toUpperCase() + readable.slice(1) : "Current plan";
+  const start = new Date(String(a.PERIOD_START));
+  const end = new Date(String(a.PERIOD_END));
+  if (end > start) {
+    const weeksInPeriod = Math.max(1, Math.ceil((end.getTime() - start.getTime()) / 6048e5));
+    const week = Math.min(weeksInPeriod, Math.max(1, Math.ceil((Date.now() - start.getTime()) / 6048e5)));
+    return { label, end: end.toISOString().slice(0, 10), weeksInPeriod, week };
+  }
+  // Forward-looking plan with measured-to-date data: view it as the full period, so run-rate forecasts do not extrapolate.
+  const weeksInPeriod = months ? Math.max(1, Math.round((months * 52) / 12)) : 52;
+  return { label, end: new Date(Date.now() + weeksInPeriod * 6048e5).toISOString().slice(0, 10), weeksInPeriod, week: weeksInPeriod };
+}
+
+function hypothesisOf(c: Channel, assumed: boolean) {
+  if (c.mqls == null || c.sqls == null) return "No lead data for this channel yet, so I cannot judge it.";
+  const rate = c.mql_to_sql == null ? "" : ` (${Math.round(c.mql_to_sql * 100)}%${c.sqls_estimated ? (assumed ? ", assumed" : ", estimated") : ""})`;
+  const spend = c.spend_usd == null ? " No spend is tracked for it." : "";
+  return `${Math.round(c.mqls)} marketing leads became ${c.sqls_estimated ? "about " : ""}${Math.round(c.sqls)} qualified leads${rate}.${spend} I judge it on qualified leads, because those turn into revenue.`;
 }
 
 // Snowflake views can take 10+ s, so pages read a cached snapshot and refresh it in the background
@@ -106,37 +129,32 @@ async function cachedLive(): Promise<CaseData> {
 }
 
 export async function fetchLive(): Promise<CaseData> {
-  const [a, raw, chans, memos] = await Promise.all([
+  const [a, s, chans, memos] = await Promise.all([
     get<AssumptionRow[]>("/assumptions").then(assumptionMap),
-    get<Strip & Record<string, Num>>("/q4/strip"),
+    get<Strip>("/now/strip"),
     // The backend may be mid-migration; a missing channel view should not take the whole company down.
-    get<Channel[]>("/q4/channels").catch((e) => (console.warn(String(e)), [] as Channel[])),
+    get<Channel[]>("/now/channels").catch((e) => (console.warn(String(e)), [] as Channel[])),
     get<Memo[]>("/memos").catch((e) => (console.warn(String(e)), [] as Memo[])),
   ]);
-  // Newer EXEC_STRIP names: measured_spend_usd, plan_budget_usd, plan_projected_sqls.
-  const s: Strip = {
-    ...raw,
-    spent_usd: raw.spent_usd ?? raw.measured_spend_usd ?? null,
-    budget_usd: raw.budget_usd ?? raw.plan_budget_usd ?? null,
-    projected_sqls_remaining: raw.projected_sqls_remaining ?? null,
-  };
   const p = period(a);
   const win = num(a, "SQL_TO_WON", 0.15);
   const acv = num(a, "ACV_USD", 120000);
-  const sqlTarget = num(a, "Q4_SQL_TARGET"); // 0 = not set; add it to ASSUMPTIONS to get a pace
+  const sqlTarget = num(a, "SQL_TARGET"); // 0 = not set; add it to ASSUMPTIONS to get a pace
   const paybackTarget = num(a, "PAYBACK_TARGET_MONTHS", 14);
   const sqls = n(s.sqls);
-  const sqlsFc = sqls + n(s.projected_sqls_remaining);
+  const sqlsFc = s.plan_projected_sqls ?? sqls;
   const mqls = n(s.mqls);
-  const mqlToSql = mqls ? sqls / mqls : 0;
-  const series = (v: number) => [{ week: p.week, value: v }];
+  const mqlToSql = s.mql_to_sql_rate ?? (mqls ? sqls / mqls : 0);
+  const series = (v: Num) => (v == null ? [] : [{ week: p.week, value: v }]);
+  const assumed = !!s.mql_to_sql_source?.startsWith("assumed");
+  const sqlSource = `${SOURCE}.EXEC_STRIP${s.sqls_estimated ? (assumed ? ` (partly estimated, assumed ${Math.round(mqlToSql * 100)}% lead to qualified rate)` : " (partly estimated)") : ""}`;
 
   const metrics: Metric[] = [
-    { id: "m-sqls", label: "Qualified sales leads this period", unit: "count", target: sqlTarget, direction: "up", lagging: true, source: `${SOURCE}.EXEC_STRIP`, objectiveId: "o-sqls", series: series(sqls) },
-    { id: "m-cps", label: "Cost per qualified lead", unit: "usd", target: num(a, "CPS_TARGET_USD"), direction: "down", lagging: false, source: `${SOURCE}.EXEC_STRIP`, objectiveId: "o-cps", series: series(n(s.cost_per_sql)) },
-    { id: "m-cpm", label: "Cost per marketing lead", unit: "usd", target: 0, direction: "down", lagging: false, source: `${SOURCE}.EXEC_STRIP`, objectiveId: "o-cps", series: series(n(s.cost_per_mql)) },
+    { id: "m-sqls", label: "Qualified sales leads", unit: "count", target: sqlTarget, direction: "up", lagging: true, source: sqlSource, objectiveId: "o-sqls", series: series(sqls) },
+    { id: "m-cps", label: "Cost per qualified lead", unit: "usd", target: num(a, "CPS_TARGET_USD"), direction: "down", lagging: false, source: sqlSource, objectiveId: "o-cps", series: series(s.cost_per_sql) },
+    { id: "m-cpm", label: "Cost per marketing lead", unit: "usd", target: 0, direction: "down", lagging: false, source: `${SOURCE}.EXEC_STRIP`, objectiveId: "o-cps", series: series(s.cost_per_mql) },
     { id: "m-mql2sql", label: "Marketing leads that become qualified", unit: "pct", target: 0, direction: "up", lagging: false, source: `${SOURCE}.EXEC_STRIP`, objectiveId: "o-sqls", series: series(mqlToSql * 100) },
-    { id: "m-payback", label: "Months to earn back a customer's cost", unit: "months", target: paybackTarget, direction: "down", lagging: true, source: `${SOURCE}.EXEC_STRIP`, objectiveId: "o-payback", series: series(n(s.payback_months)) },
+    { id: "m-payback", label: "Months to earn back a customer's cost", unit: "months", target: paybackTarget, direction: "down", lagging: true, source: `${SOURCE}.EXEC_STRIP`, objectiveId: "o-payback", series: series(s.payback_months) },
   ];
 
   const tree: TreeNode = {
@@ -161,14 +179,14 @@ export async function fetchLive(): Promise<CaseData> {
     label: c.display_name,
     channel: c.display_name,
     funnelStage: stageOf(c.channel_id),
-    budget: n(c.plan_usd) || n(c.spend_usd),
-    spent: n(c.spend_usd),
+    budget: c.plan_usd ?? c.annual_spend_usd ?? c.spend_usd ?? 0,
+    spent: c.annual_spend_usd ?? c.spend_usd,
     resultLabel: "qualified lead",
-    results: n(c.sqls),
+    results: c.annual_sqls ?? c.sqls,
     costPerResult: c.cost_per_sql ?? null,
     marginalCostPerResult: c.marginal_cost_per_sql ?? null,
     weeksRunning: p.week,
-    hypothesis: `${n(c.mqls)} marketing leads became ${n(c.sqls)} qualified leads (${Math.round(n(c.mql_to_sql) * 100)}%). I judge it on qualified leads, because those turn into revenue.`,
+    hypothesis: hypothesisOf(c, assumed),
     status: "live",
   }));
   const contributions: Contribution[] = actions.flatMap((x) => [
@@ -186,8 +204,8 @@ export async function fetchLive(): Promise<CaseData> {
         id: m.memo_id,
         title: m.title,
         rationale: m.finding,
-        impact: `About ${imp.sql_gain ?? 0} more qualified leads (${imp.sqls_before ?? "?"} → ${imp.sqls_after ?? "?"}) from the ${money(imp.remaining_budget_usd ?? 0)} still to spend.`,
-        risk: "Assumes each channel keeps getting less effective as we spend more, at the rate we have seen this period.",
+        impact: `About ${imp.sql_gain ?? 0} more qualified leads a year (${imp.sqls_before ?? "?"} → ${imp.sqls_after ?? "?"}) from a ${money(imp.budget_usd ?? imp.run_rate_usd ?? 0)} yearly budget.${imp.unallocated_usd ? ` ${money(imp.unallocated_usd)} stays unallocated because no channel can absorb more.` : ""}`,
+        risk: `Assumes each channel keeps getting less effective as we spend more, at the rate we have seen so far.${imp.estimated_channels?.length ? ` Qualified leads for ${imp.estimated_channels.join(", ")} are estimated, not measured.` : ""}`,
         reason: "above_autonomy",
         amount: imp.moved_usd,
         fromActionId: ds[0] ? `ch-${ds[0][0]}` : undefined,
@@ -196,7 +214,7 @@ export async function fetchLive(): Promise<CaseData> {
           ...ds.filter(([, d]) => d.delta_usd !== 0).map(([cid, d]) => ({
             label: label(cid),
             value: `${money(d.current_usd)} → ${money(d.recommended_usd)}`,
-            source: `${SOURCE}.Q4_PROJECTION`,
+            source: `${SOURCE}.PLAN_PROJECTION`,
           })),
           { label: "My weekly limit", value: `${money(imp.autonomy_limit_usd ?? 0)} per week`, source: `${SOURCE}.ASSUMPTIONS` },
         ],
@@ -210,12 +228,20 @@ export async function fetchLive(): Promise<CaseData> {
 
   const ranked = [...chans].filter((c) => c.cost_per_sql).sort((x, y) => n(x.cost_per_sql) - n(y.cost_per_sql));
   const changes: Change[] = [];
-  if (ranked[0]) changes.push({ id: "c-best", title: `${ranked[0].display_name}: our cheapest qualified leads`, detail: `${money(n(ranked[0].cost_per_sql))} each; the next one would cost about ${money(n(ranked[0].marginal_cost_per_sql))}.`, impact: "positive", metricId: "m-cps", source: `${SOURCE}.Q4_PROJECTION` });
+  if (ranked[0]) changes.push({ id: "c-best", title: `${ranked[0].display_name}: our cheapest qualified leads`, detail: `${money(n(ranked[0].cost_per_sql))} each${ranked[0].sqls_estimated ? " (estimated)" : ""}${ranked[0].marginal_cost_per_sql == null ? "" : `; the next one would cost about ${money(ranked[0].marginal_cost_per_sql)}`}.`, impact: "positive", metricId: "m-cps", source: `${SOURCE}.PLAN_PROJECTION` });
   const worst = ranked.at(-1);
-  if (worst && worst !== ranked[0]) changes.push({ id: "c-worst", title: `${worst.display_name}: our most expensive qualified leads`, detail: `${money(n(worst.cost_per_sql))} each; only ${Math.round(n(worst.mql_to_sql) * 100)}% of its marketing leads become qualified.`, impact: "negative", metricId: "m-cps", source: `${SOURCE}.Q4_PROJECTION` });
+  if (worst && worst !== ranked[0]) changes.push({ id: "c-worst", title: `${worst.display_name}: our most expensive qualified leads`, detail: `${money(n(worst.cost_per_sql))} each${worst.sqls_estimated ? " (estimated)" : `; only ${Math.round(n(worst.mql_to_sql) * 100)}% of its marketing leads become qualified`}.`, impact: "negative", metricId: "m-cps", source: `${SOURCE}.PLAN_PROJECTION` });
+
+  const noSpend = (s.channels_without_spend ?? []).map(label);
+  if (noSpend.length) changes.push({ id: "c-nospend", title: `No spend is tracked for ${noSpend.join(", ")}`, detail: "Their cost per lead is not measured, so I leave them out of budget moves.", impact: "neutral", source: `${SOURCE}.EXEC_STRIP` });
+
+  const days = Math.max(0, ...chans.filter((c) => c.spend_usd != null).map((c) => n(c.window_days)));
+  if (s.measured_spend_usd != null) changes.push({ id: "c-alltime", title: `All-time measured spend: ${money(s.measured_spend_usd)}`, detail: `${days ? `Across up to ${days.toLocaleString("en-US")} days of data. ` : ""}Budget and channel figures above are yearly, so they compare like with like.`, impact: "neutral", source: `${SOURCE}.EXEC_STRIP` });
 
   const pending = decisions.filter((d) => d.status === "pending");
-  const budget = n(s.budget_usd);
+  const leads = `${s.sqls_estimated ? "About " : ""}${Math.round(sqls).toLocaleString("en-US")}`;
+  const each = s.cost_per_sql == null ? "" : `, at ${money(s.cost_per_sql)} each`;
+  const budget = n(s.plan_budget_usd ?? s.annual_run_rate_usd);
   return {
     case: {
       id: LIVE_ID,
@@ -232,15 +258,15 @@ export async function fetchLive(): Promise<CaseData> {
       dataStatus: "connected",
     },
     headline: pending.length
-      ? `${Math.round(sqls).toLocaleString("en-US")} qualified sales leads so far, at ${money(n(s.cost_per_sql))} each. I have a budget move that needs your OK: ${pending[0].title}.`
-      : `${Math.round(sqls).toLocaleString("en-US")} qualified sales leads so far, at ${money(n(s.cost_per_sql))} each. Nothing needs your approval this week.`,
+      ? `${leads} qualified sales leads so far${each}. I have a budget move that needs your OK: ${pending[0].title}.`
+      : `${leads} qualified sales leads so far${each}. Nothing needs your approval this week.`,
     goals: [
-      { id: "g-sqls", label: "Qualified sales leads this period", kind: "other", target: sqlTarget, current: sqls, unit: "count", direction: "up", deadline: p.end, setBy: "ceo" },
-      { id: "g-payback", label: "Months to earn back a customer's cost", kind: "other", target: paybackTarget, current: n(s.payback_months), unit: "months", direction: "down", deadline: p.end, setBy: "board" },
+      { id: "g-sqls", label: "Qualified sales leads", kind: "other", target: sqlTarget, current: sqls, unit: "count", direction: "up", deadline: p.end, setBy: "ceo" },
+      ...(s.payback_months == null ? [] : [{ id: "g-payback", label: "Months to earn back a customer's cost", kind: "other" as const, target: paybackTarget, current: s.payback_months, unit: "months" as const, direction: "down" as const, deadline: p.end, setBy: "board" as const }]),
     ],
     guardrails: {
       budgetTotal: budget,
-      budgetSpent: n(s.spent_usd),
+      budgetSpent: n(s.annual_run_rate_usd ?? s.measured_spend_usd),
       autonomyPct: num(a, "AUTONOMY_LIMIT_PCT", 0.1) * 100,
       brandFloorPct: 0,
       maxShiftPerWeekPct: num(a, "AUTONOMY_LIMIT_PCT", 0.1) * 100,
@@ -279,7 +305,7 @@ export interface LiveThreadOpts {
   onThread?: (thread: AgentThread | null) => void;
 }
 
-export async function* askLive(question: string, turns?: AgentTurn[], opts?: LiveThreadOpts): AsyncIterable<string> {
+export async function* askLive(question: string, turns?: AgentTurn[], opts?: LiveThreadOpts): AsyncIterable<string | AskEvent> {
   const own = !turns;
   if (own && Date.now() - lastAskAt > HISTORY_IDLE_MS) [history, plainThread] = [[], null];
   lastAskAt = Date.now();
@@ -317,16 +343,34 @@ export async function* askLive(question: string, turns?: AgentTurn[], opts?: Liv
         if (line.startsWith("event:")) event = line.slice(6).trim();
         else if (line.startsWith("data:")) {
           const payload = JSON.parse(line.slice(5).trim() || "{}") as {
-            text?: string; message?: string; thread_id?: number | null; message_id?: number | null;
+            text?: string;
+            message?: string;
+            name?: string;
+            input?: Record<string, unknown>;
+            model?: string;
+            tool_use_id?: string;
+            seconds?: number;
+            ok?: boolean;
+            thread_id?: number | null;
+            message_id?: number | null;
           };
           // cmo_delta: teammate's orchestrator /ask; token: the earlier backend.
           if ((event === "cmo_delta" || event === "token") && payload.text) {
             answer += payload.text;
             yield payload.text;
+          } else if (event === "status" && payload.message) {
+            yield { type: "status", message: payload.message };
+          } else if (event === "meta" && payload.model) {
+            yield { type: "meta", model: payload.model };
+          } else if (event === "tool" && payload.name) {
+            yield { type: "tool", name: payload.name, input: payload.input, toolUseId: payload.tool_use_id };
+          } else if (event === "tool_done" && payload.tool_use_id) {
+            yield { type: "tool_done", toolUseId: payload.tool_use_id, seconds: payload.seconds, ok: payload.ok !== false };
           } else if (event === "error") {
             failed = true;
-            yield `\n[CMO agent error] ${payload.message ?? JSON.stringify(payload)}`;
+            yield { type: "error", message: payload.message ?? JSON.stringify(payload) };
           } else if (event === "done") {
+            if (payload.model) yield { type: "meta", model: payload.model };
             complete = true;
             const next = payload.thread_id ? { id: payload.thread_id, parentMessageId: payload.message_id ?? undefined } : null;
             if (own) plainThread = next;
@@ -337,6 +381,7 @@ export async function* askLive(question: string, turns?: AgentTurn[], opts?: Liv
       }
     }
   } finally {
+    await reader.cancel().catch(() => {});
     // Only finished, error-free answers become history; a cancelled stream would leave half an answer.
     if (own && complete && !failed && answer.trim()) {
       history = [...history, msg("user", question), msg("assistant", answer)].slice(-HISTORY_TURNS * 2);
@@ -382,6 +427,125 @@ async function liveSources(): Promise<DataSource[]> {
   ];
 }
 
+// ---- 2027 plan: inputs live in ASSUMPTIONS; the plan streams from POST /plan/2027 and is saved by the backend ----
+
+const PLAN_KEYS: Record<keyof PlanInputs, string> = {
+  budget_usd: "PLAN_2027_BUDGET_USD",
+  revenue_target_usd: "REVENUE_TARGET_USD",
+  sqls_per_quarter: "SQL_TARGET_PER_QUARTER",
+  brand_pct: "BRAND_PCT",
+};
+const PLAN_FIELDS = Object.keys(PLAN_KEYS) as (keyof PlanInputs)[];
+
+// Routes answer { data } (sometimes with sql); unwrap either shape.
+const unwrap = <T>(body: unknown): T =>
+  (body && typeof body === "object" && !Array.isArray(body) && "data" in body ? (body as { data: T }).data : body) as T;
+
+const NOT_DEPLOYED = "The planning tables are not deployed in Snowflake yet (PLAN_2027 is missing). Deploy the backend SQL, then retry.";
+
+const reachable = (e: unknown) =>
+  e instanceof TypeError || (e instanceof DOMException && e.name === "TimeoutError") ? new Error("Cannot reach the CMO API. Is the backend running?") : e;
+
+async function planCall<T>(path: string, init?: RequestInit): Promise<T> {
+  try {
+    const res = await fetch(`${base()}${path}`, { cache: "no-store", signal: AbortSignal.timeout(TIMEOUT_MS), ...init });
+    if (!res.ok) throw new Error(`CMO API ${path}: ${res.status} ${await res.text()}`);
+    return unwrap<T>(await res.json());
+  } catch (e) {
+    throw reachable(e);
+  }
+}
+
+const jsonInit = (method: string, body: unknown): RequestInit => ({ method, headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
+
+async function* sse(res: Response): AsyncGenerator<{ event: string; data: Record<string, unknown> }> {
+  const reader = res.body!.getReader();
+  const dec = new TextDecoder();
+  let buf = "";
+  let event = "message";
+  try {
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) return;
+      buf += dec.decode(value, { stream: true });
+      let i;
+      while ((i = buf.indexOf("\n")) >= 0) {
+        const line = buf.slice(0, i).trim();
+        buf = buf.slice(i + 1);
+        if (line.startsWith("event:")) event = line.slice(6).trim();
+        else if (line.startsWith("data:")) yield { event, data: JSON.parse(line.slice(5).trim() || "{}") };
+      }
+    }
+  } finally {
+    await reader.cancel().catch(() => {});
+  }
+}
+
+interface PlanPayload {
+  text?: string;
+  message?: string;
+  name?: string;
+  input?: Record<string, unknown>;
+  model?: string;
+  tool_use_id?: string;
+  seconds?: number;
+  ok?: boolean;
+  plan_id?: string;
+}
+
+async function* plan2027Live(inputs: PlanInputs): AsyncGenerator<PlanEvent> {
+  yield { type: "status", message: "Saving your inputs" };
+  await Promise.all(PLAN_FIELDS.map((f) => planCall(`/assumptions/${PLAN_KEYS[f]}`, jsonInit("PUT", { num: inputs[f] }))));
+  let res: Response;
+  try {
+    res = await fetch(`${base()}/plan/2027`, jsonInit("POST", inputs));
+  } catch (e) {
+    throw reachable(e);
+  }
+  if (!res.ok || !res.body) {
+    const detail = await res.text().catch(() => "");
+    throw new Error(/PLAN_2027/i.test(detail) ? NOT_DEPLOYED : `The planner is unavailable (${res.status}). ${detail.slice(0, 200)}`.trim());
+  }
+  for await (const { event, data } of sse(res)) {
+    const d = data as PlanPayload;
+    if (event === "meta" && d.model) yield { type: "meta", model: d.model };
+    else if (event === "status" && d.message) yield { type: "status", message: d.message };
+    else if (event === "tool" && d.name) yield { type: "tool", name: d.name, input: d.input, toolUseId: d.tool_use_id };
+    else if (event === "tool_done" && d.tool_use_id) yield { type: "tool_done", toolUseId: d.tool_use_id, seconds: d.seconds, ok: d.ok !== false };
+    else if (event === "plan" || event === "channel_plan" || event === "targets") yield { type: event, ...data } as PlanEvent;
+    else if (event === "cmo_delta" && d.text) yield { type: "text", text: d.text };
+    else if (event === "error") {
+      yield { type: "error", message: /unknown user-defined function.*PLAN_2027/i.test(d.message ?? "") ? NOT_DEPLOYED : (d.message ?? JSON.stringify(d)) };
+      return;
+    } else if (event === "done") {
+      if (d.model) yield { type: "meta", model: d.model };
+      yield { type: "done", planId: d.plan_id };
+      return;
+    }
+  }
+}
+
+const livePlan2027: Plan2027Provider = {
+  async load() {
+    const [assumptions, latest] = await Promise.allSettled([
+      planCall<AssumptionRow[]>("/assumptions"),
+      planCall<SavedPlan | null>("/plan/2027/latest"),
+    ]);
+    const stored = assumptions.status === "fulfilled" ? assumptionMap(assumptions.value) : {};
+    const inputs = Object.fromEntries(PLAN_FIELDS.map((f) => [f, num(stored, PLAN_KEYS[f], DEFAULT_PLAN_INPUTS[f])])) as unknown as PlanInputs;
+    const failed = [assumptions, latest].find((r) => r.status === "rejected");
+    return {
+      inputs,
+      saved: latest.status === "fulfilled" ? latest.value : null,
+      live: true,
+      notice: failed?.status === "rejected" ? `Some saved values could not be loaded. ${(failed.reason as Error).message}` : undefined,
+    } satisfies Plan2027Load;
+  },
+  run: (_caseId, inputs) => plan2027Live(inputs),
+  draft: (_caseId, planId, channelId) => planCall<CampaignDraft>("/campaigns/draft", jsonInit("POST", { plan_id: planId, channel_id: channelId })),
+  campaigns: (_caseId, channelId) => planCall<CampaignDraft[]>(`/campaigns?channel_id=${encodeURIComponent(channelId)}`),
+};
+
 export const cmoApiProvider: CmoProvider = {
   async listCases(): Promise<CaseSummary[]> {
     const live: CaseSummary = { id: LIVE_ID, name: LIVE_NAME, stageLabel: "Scaling company", tagline: "Live from Snowflake", sample: false, dataStatus: "connected" };
@@ -391,6 +555,7 @@ export const cmoApiProvider: CmoProvider = {
     return caseId === LIVE_ID ? cachedLive() : mockProvider.getCaseData(caseId);
   },
   isLive: (caseId: CaseId) => caseId === LIVE_ID,
+  plan2027: livePlan2027,
   async decide(_caseId, decisionId, status, note) {
     // The note goes to the agent as feedback on the run that wrote the memo.
     const res = await fetch(`${base()}/memos/${encodeURIComponent(decisionId)}/${status === "approved" ? "approve" : "reject"}`, {
@@ -401,7 +566,7 @@ export const cmoApiProvider: CmoProvider = {
     if (!res.ok) throw new Error(`CMO API decide: ${res.status} ${await res.text()}`);
     await refresh(); // the next read must show the decision, not the cached pending card
   },
-  ask(caseId: CaseId, question: string, data: CaseData, turns?: AgentTurn[]) {
+  ask(caseId: CaseId, question: string, data: () => Promise<CaseData>, turns?: AgentTurn[]) {
     return caseId === LIVE_ID ? askLive(question, turns) : mockProvider.ask(caseId, question, data, turns);
   },
   async listSources(caseId: CaseId) {

@@ -57,7 +57,7 @@ export function ActionNode({
           {v.word}
         </span>
         <span className="tabular text-faint">
-          {money(action.spent)} of {money(action.budget)}
+          {action.spent == null ? "spend not tracked" : `${money(action.spent)} of ${money(action.budget)}`}
         </span>
       </span>
     </button>

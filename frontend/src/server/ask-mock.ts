@@ -112,7 +112,7 @@ function simulateShift(q: string, data: CaseData): string {
 
   const g = data.guardrails;
   const autonomy = (g.budgetTotal * g.autonomyPct) / 100;
-  const remaining = Math.max(0, from.budget - from.spent);
+  const remaining = Math.max(0, from.budget - (from.spent ?? 0));
   // Default: the larger of one week's autonomy or a quarter of what the source has left, capped at that remainder.
   const wanted = parseAmount(q) ?? Math.max(autonomy, remaining * 0.25);
   const amount = Math.round(remaining > 0 ? Math.min(wanted, remaining) : wanted);

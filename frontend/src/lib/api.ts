@@ -4,6 +4,8 @@
 import { useCallback, useEffect, useState } from "react";
 import type {
   AgentEvals,
+  AskEvent,
+  CampaignDraft,
   CaseId,
   CaseSummary,
   CompanyInput,
@@ -14,6 +16,9 @@ import type {
   DeepDiveList,
   Metric,
   MondayBriefState,
+  Plan2027Load,
+  PlanEvent,
+  PlanInputs,
   StrategyMap,
   SteeringUpdate,
   WeeklyBrief,
@@ -22,6 +27,28 @@ import type {
 async function json<T>(res: Response): Promise<T> {
   if (!res.ok) throw new Error(`${res.status} ${await res.text()}`);
   return res.json() as Promise<T>;
+}
+
+// Reads an NDJSON response line by line.
+async function readEvents<E>(res: Response, onEvent: (e: E) => void) {
+  if (!res.ok || !res.body) throw new Error(`${res.status} ${await res.text().catch(() => "")}`.trim());
+  const reader = res.body.getReader();
+  const dec = new TextDecoder();
+  let buf = "";
+  const flush = (line: string) => {
+    if (line.trim()) onEvent(JSON.parse(line) as E);
+  };
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buf += dec.decode(value, { stream: true });
+    let i;
+    while ((i = buf.indexOf("\n")) >= 0) {
+      flush(buf.slice(0, i));
+      buf = buf.slice(i + 1);
+    }
+  }
+  flush(buf);
 }
 
 export const api = {
@@ -64,21 +91,28 @@ export const api = {
     fetch(`/api/companies/${c}/deep-dives/${id}`, { method: "DELETE" }).then(json<{ ok: true }>),
   writeUp: (c: CaseId, id: string) =>
     fetch(`/api/companies/${c}/deep-dives/${id}/write-up`, { method: "POST" }).then(json<DeepDiveArtifact>),
-  // Streams plain text chunks of the CMO agent's answer; with a deep dive id the exchange is saved there.
-  ask: async (c: CaseId, question: string, onChunk: (text: string) => void, deepDiveId?: string) => {
+  plan2027: (c: CaseId) => fetch(`/api/companies/${c}/plan2027`).then(json<Plan2027Load>),
+  // Streams the CMO agent building the 2027 plan (NDJSON PlanEvents).
+  runPlan2027: async (c: CaseId, inputs: PlanInputs, onEvent: (e: PlanEvent) => void) =>
+    readEvents<PlanEvent>(
+      await fetch(`/api/companies/${c}/plan2027`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(inputs) }),
+      onEvent,
+    ),
+  draftCampaign: (c: CaseId, planId: string, channelId: string) =>
+    fetch(`/api/companies/${c}/campaigns`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ planId, channelId }),
+    }).then(json<CampaignDraft>),
+  campaigns: (c: CaseId, channelId: string) => fetch(`/api/companies/${c}/campaigns?channelId=${encodeURIComponent(channelId)}`).then(json<CampaignDraft[]>),
+  // Streams the CMO agent's work and answer as events (NDJSON); with a deep dive id the exchange is saved there.
+  ask: async (c: CaseId, question: string, onEvent: (e: AskEvent) => void, deepDiveId?: string) => {
     const res = await fetch(deepDiveId ? `/api/companies/${c}/deep-dives/${deepDiveId}/ask` : `/api/companies/${c}/ask`, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ question }),
     });
-    if (!res.ok || !res.body) throw new Error(`${res.status}`);
-    const reader = res.body.getReader();
-    const dec = new TextDecoder();
-    for (;;) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      onChunk(dec.decode(value, { stream: true }));
-    }
+    await readEvents<AskEvent>(res, onEvent);
   },
 };
 

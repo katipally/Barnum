@@ -1,4 +1,0 @@
-board_id,market,location,format,flight_start,flight_end,weekly_impressions,flat_cost_usd,vanity_url,qr_code_id,vanity_url_visits,qr_scans
-BB-SF-101,San Francisco,US-101 S at Cesar Chavez,Bulletin 14x48,2026-10-01,2026-10-28,410000,4000,datasaur.ai/sf,QR-BB-SF-101,269,23
-BB-SF-101,San Francisco,US-101 S at Cesar Chavez,Bulletin 14x48,2026-10-29,2026-11-25,410000,4000,datasaur.ai/sf,QR-BB-SF-101,293,23
-BB-NYC-7A,New York,7th Ave and W 33rd St,Bulletin 14x48,2026-10-15,2026-11-11,520000,5000,datasaur.ai/nyc,QR-BB-NYC-7A,382,23

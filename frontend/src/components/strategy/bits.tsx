@@ -31,10 +31,20 @@ export function ResultTerm({ label, plural }: { label: string; plural?: boolean 
 export function Efficiency({ action: a }: { action: Action }) {
   const avg = avgCost(a);
   if (a.status === "planned") return <>Starts later. {money(a.budget)} set aside.</>;
+  if (a.results == null) return <>Results not measured yet.</>;
   if (a.results === 0 || avg == null)
     return (
       <>
-        {money(a.spent)} spent, no <ResultTerm label={a.resultLabel} plural /> yet.
+        {a.spent == null ? "Spend not tracked" : `${money(a.spent)} spent`},{" "}
+        {a.results ? (
+          <>
+            {fmt(a.results, "count")} <ResultTerm label={a.resultLabel} plural /> so far.
+          </>
+        ) : (
+          <>
+            no <ResultTerm label={a.resultLabel} plural /> yet.
+          </>
+        )}
       </>
     );
   return (
@@ -48,7 +58,7 @@ export function Efficiency({ action: a }: { action: Action }) {
 // Bar length = budget (relative to the biggest), filled part = spent so far.
 export function SpendBar({ action: a, max }: { action: Action; max: number }) {
   const len = max > 0 ? Math.max((a.budget / max) * 100, 2) : 0;
-  const fill = a.budget > 0 ? Math.min(a.spent / a.budget, 1) * 100 : 0;
+  const fill = a.budget > 0 && a.spent != null ? Math.min(a.spent / a.budget, 1) * 100 : 0;
   return (
     <div className="flex items-center gap-3">
       <div className="h-2 min-w-0 flex-1">
@@ -57,7 +67,13 @@ export function SpendBar({ action: a, max }: { action: Action; max: number }) {
         </div>
       </div>
       <span className="tabular shrink-0 text-xs text-muted">
-        <span className="text-ink">{money(a.spent)}</span> of {money(a.budget)}
+        {a.spent == null ? (
+          "spend not tracked"
+        ) : (
+          <>
+            <span className="text-ink">{money(a.spent)}</span> of {money(a.budget)}
+          </>
+        )}
       </span>
     </div>
   );

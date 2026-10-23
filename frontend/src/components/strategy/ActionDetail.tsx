@@ -66,10 +66,22 @@ export function ActionDetail({
       <dl className="grid grid-cols-2 gap-x-4 gap-y-3">
         <Stat label="Budget this period">{money(a.budget)}</Stat>
         <Stat label="Spent so far">
-          {money(a.spent)} <span className="text-faint">({fmt(a.budget ? (a.spent / a.budget) * 100 : 0, "pct")})</span>
+          {a.spent == null ? (
+            "Not tracked"
+          ) : (
+            <>
+              {money(a.spent)} <span className="text-faint">({fmt(a.budget ? (a.spent / a.budget) * 100 : 0, "pct")})</span>
+            </>
+          )}
         </Stat>
         <Stat label="Results so far">
-          {fmt(a.results, "count")} <ResultTerm label={a.resultLabel} plural={a.results !== 1} />
+          {a.results == null ? (
+            "Not measured"
+          ) : (
+            <>
+              {fmt(a.results, "count")} <ResultTerm label={a.resultLabel} plural={a.results !== 1} />
+            </>
+          )}
         </Stat>
         <Stat label={<Term k="marginal">The next one would cost</Term>}>{next != null ? perUnit(next) : "Not known yet"}</Stat>
       </dl>
@@ -105,7 +117,7 @@ export function ActionDetail({
           <span className="hidden group-open:inline">Hide the math</span>
         </summary>
         <ul className="mt-2 space-y-1.5 text-xs leading-relaxed text-muted">
-          {avg != null && a.results > 0 && (
+          {avg != null && a.results != null && a.spent != null && a.results > 0 && (
             <li>
               {money(a.spent)} spent for {fmt(a.results, "count")} <ResultTerm label={a.resultLabel} plural={a.results !== 1} />,
               so {perUnit(avg)} each on average.

@@ -88,7 +88,7 @@ const nextCost = (a: Action) => a.marginalCostPerResult ?? a.costPerResult;
 
 export function avgCost(a: Action): number | null {
   if (a.costPerResult != null && a.costPerResult > 0) return a.costPerResult;
-  return a.results > 0 ? a.spent / a.results : null;
+  return a.results && a.spent != null ? a.spent / a.results : null;
 }
 
 export function median(values: number[]): number | null {
@@ -133,6 +133,7 @@ export function whySentence(a: Action, all: Action[], minTestWeeks = DEFAULT_MIN
   const v = verdictOf(a, minTestWeeks);
   if (a.status === "planned") return "Not started yet. I'll judge it once results come in.";
   if (v === "test") return `Only ${a.weeksRunning} week${a.weeksRunning === 1 ? "" : "s"} of data, too early to judge.`;
+  if (a.results == null) return "Results are not measured for this channel yet, so I cannot judge it.";
   if (a.results === 0) return "Money is going out and nothing is coming back yet.";
   const c = comparison(a, all);
   switch (v) {
@@ -153,7 +154,7 @@ const say = (n: number) => NUMBER_WORDS[n] ?? String(n);
 
 // The page's one-sentence answer: spend so far, then which channels deserve more or less.
 export function moneyAnswer(actions: Action[], g: Guardrails, minTestWeeks: number): string {
-  const spent = g.budgetSpent || actions.reduce((s, a) => s + a.spent, 0);
+  const spent = g.budgetSpent || actions.reduce((s, a) => s + (a.spent ?? 0), 0);
   const total = g.budgetTotal || actions.reduce((s, a) => s + a.budget, 0);
   const more = actions.filter((a) => verdictOf(a, minTestWeeks) === "scale").length;
   const less = actions.filter((a) => verdictOf(a, minTestWeeks) === "cut").length;

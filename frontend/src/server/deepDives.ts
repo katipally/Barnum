@@ -2,7 +2,7 @@
 // Their write-ups are fed back to the agent as notes, so later answers build on earlier conclusions.
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
-import type { CaseData, CaseId, DeepDive, DeepDiveArtifact, DeepDiveList, DeepDiveMessage, DeepDiveSummary } from "@/lib/types";
+import type { AskEvent, CaseData, CaseId, DeepDive, DeepDiveArtifact, DeepDiveList, DeepDiveMessage, DeepDiveSummary } from "@/lib/types";
 import { money } from "@/lib/format";
 import { dataDir } from "./companies";
 import { HttpError } from "./errors";
@@ -143,27 +143,30 @@ export async function assertCanAsk(caseId: CaseId, id: string): Promise<void> {
 }
 
 /** Live deep dives keep their conversation in a Snowflake thread; the history seeds it and is the fallback. */
-function ask(d: DeepDive, question: string, data: CaseData, history: AgentTurn[]): AsyncIterable<string> {
+function ask(d: DeepDive, question: string, data: () => Promise<CaseData>, history: AgentTurn[]): AsyncIterable<string | AskEvent> {
   const provider = getProvider();
   if (provider !== cmoApiProvider || !provider.isLive?.(d.caseId)) return provider.ask(d.caseId, question, data, history);
   return askLive(question, history, { thread: d.thread, onThread: (t) => (d.thread = t ?? undefined) });
 }
 
 /** Streams the agent's answer and saves both sides of the exchange to the deep dive. */
-export async function* askInDeepDive(caseId: CaseId, id: string, question: string, data: CaseData): AsyncGenerator<string> {
+export async function* askInDeepDive(caseId: CaseId, id: string, question: string, data: () => Promise<CaseData>): AsyncGenerator<string | AskEvent> {
   const d = await getDeepDive(caseId, id);
   checkCanAsk(d);
   answering.add(id);
   let answer = "";
   const threadBefore = d.thread;
   try {
+    const last = d.messages.at(-1);
+    if (last?.role === "user" && last.text === question) d.messages.pop(); // a retry replaces the unanswered turn
     const history = [...(await notes(caseId, id)), ...toTurns(d.messages)];
     if (!d.messages.length) d.title = titleFrom(question);
     d.messages.push({ role: "user", text: question, at: now() });
     d.updatedAt = now();
     await save();
     for await (const chunk of ask(d, question, data, history)) {
-      answer += chunk;
+      if (typeof chunk === "string") answer += chunk;
+      else if (chunk.type === "text") answer += chunk.text;
       yield chunk;
     }
   } finally {
@@ -191,7 +194,10 @@ export async function writeUp(caseId: CaseId, id: string, data: CaseData): Promi
   if (getProvider().isLive?.(caseId)) {
     try {
       let raw = "";
-      for await (const chunk of getProvider().ask(caseId, WRITE_UP_PROMPT, data, toTurns(d.messages))) raw += chunk;
+      for await (const chunk of getProvider().ask(caseId, WRITE_UP_PROMPT, async () => data, toTurns(d.messages))) {
+        if (typeof chunk === "string") raw += chunk;
+        else if (chunk.type === "text") raw += chunk.text;
+      }
       artifact = parseWriteUp(raw, d);
     } catch (e) {
       console.error("[deep-dives] agent write-up failed, using the transcript", e);

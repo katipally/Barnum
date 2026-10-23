@@ -8,7 +8,7 @@ export const NAV_ITEMS: NavItem[] = [
   { href: "/breakdown", label: "How we reach the goal" },
   { href: "/strategy", label: "Where the money goes" },
   { href: "/evaluation", label: "Numbers we watch" },
-  { href: "/goals", label: "Goals and limits" },
+  { href: "/goals", label: "2027 Plan" },
   { href: "/deep-dives", label: "Deep dives" },
   { href: "/sources", label: "Data sources" },
 ];

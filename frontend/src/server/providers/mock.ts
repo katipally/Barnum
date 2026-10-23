@@ -21,14 +21,13 @@ export const mockProvider: CmoProvider = {
   async listCases() {
     return seedSummaries();
   },
-  ask(caseId: CaseId, question: string, data: CaseData, turns?: AgentTurn[]) {
+  async *ask(caseId: CaseId, question: string, getData: () => Promise<CaseData>, turns?: AgentTurn[]) {
+    const data = await getData();
     const note = relatedNote(question, turns);
-    if (!note) return askMock(caseId, question, data);
+    if (!note) return yield* askMock(caseId, question, data);
     // Scripted answers often repeat the earlier conclusion; then name the deep dive without quoting it again.
     const repeats = composeAnswer(question, data).includes(note.text.slice(0, 60));
-    return (async function* () {
-      yield* streamWords(repeats ? `Building on our deep dive "${note.title}":\n\n` : `Building on our deep dive "${note.title}": ${note.text}\n\n`);
-      yield* askMock(caseId, question, data);
-    })();
+    yield* streamWords(repeats ? `Building on our deep dive "${note.title}":\n\n` : `Building on our deep dive "${note.title}": ${note.text}\n\n`);
+    yield* askMock(caseId, question, data);
   },
 };

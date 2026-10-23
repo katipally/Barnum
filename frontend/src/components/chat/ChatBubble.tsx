@@ -1,8 +1,9 @@
-import { cx } from "@/components/ui";
+import { Button, cx } from "@/components/ui";
 import { AgentText } from "./AgentText";
+import { AskProgress } from "./AskProgress";
 import type { ChatMessage } from "./useAskStream";
 
-export function ChatBubble({ message }: { message: ChatMessage }) {
+export function ChatBubble({ message, onRetry }: { message: ChatMessage; onRetry?: () => void }) {
   if (message.role === "user") {
     return (
       <div className="flex justify-end">
@@ -13,25 +14,31 @@ export function ChatBubble({ message }: { message: ChatMessage }) {
     );
   }
 
-  const waiting = message.status === "streaming" && !message.text;
+  const failed = message.status === "error";
+  const empty = message.status === "done" && !message.text.trim();
   return (
     <div>
-      <div className="mb-1.5 flex items-center gap-2 text-[11px] font-medium tracking-wide text-accent">
+      <div className="mb-1.5 flex flex-wrap items-center gap-x-2 text-[11px] font-medium tracking-wide text-accent">
         <span aria-hidden className="h-1.5 w-1.5 rotate-45 bg-accent" />
         CMO agent
+        {message.model && <span className="break-all font-normal text-faint">· {message.model} · Snowflake Cortex</span>}
       </div>
-      <div className={cx("text-sm leading-relaxed text-ink/90", message.status === "error" && "text-bad")}>
-        {waiting ? (
-          <span className="inline-flex items-center gap-1 text-muted" aria-label="Thinking">
-            <span className="h-1 w-1 animate-pulse rounded-full bg-muted" />
-            <span className="h-1 w-1 animate-pulse rounded-full bg-muted [animation-delay:150ms]" />
-            <span className="h-1 w-1 animate-pulse rounded-full bg-muted [animation-delay:300ms]" />
-          </span>
-        ) : (
-          <AgentText text={message.text} />
-        )}
-        {message.status === "error" && (
-          <p className="mt-1 text-sm text-bad">I couldn&apos;t answer just now. Try again in a moment.</p>
+      {message.startedAt !== undefined && message.steps && (
+        <AskProgress steps={message.steps} startedAt={message.startedAt} endedAt={message.endedAt} failed={failed} />
+      )}
+      <div className={cx("text-sm leading-relaxed text-ink/90", failed && "text-bad")}>
+        {message.text && <AgentText text={message.text} />}
+        {(failed || empty) && (
+          <div className={cx("flex flex-wrap items-center gap-x-3 gap-y-2", message.text && "mt-2")}>
+            <p className="min-w-0 break-words text-sm text-bad">
+              {failed ? "I couldn't answer just now. Try again in a moment." : "I finished without an answer. Try asking again."}
+            </p>
+            {onRetry && (
+              <Button variant="secondary" onClick={onRetry} className="text-xs">
+                Retry
+              </Button>
+            )}
+          </div>
         )}
       </div>
     </div>

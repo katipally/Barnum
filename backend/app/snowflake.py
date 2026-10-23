@@ -3,6 +3,7 @@ import json
 import os
 import threading
 import tomllib
+from functools import lru_cache
 from pathlib import Path
 from typing import Any, AsyncIterator
 
@@ -75,14 +76,21 @@ def _agent_url(schema: str, agent: str) -> str:
     return f"{_base_url()}/databases/{DB}/schemas/{schema}/agents/{agent}:run"
 
 
+@lru_cache(maxsize=16)
+def agent_model(schema: str, agent: str) -> str | None:
+    """Orchestration model from the deployed agent's spec."""
+    rows = query(f"DESCRIBE AGENT {DB}.{ident(schema)}.{ident(agent)}")
+    return json.loads(rows[0]["agent_spec"]).get("models", {}).get("orchestration") if rows else None
+
+
 async def run_agent(schema: str, agent: str, question: str, client: httpx.AsyncClient) -> dict:
     """Non-streaming run. Returns {'text': final answer, 'raw': response json}."""
     body = {"messages": [{"role": "user", "content": [{"type": "text", "text": question}]}], "stream": False}
     r = await client.post(_agent_url(schema, agent), json=body, headers=_headers(), timeout=300)
     r.raise_for_status()
     data = r.json()
-    text = "".join(c.get("text", "") for c in data.get("content", []) if c.get("type") == "text")
-    return {"text": text, "raw": data}
+    texts = [c.get("text", "") for c in data.get("content", []) if c.get("type") == "text"]
+    return {"text": texts[-1] if texts else "", "raw": data}  # earlier text blocks are pre-tool narration; the last is the answer
 
 
 async def stream_agent(schema: str, agent: str, messages: list[dict], thread_id: int | None = None,

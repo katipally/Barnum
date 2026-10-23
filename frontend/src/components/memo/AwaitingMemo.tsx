@@ -40,9 +40,9 @@ export function AwaitingMemo({ brief, caseId }: { brief: WeeklyBrief; caseId: Ca
 
       <Step n={3} title="What I need from you" subtitle="Bigger calls that need your yes or no." tour="decisions">
         <p className="text-[15px] text-muted">
-          Nothing yet. Check that your goal, budget and limits are right in{" "}
+          Nothing yet. Check that your budget and targets are right in{" "}
           <Link href={withCase("/goals", caseId)} className="text-ink underline decoration-line-strong underline-offset-4 hover:decoration-accent">
-            Goals and limits
+            2027 Plan
           </Link>
           . Once I can see where you stand today, I&apos;ll suggest a target for each number.
         </p>

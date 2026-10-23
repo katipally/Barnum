@@ -14,7 +14,7 @@ import { useAskStream } from "./useAskStream";
 // Transcript + input for one conversation; the drawer remounts it per case or when a new conversation starts.
 export function ChatPanel({ caseId, caseName, onNew }: { caseId: CaseId; caseName?: string; onNew?: () => void }) {
   const { isOpen, request, clearRequest } = useAskCmo();
-  const { messages, busy, send, deepDiveId } = useAskStream(caseId);
+  const { messages, busy, send, retry, deepDiveId } = useAskStream(caseId);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -53,7 +53,9 @@ export function ChatPanel({ caseId, caseName, onNew }: { caseId: CaseId; caseNam
             <SuggestedQuestions className="mt-4" questions={remaining} onPick={send} disabled={busy} />
           </div>
         ) : (
-          messages.map((m) => <ChatBubble key={m.id} message={m} />)
+          messages.map((m, i) => (
+            <ChatBubble key={m.id} message={m} onRetry={i === messages.length - 1 && !busy ? () => retry(m.id) : undefined} />
+          ))
         )}
       </div>
       <div className="space-y-2.5 border-t border-line px-5 py-4">

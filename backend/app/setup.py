@@ -12,7 +12,6 @@ import jinja2
 from . import snowflake as sf
 
 ROOT = Path(__file__).resolve().parents[2]
-# Strongest Claude this account reaches (public preview, via CORTEX_ENABLED_CROSS_REGION); claude-opus-5 is the GA fallback.
 CMO_MODEL = os.getenv("CMO_MODEL", "claude-opus-5-5")
 
 
