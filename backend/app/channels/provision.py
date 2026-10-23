@@ -49,3 +49,14 @@ def approve(cid: str, version: int | None = None) -> dict:
     sf.execute("CALL CMO_DB.CORE.REBUILD_FUNNEL()")
     reconcile = json.loads(sf.query(f"CALL CMO_DB.{ch['schema_name']}.RECONCILE()")[0]["reconcile"])
     return {"approved": True, "version": rec["version"], "reconcile": reconcile, "validation": check}
+
+
+def set_active(cid: str, active: bool) -> dict:
+    """Pause or resume a provisioned channel; FUNNEL_FACT and the CMO fan-out follow the registry."""
+    ch = ingest.get_channel(cid)
+    if active and not ch["map_version"]:
+        raise ValueError(f"{cid} has no approved mapping yet")
+    sf.execute("UPDATE CMO_DB.CORE.CHANNEL_REGISTRY SET status = %s, updated_at = CURRENT_TIMESTAMP() WHERE channel_id = %s",
+               ("active" if active else "paused", cid))
+    sf.execute("CALL CMO_DB.CORE.REBUILD_FUNNEL()")
+    return ingest.get_channel(cid)

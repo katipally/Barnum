@@ -103,6 +103,8 @@ def run(session):
                    "autonomy_limit_usd": round(float(a["AUTONOMY_LIMIT_PCT"]) * budget)},
         "status": "auto_applied" if auto else "pending",
     }
+    session.sql("UPDATE CMO_DB.CORE.DECISION_LOG SET status = 'superseded', decided_at = CURRENT_TIMESTAMP() "
+                "WHERE kind = 'reallocation' AND status = 'pending'").collect()
     session.sql("""INSERT INTO CMO_DB.CORE.DECISION_LOG (memo_id, kind, title, finding, evidence_sql, recommendation, deltas, impact, status)
                    SELECT ?, ?, ?, ?, ?, ?, PARSE_JSON(?), PARSE_JSON(?), ?""",
                 params=[memo["memo_id"], memo["kind"], memo["title"], memo["finding"], memo["evidence_sql"],

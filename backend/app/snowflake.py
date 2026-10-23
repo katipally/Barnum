@@ -98,4 +98,8 @@ async def stream_agent(schema: str, agent: str, messages: list[dict]) -> AsyncIt
                     event = line[6:].strip()
                 elif line.startswith("data:"):
                     payload = line[5:].strip()
-                    yield event, json.loads(payload) if payload.startswith(("{", "[")) else {"value": payload}
+                    try:
+                        data = json.loads(payload)
+                    except ValueError:  # end-of-stream markers such as [DONE]
+                        continue
+                    yield event, data if isinstance(data, dict) else {"value": data}

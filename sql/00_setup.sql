@@ -69,7 +69,7 @@ CREATE TABLE IF NOT EXISTS CMO_DB.CORE.DECISION_LOG (
   recommendation STRING,
   deltas         VARIANT,    -- {channel_id: delta_usd}
   impact         VARIANT,    -- {sqls_before, sqls_after, ...}
-  status         STRING,     -- pending | approved | rejected | auto_applied
+  status         STRING,     -- pending | approved | rejected | auto_applied | superseded
   decided_at     TIMESTAMP_LTZ
 );
 
