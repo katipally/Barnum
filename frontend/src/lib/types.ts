@@ -291,6 +291,8 @@ export interface PlanChannel {
   projected_native: Record<string, number> | null; // {metric: value}, e.g. {impressions: 4106667}
   estimated: boolean;
   basis_note: string | null;
+  beyond_proven_range_usd?: number | null; // budget past the proven range of its cost curve (extrapolated); null without a curve
+  exploratory_overflow_usd?: number; // overflow that funds tests because the next performance dollar returns less than a dollar of ARR
   // filled by the channel agent; absent while the channel is still being planned
   verdict?: PlanVerdict;
   rationale?: string;
@@ -308,6 +310,8 @@ export interface PlanTotals {
   projected_sqls_per_quarter: number | null;
   projected_customers: number | null;
   projected_new_arr_usd: number | null;
+  beyond_proven_range_usd?: number;
+  exploratory_overflow_usd?: number;
 }
 
 export interface PlanTargets {

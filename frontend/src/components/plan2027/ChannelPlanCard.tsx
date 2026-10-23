@@ -76,6 +76,8 @@ export function ChannelPlanCard({ caseId, channel: c, planId, planning }: { case
   };
 
   const pending = !c.verdict;
+  const beyond = c.beyond_proven_range_usd ?? 0;
+  const overflow = c.exploratory_overflow_usd ?? 0;
   const label = c.verdict === "start" ? "Start campaign" : "Optimize campaign";
   return (
     <Card className="flex min-w-0 flex-col gap-4 p-5">
@@ -99,6 +101,20 @@ export function ChannelPlanCard({ caseId, channel: c, planId, planning }: { case
           <span className="text-2xl font-light tracking-tight text-ink tabular">{money(c.budget_usd)}</span>
           <span className="text-xs text-muted tabular">{round(c.share * 100, 1)}% of budget</span>
         </div>
+        {(beyond > 0 || overflow > 0) && (
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {beyond > 0 && (
+              <span className="chip" title={`${money(beyond)} is beyond the spend this channel has data for, so its SQLs are extrapolated from the cost curve.`}>
+                extrapolated
+              </span>
+            )}
+            {overflow > 0 && (
+              <span className="chip" title={`${money(overflow)} of this test budget is overflow: more performance spend would return less than a dollar of ARR per dollar, so it buys cost data instead.`}>
+                exploratory overflow
+              </span>
+            )}
+          </div>
+        )}
         <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-surface-3">
           <div className="h-full rounded-full bg-accent" style={{ width: `${Math.max(0, Math.min(100, c.share * 100))}%` }} />
         </div>

@@ -223,8 +223,10 @@ How the CMO delegates. `POST /plan/2027` first calls `CORE.PLAN_2027`, which is 
 
 Allocation (`sql/25_plan_2027.sql`, same response curves as `UNIT_ECON`):
 - **brand**: channels with awareness metrics (`PLAN_AWARENESS_METRICS`) and no SQL cost curve, plus one-off flights such as billboards. They share `BRAND_PCT × budget` pro rata to current spend; a brand channel with no spend counts as the average spend-bearing one.
-- **unpriced**: outcomes but no spend data (outbound, conferences, email threads). Each gets a `PLAN_TEST_BUDGET_USD` test budget (at most half of what remains after brand) and keeps its run-rate SQLs.
-- **performance**: the rest, greedy on marginal SQLs per dollar, each channel capped at `SCALE_CAP_X` times its run rate. Budget that does not fit is `unallocated_usd`.
+- **unpriced**: outcomes but no spend data (outbound, conferences, email threads). Each gets a test budget of `max(PLAN_TEST_BUDGET_USD, PLAN_TEST_PCT × budget)` (together at most half of what remains after brand) and keeps its run-rate SQLs.
+- **performance**: the rest, greedy on marginal SQLs per dollar. Spend beyond `SCALE_CAP_X` times a channel's run rate is extrapolated on its curve and flagged as `beyond_proven_range_usd`, not dropped. Once the next dollar would return less than a dollar of ARR, the remainder is `exploratory_overflow_usd` shared by the unpriced channels.
+
+Every dollar of the budget is placed, so `allocated_usd` equals the budget and more budget always means more spend on a channel.
 
 Campaigns are a stub: `POST /campaigns/draft {plan_id, channel_id}` writes a draft brief (name, objective, budget, KPIs, steps) to `CAMPAIGN_DRAFTS`. Full contract: `docs/PLAN_2027_CONTRACT.md`.
 

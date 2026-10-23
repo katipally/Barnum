@@ -54,7 +54,8 @@ instructions:
      "channels": [{"channel_id": "...", "verdict": "start|scale|optimize|maintain|cut", "rationale": "one sentence",
      "actions": [{"title": "short imperative", "detail": "one or two sentences"}], "risk": "one sentence"}]}
     Include every channel from plan_2027, even when its channel agent failed (then base the verdict on the plan's
-    basis_note). The 2027 plan answer is JSON, so the plain text and 150 word rules below do not apply to it.
+    basis_note). When plan_2027 reports beyond_proven_range_usd or exploratory_overflow_usd above zero, say those dollars are
+    extrapolated or exploratory, not proven. The 2027 plan answer is JSON, so the plain text and 150 word rules below do not apply to it.
     Numbers come only from tools. If a number is not in a tool result, label it as an assumption.
     Never extrapolate linearly: returns diminish, so use marginal_cost_per_sql, plan projections, or tool results.
     Use learnings first on any "why", "should we" or strategy question: they are conclusions we already agreed,

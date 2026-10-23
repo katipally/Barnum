@@ -11,6 +11,7 @@ const SQL_RATE = 0.08;
 const WIN_RATE = 0.2;
 const ACV_USD = 25_000;
 const TEST_SHARE = 0.02;
+const PROVEN_X = 3;
 const STEP_MS = 450;
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -51,8 +52,9 @@ function planChannels(groups: Group[], inputs: PlanInputs): PlanChannel[] {
   const brand = groups.filter((g) => g.kind === "brand");
   const perf = groups.filter((g) => g.kind === "performance");
   const testEach = inputs.budget_usd * TEST_SHARE;
-  const brandPool = brand.length ? inputs.budget_usd * inputs.brand_pct : 0;
+  const brandPool = brand.length ? inputs.budget_usd * (perf.length || tests.length ? inputs.brand_pct : 1) : 0;
   const perfPool = Math.max(0, inputs.budget_usd - brandPool - testEach * tests.length);
+  const overflow = perf.length || !tests.length ? 0 : perfPool / tests.length;
   const costs = perf.flatMap((g) => (g.cost ? [g.cost] : []));
   const avgCost = costs.length ? costs.reduce((s, c) => s + c, 0) / costs.length : 1;
   const weight = (g: Group) => g.annualSpend * (g.cost ? Math.sqrt(avgCost / g.cost) : 1);
@@ -63,7 +65,7 @@ function planChannels(groups: Group[], inputs: PlanInputs): PlanChannel[] {
   const perfW = weights(perf);
   const brandW = weights(brand);
   return groups.map((g) => {
-    const budget = g.kind === "unpriced" ? testEach : g.kind === "brand" ? brandPool * brandW(g) : perfPool * perfW(g);
+    const budget = g.kind === "unpriced" ? testEach + overflow : g.kind === "brand" ? brandPool * brandW(g) : perfPool * perfW(g);
     const saturation = g.annualSpend > 0 && budget > g.annualSpend ? (g.annualSpend / budget) ** 0.35 : 1;
     const units = g.cost ? (budget / g.cost) * saturation : null; // leads (or brand units) per year
     const sqlsYear = g.kind === "performance" && units !== null ? units * SQL_RATE : null;
@@ -80,6 +82,8 @@ function planChannels(groups: Group[], inputs: PlanInputs): PlanChannel[] {
       plan_cost_per_sql: sqlsYear ? budget / sqlsYear : null,
       projected_native: g.kind === "brand" && units !== null ? { [g.label]: Math.round(units) } : null,
       estimated: true,
+      beyond_proven_range_usd: g.cost ? Math.max(0, budget - PROVEN_X * g.annualSpend) : null,
+      exploratory_overflow_usd: g.kind === "unpriced" ? overflow : 0,
       basis_note: g.cost ? `Sample estimate from the sample data, ${money(g.cost)} per ${g.label}.` : "Sample estimate. No results measured yet.",
     };
   });
@@ -101,6 +105,8 @@ function totalsAndTargets(channels: PlanChannel[], inputs: PlanInputs): { totals
       projected_sqls_per_quarter: sqls,
       projected_customers: customers,
       projected_new_arr_usd: arr,
+      beyond_proven_range_usd: channels.reduce((s, c) => s + (c.beyond_proven_range_usd ?? 0), 0),
+      exploratory_overflow_usd: channels.reduce((s, c) => s + (c.exploratory_overflow_usd ?? 0), 0),
     },
     targets: {
       revenue: { target_usd: inputs.revenue_target_usd, projected_usd: arr, gap_usd: arr - inputs.revenue_target_usd, met: arr >= inputs.revenue_target_usd },

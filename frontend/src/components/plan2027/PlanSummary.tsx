@@ -27,7 +27,13 @@ export function PlanSummary({ totals, targets, summary, running }: { totals?: Pl
         <Tile
           label="Allocated"
           value={money(totals.allocated_usd)}
-          sub={`${money(totals.unallocated_usd)} unallocated`}
+          sub={[
+            totals.unallocated_usd >= 1 && `${money(totals.unallocated_usd)} unallocated`,
+            totals.beyond_proven_range_usd && `${money(totals.beyond_proven_range_usd)} extrapolated`,
+            totals.exploratory_overflow_usd && `${money(totals.exploratory_overflow_usd)} exploratory overflow`,
+          ]
+            .filter(Boolean)
+            .join(", ")}
         />
         <Tile
           label="SQLs per quarter"
