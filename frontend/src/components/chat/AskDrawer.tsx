@@ -28,7 +28,7 @@ export function AskDrawer() {
       <aside
         id="ask-cmo-drawer"
         role="dialog"
-        aria-label="Ask the CMO"
+        aria-label="Ask Barnum"
         aria-hidden={!isOpen}
         inert={!isOpen}
         className={cx(
@@ -38,7 +38,7 @@ export function AskDrawer() {
       >
         <header className="flex items-center justify-between gap-3 border-b border-line px-5 py-3.5">
           <div>
-            <h2 className="text-sm font-medium text-ink">Ask the CMO</h2>
+            <h2 className="text-sm font-medium text-ink">Ask Barnum</h2>
             <p className="text-xs text-faint">{caseName ? `Talking about ${caseName}` : "Your marketing agent"}</p>
           </div>
           <button

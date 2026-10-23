@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Agentic CMO",
-  description: "A CMO agent that turns business goals into marketing decisions",
+  title: "Barnum",
+  description: "Barnum: a CMO agent that turns business goals into marketing decisions",
 };
 
 export default function RootLayout({

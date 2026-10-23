@@ -7,7 +7,7 @@ import { Sidebar } from "./Sidebar";
 import { TopBar } from "./TopBar";
 import { useDefaultCompany } from "./useDefaultCompany";
 
-// Frame for every page: sidebar (top nav under 900px), top bar, content column and the Ask the CMO drawer.
+// Frame for every page: sidebar (top nav under 900px), top bar, content column and the Ask Barnum drawer.
 export function AppShell({ children }: { children: ReactNode }) {
   const ready = useDefaultCompany();
   return (

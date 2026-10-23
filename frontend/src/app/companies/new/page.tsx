@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { CompanyForm } from "@/components/companies/CompanyForm";
 
-export const metadata: Metadata = { title: "Add company · Agentic CMO" };
+export const metadata: Metadata = { title: "Add company · Barnum" };
 
 export default function NewCompanyPage() {
   return (
