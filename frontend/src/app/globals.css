@@ -1,0 +1,38 @@
+@import "tailwindcss";
+
+/* "War room" theme: near-black canvas, warm ink, one gold accent. Status colors only for status. */
+@theme {
+  --color-bg: #0b0d0c;
+  --color-surface: #121514;
+  --color-surface-2: #181c1a;
+  --color-surface-3: #1f2421;
+  --color-line: rgba(255, 255, 255, 0.08);
+  --color-line-strong: rgba(255, 255, 255, 0.16);
+  --color-ink: #ece9e2;
+  --color-muted: #8b908c;
+  --color-faint: #5d625f;
+  --color-gold: #d4a84b;
+  --color-gold-soft: rgba(212, 168, 75, 0.14);
+  --color-ok: #4cb782;
+  --color-warn: #e0a23b;
+  --color-bad: #e5534b;
+  --color-info: #6ea8fe;
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+html,
+body {
+  background: var(--color-bg);
+  color: var(--color-ink);
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}

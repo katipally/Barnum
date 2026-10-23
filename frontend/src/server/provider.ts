@@ -1,0 +1,24 @@
+// Data/agent provider switch. CMO_PROVIDER = "mock" (default) | "cortex".
+import type { CaseData, CaseId, CaseSummary, CompanyCase } from "@/lib/types";
+import { mockProvider } from "./providers/mock";
+import { cortexProvider } from "./providers/cortex";
+import { cmoApiProvider } from "./providers/cmoApi";
+
+export interface CmoProvider {
+  /** Provider-owned (sample) companies; read-only, cannot be deleted. */
+  listCases(): Promise<CaseSummary[]>;
+  getCaseData(caseId: CaseId): Promise<CaseData | undefined>;
+  /** Live data for a user-created company once its data source is connected; null while awaiting data. */
+  getConnectedData?(company: CompanyCase): Promise<CaseData | null>;
+  ask(caseId: CaseId, question: string, data: CaseData): AsyncIterable<string>;
+  /** Live companies are re-read on every request (no in-memory copy) and decide through the backend. */
+  isLive?(caseId: CaseId): boolean;
+  decide?(caseId: CaseId, decisionId: string, status: "approved" | "rejected", note?: string): Promise<void>;
+}
+
+// CMO_PROVIDER = "mock" (default) | "cortex" | "cmo-api" (CMO-Agent FastAPI over Snowflake, needs CMO_API_URL).
+export function getProvider(): CmoProvider {
+  if (process.env.CMO_PROVIDER === "cmo-api") return cmoApiProvider;
+  return process.env.CMO_PROVIDER === "cortex" ? cortexProvider : mockProvider;
+}
+
