@@ -20,9 +20,10 @@ import httpx
 from . import queries
 from . import snowflake as sf
 
-REVIEW_QUESTION = ("Give your status report for this quarter for the CMO: spend vs plan, MQLs, SQLs, cost per SQL, "
-                   "MQL-to-SQL rate, what the next $10k buys, best and worst campaigns, whether spend reconciles, "
-                   "and one recommendation with a dollar amount.")
+REVIEW_QUESTION = ("Give the CMO your status report: what your data measures and over which window, the funnel stages "
+                   "you measure (and which are proxies or estimates), cost per stage when spend is measured, your most "
+                   "telling native metrics, best and worst campaigns or segments, whether spend reconciles, and one "
+                   "recommendation.")
 
 
 def sse(event: str, data) -> str:
@@ -60,7 +61,7 @@ async def guarded(gen: AsyncIterator[str]) -> AsyncIterator[str]:
 
 
 async def review(question: str = REVIEW_QUESTION) -> AsyncIterator[str]:
-    """Full Q4 review: strip, parallel channel reports, reallocation memo, CMO memo to the CEO."""
+    """Full review: strip, parallel channel reports, reallocation memo, CMO memo to the CEO."""
     t0 = time.monotonic()
     yield sse("strip", await asyncio.to_thread(queries.strip))
     channels = await asyncio.to_thread(queries.active_channels)
@@ -73,11 +74,15 @@ async def review(question: str = REVIEW_QUESTION) -> AsyncIterator[str]:
             reports.append(r)
             yield sse("delegation", r)
     yield sse("status", {"stage": "reallocation", "message": "optimizing remaining budget on SQLs"})
-    memo = await asyncio.to_thread(queries.propose_reallocation)
-    yield sse("memo", memo)
-    brief = ("Write the CMO memo to the CEO for this quarter from the material below. Do not call tools; every number you "
-             "need is here. Lead with the decision, then evidence per channel, then the memo's SQL impact and whether it "
-             "needs approval.\n\nChannel agent reports:\n"
+    try:
+        memo = await asyncio.to_thread(queries.propose_reallocation)
+        yield sse("memo", memo)
+    except ValueError as e:  # fewer than two budget channels: review still runs
+        memo = {"skipped": str(e)}
+        yield sse("status", {"stage": "reallocation", "message": f"skipped: {e}"})
+    brief = ("Write the CMO memo to the CEO from the material below. Do not call tools; every number you need is here. "
+             "Lead with the decision, then evidence per channel in its own terms, then the memo's SQL impact and whether it "
+             "needs approval, then data gaps.\n\nChannel agent reports:\n"
              + "\n\n".join(f"[{r['channel']}] {r['text']}" for r in reports if r["state"] == "done")
              + f"\n\nReallocation memo (from the optimizer):\n{json.dumps(memo, default=str)}")
     async for chunk in _cmo_stream([{"role": "user", "content": [{"type": "text", "text": brief}]}]):

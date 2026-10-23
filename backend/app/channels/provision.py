@@ -26,10 +26,31 @@ def latest_mapping(cid: str, version: int | None = None) -> dict:
     return r | {"mapping": json.loads(r["mapping"]), "validation": json.loads(r["validation"])}
 
 
+MAX_TEXT_LEN = 500  # longer text columns (HTML bodies, full AI answers) are not useful as dimensions
+
+
+def raw_tables(schema: str) -> list[dict]:
+    """Raw uploads exposed to the channel's own semantic view: text/date columns as dimensions, numbers as facts."""
+    out = []
+    for i, t in enumerate(ingest.profile(schema)["tables"]):
+        cols = {c: v["type"] for c, v in t["columns"].items()}
+        text = [c for c, ty in cols.items() if ty == "TEXT"]
+        lens = sf.query(f"SELECT {', '.join(f'MAX(LEN({c})) {c}' for c in text)} FROM {t['table']}")[0] if text else {}
+        out.append({"alias": f"raw{i + 1}", "table": t["table"],
+                    "dims": [c for c, ty in cols.items() if ty != "NUMBER" and ty != "FLOAT"
+                             and (ty != "TEXT" or (lens.get(c.lower()) or 0) <= MAX_TEXT_LEN)],
+                    "nums": [c for c, ty in cols.items() if ty in ("NUMBER", "FLOAT")]})
+    return out
+
+
 def render(ch: dict, m: dict) -> str:
+    measured = [f for f, on in m["measures"].items() if on]
     return _env.from_string(TEMPLATE.read_text()).render(
         s=ch["schema_name"], cid=ch["channel_id"], display=ch["display_name"], description=ch["description"],
         map_select=mapping.map_select(ch["channel_id"], m["select_sql"]), raw_spend_sql=m["raw_spend_sql"],
+        raw_tables=raw_tables(ch["schema_name"]), metric_notes=m["metric_notes"],
+        measured=", ".join(measured) or "no shared funnel fields",
+        unmeasured=", ".join(f for f in mapping.MEASURES if f not in measured) or "nothing",
         model=MODEL, warehouse=sf.WAREHOUSE)
 
 
@@ -41,9 +62,11 @@ def approve(cid: str, version: int | None = None) -> dict:
     if not check["ok"]:
         return {"approved": False, "validation": check}
     sf.conn().execute_string(render(ch, rec["mapping"]), remove_comments=True)
-    sf.execute("""UPDATE CMO_DB.CORE.CHANNEL_REGISTRY SET status = 'active', outcome_mode = %s, map_version = %s,
+    m = rec["mapping"]
+    sf.execute("""UPDATE CMO_DB.CORE.CHANNEL_REGISTRY SET status = 'active', map_version = %s, grain = %s,
+                  window_start = COALESCE(window_start, TRY_TO_DATE(%s::STRING)), window_end = COALESCE(window_end, TRY_TO_DATE(%s::STRING)),
                   updated_at = CURRENT_TIMESTAMP() WHERE channel_id = %s""",
-               (rec["mapping"]["outcome_mode"], rec["version"], cid))
+               (rec["version"], m["grain"], m["window_start"], m["window_end"], cid))
     sf.execute("UPDATE CMO_DB.CORE.MAPPING_HISTORY SET status = 'approved' WHERE channel_id = %s AND version = %s",
                (cid, rec["version"]))
     sf.execute("CALL CMO_DB.CORE.REBUILD_FUNNEL()")

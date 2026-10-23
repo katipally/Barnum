@@ -1,29 +1,56 @@
 -- Provisions one channel's isolated stack. Rendered by backend/app/channels/provision.py.
--- Inputs: s (schema), cid (channel id), display, description, map_select, raw_spend_sql, model, warehouse.
+-- Inputs: s, cid, display, description, map_select, raw_spend_sql, raw_tables [{alias, table, dims[], nums[]}],
+--         metric_notes, measures {field: bool}, model, warehouse.
 
 CREATE OR REPLACE VIEW CMO_DB.{{ s }}.MAP AS
 {{ map_select }};
 
+-- Every native metric the mapping kept, one row per (date, campaign, metric).
+CREATE OR REPLACE VIEW CMO_DB.{{ s }}.NATIVE_METRICS AS
+SELECT m.date, m.campaign, m.audience, f.key AS metric, f.value::FLOAT AS value
+FROM CMO_DB.{{ s }}.MAP m, LATERAL FLATTEN(input => m.metrics) f;
+
 CREATE OR REPLACE SEMANTIC VIEW CMO_DB.{{ s }}.SV
-  TABLES (funnel AS CMO_DB.{{ s }}.MAP COMMENT = '{{ display | sq }} funnel rows: one row per day and campaign')
+  TABLES (
+    funnel AS CMO_DB.{{ s }}.MAP COMMENT = 'Shared funnel fields; NULL means this channel does not measure it',
+    native AS CMO_DB.{{ s }}.NATIVE_METRICS COMMENT = 'Native metrics in long form. Metric keys: {{ metric_notes | sq }}'
+    {%- for t in raw_tables %},
+    {{ t.alias }} AS {{ t.table }} COMMENT = 'Raw upload as exported by the platform'
+    {%- endfor %}
+  )
   FACTS (
     funnel.spend_fact AS spend_usd, funnel.mql_fact AS mqls, funnel.sql_fact AS sqls,
-    funnel.opp_fact AS opps, funnel.pipeline_fact AS pipeline_usd, funnel.won_fact AS won
+    funnel.opp_fact AS opps, funnel.pipeline_fact AS pipeline_usd, funnel.won_fact AS won,
+    native.value_fact AS value
+    {%- for t in raw_tables %}{% for c in t.nums %},
+    {{ t.alias }}.{{ t.alias }}_{{ c | lower }}_f AS {{ c }}
+    {%- endfor %}{% endfor %}
   )
   DIMENSIONS (
     funnel.day AS date WITH SYNONYMS = ('date', 'day'),
-    funnel.campaign AS campaign WITH SYNONYMS = ('creative', 'keyword', 'event', 'board', 'audience segment'),
+    funnel.campaign AS campaign WITH SYNONYMS = ('campaign', 'creative', 'keyword', 'board', 'sequence', 'query', 'page'),
     funnel.creative_text AS creative_text,
-    funnel.audience AS audience
+    funnel.audience AS audience,
+    native.metric_day AS date,
+    native.metric_campaign AS campaign,
+    native.metric_audience AS audience,
+    native.metric AS metric WITH SYNONYMS = ('native metric', 'kpi')
+    {%- for t in raw_tables %}{% for c in t.dims %},
+    {{ t.alias }}.{{ t.alias }}_{{ c | lower }} AS {{ c }}
+    {%- endfor %}{% endfor %}
   )
   METRICS (
-    funnel.spend AS SUM(spend_usd) COMMENT = 'Spend in USD',
-    funnel.mql_count AS SUM(mqls) WITH SYNONYMS = ('MQLs', 'marketing qualified leads'),
-    funnel.sql_count AS SUM(sqls) WITH SYNONYMS = ('SQLs', 'sales qualified leads'),
+    funnel.spend AS SUM(spend_usd) COMMENT = 'Spend in USD; NULL when not measured',
+    funnel.mql_count AS SUM(mqls) WITH SYNONYMS = ('MQLs'),
+    funnel.sql_count AS SUM(sqls) WITH SYNONYMS = ('SQLs'),
     funnel.pipeline AS SUM(pipeline_usd),
     funnel.cost_per_mql AS SUM(spend_usd) / NULLIF(SUM(mqls), 0),
-    funnel.cost_per_sql AS SUM(spend_usd) / NULLIF(SUM(sqls), 0) WITH SYNONYMS = ('$ per SQL', 'CPS'),
-    funnel.mql_to_sql_rate AS SUM(sqls) / NULLIF(SUM(mqls), 0)
+    funnel.cost_per_sql AS SUM(spend_usd) / NULLIF(SUM(sqls), 0),
+    funnel.mql_to_sql_rate AS SUM(sqls) / NULLIF(SUM(mqls), 0),
+    native.metric_total AS SUM(value) COMMENT = 'Sum of a native metric; always filter or group by metric'
+    {%- for t in raw_tables %}{% for c in t.nums %},
+    {{ t.alias }}.{{ t.alias }}_{{ c | lower }}_total AS SUM({{ t.alias }}.{{ t.alias }}_{{ c | lower }}_f)
+    {%- endfor %}{% endfor %}
   )
   COMMENT = '{{ description | sq }}';
 
@@ -42,8 +69,9 @@ DECLARE
 BEGIN
   raw_spend := ({{ raw_spend_sql }});
   map_spend := (SELECT SUM(spend_usd) FROM CMO_DB.{{ s }}.MAP);
-  RETURN OBJECT_CONSTRUCT('raw_spend_usd', ROUND(raw_spend, 2), 'mapped_spend_usd', ROUND(map_spend, 2),
-                          'diff_usd', ROUND(map_spend - raw_spend, 2), 'ok', ABS(map_spend - raw_spend) <= 1);
+  RETURN OBJECT_CONSTRUCT('spend_measured', raw_spend IS NOT NULL, 'raw_spend_usd', ROUND(raw_spend, 2),
+                          'mapped_spend_usd', ROUND(map_spend, 2), 'diff_usd', ROUND(map_spend - raw_spend, 2),
+                          'ok', (raw_spend IS NULL AND map_spend IS NULL) OR ABS(map_spend - raw_spend) <= 1);
 END;
 $$;
 
@@ -57,28 +85,31 @@ models:
 instructions:
   orchestration: >
     You are the {{ display | yq }} channel agent, reporting to the CMO. {{ description | yq }}
-    You only know your own channel. Judge performance on cost per SQL, never on clicks, impressions or scans.
-    For any status or review request: call report first, then reconcile, then use ChannelData for the
-    breakdown by campaign to find the best and worst campaigns by cost per SQL.
+    You only know your own channel. This channel measures: {{ measured | yq }}. It does not measure: {{ unmeasured | yq }};
+    never present an unmeasured number as zero. SQLs flagged sqls_estimated come from the cross-channel MQL-to-SQL rate.
+    Your native metrics: {{ metric_notes | yq }}
+    For any status or review request: call report, then reconcile, then use ChannelData for breakdowns. Use the native
+    metrics and raw tables to explain why: which campaigns, creatives, audiences, queries or segments drive results.
   response: >
-    Lead with numbers. Always state spend vs plan, MQLs, SQLs, cost per SQL, MQL-to-SQL rate and
-    what the next $10k buys (sqls_per_next_10k from report). Name the best and worst campaign by cost per SQL.
-    Say whether spend reconciles. End with one recommendation: scale, keep, cut, or test, with a dollar amount.
-    Use only tool results; label anything else as an assumption.
+    Lead with the numbers this channel actually has: spend and cost per MQL / SQL when spend is measured, the funnel
+    stages it measures, and its most telling native metrics (rates computed from summed numerators and denominators).
+    Name the best and worst campaign or segment on the deepest measured stage. Say whether spend reconciles.
+    State clearly which numbers are proxies or estimates. End with one recommendation: scale, keep, cut, fix or test,
+    with a dollar amount when spend is measured. Use only tool results; label anything else as an assumption.
 tools:
   - tool_spec:
       type: cortex_analyst_text_to_sql
       name: ChannelData
-      description: "{{ display | yq }} funnel by day and campaign: spend, MQLs, SQLs, pipeline, cost per SQL."
+      description: "{{ display | yq }} data: shared funnel fields, every native metric, and the raw platform export."
   - tool_spec:
       type: generic
       name: report
-      description: "Headline numbers for this channel: spend, plan, pacing, MQLs, SQLs, cost per SQL, marginal cost per SQL, SQLs the next $10k buys."
+      description: "Headline numbers for this channel: what it measures, spend, MQLs, SQLs (and whether estimated), cost per stage, native metric totals, window and annual run rate."
       input_schema: {type: object, properties: {}}
   - tool_spec:
       type: generic
       name: reconcile
-      description: "Check that spend in the funnel equals spend in the raw platform data, to the dollar."
+      description: "Check that spend in the funnel equals spend in the raw platform data, to the dollar (or that neither has spend)."
       input_schema: {type: object, properties: {}}
 tool_resources:
   ChannelData:

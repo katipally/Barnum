@@ -1,5 +1,6 @@
-"""Numbers the demo depends on. Runs against the live CMO_DB with the seed loaded (python -m seed.load).
+"""Checks against the real Datasaur exports, loaded with: python -m seed.load_real <test-data dir>
 
+Expected values were computed independently from the CSVs with pandas, not from the pipeline.
 pytest tests/
 """
 import json
@@ -9,66 +10,89 @@ import pytest
 from backend.app import queries
 from backend.app import snowflake as sf
 
-Q4 = {  # PRD Q4 table: spend, MQL, SQL
-    "google": (17000, 34, 9), "linkedin": (21000, 76, 7), "billboard": (13000, 5, 2), "conferences": (12000, 25, 7),
+EXPECTED = {  # channel: (spend_usd or None, mqls or None, sqls or None)
+    "google": (319_222.26, 2325, None),
+    "linkedin": (22_725.41, 13, None),
+    "billboard": (30_000.00, 112, None),
+    "outbound": (None, 86, 77),
+    "seo": (None, None, None),
+    "geo": (None, None, None),
 }
+NATIVE = {"seo": {"clicks": 12_462, "impressions": 1_314_511}, "geo": {"ai_answers": 240, "ai_mentions": 79}}
+
+
+@pytest.fixture(scope="module")
+def raw():
+    """Measured values straight from each MAP view, before cross-channel SQL estimation."""
+    rows = sf.query("SELECT channel, SUM(spend_usd) spend, SUM(mqls) mqls, SUM(sqls) sqls FROM CMO_DB.CORE.FUNNEL_RAW GROUP BY 1")
+    return {r["channel"]: r for r in rows}
 
 
 @pytest.fixture(scope="module", autouse=True)
 def clean():
-    queries.reset_demo()
+    queries.reset_decisions()
     yield
-    queries.reset_demo()
+    queries.reset_decisions()
 
 
-@pytest.mark.parametrize("cid", sorted(Q4))
+@pytest.mark.parametrize("cid", sorted(EXPECTED))
+def test_measured_values_match_export(cid, raw):
+    spend, mqls, sqls = EXPECTED[cid]
+    r = raw[cid]
+    assert (r["spend"] is None) == (spend is None) and (spend is None or abs(r["spend"] - spend) <= 1), r
+    assert (r["mqls"] is None) == (mqls is None) and (mqls is None or abs(r["mqls"] - mqls) < 1), r
+    assert (r["sqls"] is None) == (sqls is None) and (sqls is None or abs(r["sqls"] - sqls) < 1), r
+
+
+@pytest.mark.parametrize("cid", sorted(EXPECTED))
 def test_channel_reconciles(cid):
     r = json.loads(sf.query(f"CALL CMO_DB.CH_{cid.upper()}.RECONCILE()")[0]["reconcile"])
-    assert r["ok"] and r["diff_usd"] == 0
+    assert r["ok"], r
 
 
-def test_q4_funnel_matches_prd():
-    rows = {r["channel_id"]: r for r in queries.q4_channels()["data"]}
-    for cid, (spend, mqls, sqls) in Q4.items():
-        assert (rows[cid]["spend_usd"], rows[cid]["mqls"], rows[cid]["sqls"]) == (spend, mqls, sqls), cid
+@pytest.mark.parametrize("cid", sorted(NATIVE))
+def test_native_metrics_kept(cid):
+    m = {r["metric"]: r["total"] for r in sf.query("SELECT metric, total FROM CMO_DB.CORE.CHANNEL_METRICS WHERE channel = %s", (cid,))}
+    for k, v in NATIVE[cid].items():
+        assert abs(m[k] - v) < 1, (k, m.get(k))
 
 
-def test_exec_strip():
+def test_unmeasured_is_never_zero():
+    rows = {r["channel_id"]: r for r in queries.channels()["data"]}
+    assert rows["outbound"]["spend_usd"] is None and rows["outbound"]["cost_per_sql"] is None
+    assert rows["seo"]["mqls"] is None and rows["geo"]["sqls"] is None
+
+
+def test_sql_estimation_is_flagged_and_learned_from_outbound():
     s = queries.strip()["data"]
-    assert (s["spent_usd"], s["budget_left_usd"], s["mqls"], s["sqls"]) == (63000, 62000, 140, 25)
-    assert round(s["cost_per_mql"]) == 450 and round(s["cost_per_sql"]) == 2520
-    assert round(s["cac_full_usd"]) == 56800 and round(s["payback_months"], 1) == 8.1
+    assert "outbound" in s["mql_to_sql_source"] and 0.85 < s["mql_to_sql_rate"] < 0.95  # 77 / 86
+    rows = {r["channel_id"]: r for r in queries.channels()["data"]}
+    assert rows["google"]["sqls_estimated"] and not rows["outbound"]["sqls_estimated"]
+    assert s["sqls_estimated"] and set(s["channels_without_spend"]) == {"outbound", "seo", "geo"}
 
 
-def test_linkedin_is_the_trap():
-    rows = {r["channel_id"]: r for r in queries.q4_channels()["data"]}
-    assert min(rows, key=lambda c: rows[c]["cost_per_mql"]) == "linkedin"
-    assert rows["linkedin"]["cost_per_sql"] > rows["google"]["cost_per_sql"] > rows["conferences"]["cost_per_sql"]
+def test_strip_cost_metrics_cover_paid_channels_only():
+    s = queries.strip()["data"]
+    paid = sum(EXPECTED[c][0] for c in ("google", "linkedin", "billboard"))
+    assert abs(s["measured_spend_usd"] - paid) <= 3
+    assert abs(s["cost_per_mql"] - paid / (2325 + 13 + 112)) < 1
 
 
 def test_reallocation_memo_and_approval():
     m = queries.propose_reallocation()
-    assert m["status"] == "pending"  # moves more than the 10% autonomy limit
-    assert m["finding"].startswith("LinkedIn Ads ranks #1")
-    d = {c: v["recommended_usd"] for c, v in m["deltas"].items()}
-    assert d["conferences"] > 12000 and d["linkedin"] < 21000 and d["billboard"] == 5000 and sum(d.values()) == 62000
-    assert m["impact"]["sqls_after"] > m["impact"]["sqls_before"]
-    assert queries.decide(m["memo_id"], "approved")["status"] == "approved"
-    assert round(queries.strip()["data"]["projected_sqls_remaining"], 1) == m["impact"]["sqls_after"]
-    assert "error" in queries.decide(m["memo_id"], "approved")
+    assert set(m["deltas"]) == {"google", "linkedin", "billboard"} and set(m["impact"]["not_allocated"]) == {"outbound", "seo", "geo"}
+    assert abs(sum(d["recommended_usd"] for d in m["deltas"].values()) - m["impact"]["budget_usd"]) <= 3
+    assert m["impact"]["sqls_after"] >= m["impact"]["sqls_before"]
+    if m["status"] == "pending":
+        assert queries.decide(m["memo_id"], "approved")["status"] == "approved"
+        assert "error" in queries.decide(m["memo_id"], "approved")
+    plan = queries.strip()["data"]["plan_projected_sqls"]
+    assert abs(plan - m["impact"]["sqls_after"]) < 0.2
 
 
-def test_plan_1m_12mo():
-    u = queries.unit_econ(1_000_000, "12mo")["data"]
-    p = u["plan"]
-    assert 44 <= p["customers"] <= 47 and 60_000 <= p["avg_cac_usd"] <= 64_000 and 8.5 <= p["payback_months"] <= 9.2
-    assert p["last_customer_pays_back"] and u["cac_bound"] and 1_100_000 <= u["ceiling_usd"] <= 1_400_000
-    split = {s["channel"]: s["share"] for s in p["split"]}
-    assert split["conferences"] > split["linkedin"] > split["google"] >= split["billboard"] == 0.1
-
-
-def test_plan_3yr_is_not_cac_bound():
-    u = queries.unit_econ(2_000_000, "3yr")["data"]
-    assert u["ceiling_usd"] is None and not u["cac_bound"]
-    one = queries.unit_econ(1_000_000, "3yr")["data"]["plan"]
-    assert u["plan"]["net_3yr_usd"] > one["net_3yr_usd"] and u["plan"]["year1_net_usd"] < one["year1_net_usd"]
+@pytest.mark.parametrize("rule", ["12mo", "3yr"])
+def test_unit_econ_runs_on_paid_channels(rule):
+    u = queries.unit_econ(1_000_000, rule)["data"]
+    assert set(u["channels_not_allocated"]) == {"outbound", "seo", "geo"}
+    assert {s["channel"] for s in u["plan"]["split"]} == {"google", "linkedin", "billboard"}
+    assert u["plan"]["customers"] > 0 and "google" in u["sqls_estimated_for"]

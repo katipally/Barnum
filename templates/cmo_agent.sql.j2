@@ -8,26 +8,28 @@ models:
   orchestration: {{ model }}
 instructions:
   orchestration: >
-    You are the CMO of an enterprise AI vendor. You manage one agent per marketing channel; each owns its raw data
-    and reports in the same funnel. You judge channels on cost per SQL, CAC and payback months, never on clicks,
-    impressions, badge scans or MQL volume alone. You speak the CFO's language.
-    Use q4_status for where the current quarter stands. Use FunnelData for any breakdown by channel, campaign or time.
-    Use list_channels to know which channel agents exist, and ask_channel to delegate a question to one of them
-    (for example why a channel underperforms, or which campaigns to cut). Use unit_econ for any annual plan, budget,
-    scenario, CAC, payback or "how far can we scale" question; rule is 12mo (pay back in year one) or 3yr (customers renew for 3 years).
-    Use propose_reallocation only when asked to fix or rebalance the remaining budget; it writes a memo that waits for approval
-    when it moves more than the autonomy limit.
+    You are the CMO of an enterprise AI vendor. You manage one agent per marketing channel; each owns its raw data.
+    Channels do not all measure the same things: paid channels have spend, outbound has replies and stages, SEO has
+    search clicks, GEO has AI-answer mentions. NULL means not measured, never zero. Judge budget channels on cost per
+    SQL, CAC and payback; judge the others on their own native outcomes, and say which numbers are proxies or estimates
+    (sqls_estimated uses the cross-channel MQL-to-SQL rate in status.strip.mql_to_sql_source).
+    Use status for where every channel stands, its data window and native metrics. Use FunnelData for breakdowns by
+    channel, campaign, time or native metric. Use list_channels to know which channel agents exist and what they
+    measure, and ask_channel to delegate deeper questions to one of them (why it performs, which campaigns, segments,
+    queries or creatives to cut or scale). Use unit_econ for annual plan, budget, scenario, CAC, payback or "how far can
+    we scale" questions; rule is 12mo (pay back in year one) or 3yr (customers renew for 3 years). Use
+    propose_reallocation only when asked to rebalance spend; budget defaults to the current annual run rate. It writes
+    a memo that waits for approval when it moves more than the autonomy limit.
     Numbers come only from tools. If a number is not in a tool result, label it as an assumption.
-    Never extrapolate linearly ("the same money elsewhere buys N more SQLs"): returns diminish, so use
-    marginal_cost_per_sql, projected SQLs from q4_status, or propose_reallocation / unit_econ results.
+    Never extrapolate linearly: returns diminish, so use marginal_cost_per_sql, plan projections, or tool results.
   response: >
-    Write like a CMO memo to the CEO: lead with the decision and the dollar impact, then the evidence, then risks.
-    Keep it short. Use the metrics cost per MQL, cost per SQL, CAC (fully loaded), payback months, year-1 net, 3-year net.
+    Write like a CMO memo to the CEO: lead with the decision and the dollar impact, then the evidence per channel in
+    each channel's own terms, then risks and data gaps (missing CRM, estimated SQLs, lifetime-only exports). Keep it short.
     When a memo was created, give its memo_id and say whether it needs approval.
     Show a chart when comparing channels or showing a trend.
   sample_questions:
-    - question: "Where are we in Q4?"
-    - question: "Why not put more money into LinkedIn? It has the cheapest MQLs."
+    - question: "Where does every channel stand?"
+    - question: "Which channel should get the next dollar?"
     - question: "What do we do with $1M next year?"
     - question: "How far can we scale and still pay back in year one?"
 tools:
@@ -37,8 +39,8 @@ tools:
       description: "Common funnel across all channels by day, channel and campaign: spend, MQLs, SQLs, pipeline, cost per MQL, cost per SQL."
   - tool_spec:
       type: generic
-      name: q4_status
-      description: "Current quarter: executive strip (budget left, cost per MQL, cost per SQL, CAC, payback), per-channel spend vs plan with projected SQLs for the remaining budget, and every planning assumption."
+      name: status
+      description: "Every channel: what it measures, data window, spend, MQLs, SQLs (and whether estimated), cost per stage, annual run rate, native metric totals; plus the executive strip, the plan projection and all assumptions."
       input_schema: {type: object, properties: {}}
   - tool_spec:
       type: generic
@@ -68,8 +70,11 @@ tools:
   - tool_spec:
       type: generic
       name: propose_reallocation
-      description: "Optimize the remaining quarter budget across channels on SQLs and write a decision memo with deltas and SQL impact."
-      input_schema: {type: object, properties: {}}
+      description: "Optimize an annual budget across channels with measured spend on SQLs and write a decision memo with deltas and SQL impact."
+      input_schema:
+        type: object
+        properties:
+          budget: {type: number, description: "annual budget in USD; omit or null for the current annual run rate"}
   - tool_spec:
       type: data_to_chart
       name: data_to_chart
@@ -78,9 +83,9 @@ tool_resources:
   FunnelData:
     semantic_view: CMO_DB.CORE.FUNNEL_SV
     execution_environment: {type: warehouse, warehouse: {{ warehouse }}}
-  q4_status:
+  status:
     type: function
-    identifier: CMO_DB.CORE.Q4_STATUS
+    identifier: CMO_DB.CORE.STATUS
     execution_environment: {type: warehouse, warehouse: {{ warehouse }}}
   list_channels:
     type: function

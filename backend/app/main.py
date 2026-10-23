@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
-from . import orchestrator, queries, simulate
+from . import orchestrator, queries
 from .channels import ingest, mapping, provision
 
 app = FastAPI(title="Agentic CMO", version="0.1.0")
@@ -33,8 +33,11 @@ class ChannelIn(BaseModel):
     channel_id: str = Field(examples=["webinars"])
     display_name: str
     description: str = Field(description="What the channel is and how its data links to leads; goes into the mapping prompt")
-    mql_rule: str | None = Field(None, description="Overrides the shared MQL definition for this channel")
-    plan_usd: float | None = Field(None, description="Planned spend for the current period")
+    mql_rule: str | None = Field(None, description="What counts as an MQL in this data; proxies are fine")
+    sql_rule: str | None = Field(None, description="What counts as an SQL; leave empty when the data cannot show SQLs")
+    window_start: str | None = Field(None, description="YYYY-MM-DD the data starts; inferred from the data when omitted")
+    window_end: str | None = Field(None, description="YYYY-MM-DD the data ends")
+    plan_usd: float | None = Field(None, description="Planned spend for the planning period")
 
 
 class ProposeIn(BaseModel):
@@ -52,7 +55,8 @@ def list_channels():
 
 @app.post("/channels", status_code=201)
 def create_channel(body: ChannelIn):
-    return _guard(ingest.create_channel, body.channel_id, body.display_name, body.description, body.mql_rule, body.plan_usd)
+    return _guard(ingest.create_channel, body.channel_id, body.display_name, body.description, body.mql_rule,
+                  body.sql_rule, body.window_start, body.window_end, body.plan_usd)
 
 
 @app.post("/channels/{cid}/files")
@@ -65,13 +69,18 @@ async def upload_files(cid: str, files: list[UploadFile] = File(...), replace: b
 @app.get("/channels/{cid}/profile")
 def channel_profile(cid: str):
     ch = _guard(ingest.get_channel, cid)
-    prof = ingest.profile(ch["schema_name"])
-    return prof | {"outcome_hint": ingest.outcome_hint(prof)}
+    return ingest.profile(ch["schema_name"])
 
 
 @app.post("/channels/{cid}/mapping/propose")
 def propose_mapping(cid: str, body: ProposeIn | None = None):
     return _guard(mapping.propose, cid, body.feedback if body else None)
+
+
+@app.post("/channels/{cid}/mapping")
+def submit_mapping(cid: str, body: dict):
+    """Hand-written mapping (same JSON shape as a proposal); validated, then approved like any other."""
+    return _guard(mapping.submit, cid, body)
 
 
 @app.get("/channels/{cid}/mapping")
@@ -107,30 +116,35 @@ async def upload_crm(files: list[UploadFile] = File(...), replace: bool = False)
     return [ingest.load_csv("CORE", f.filename, await f.read(), replace) for f in files]
 
 
-# ---- Q4 Now ------------------------------------------------------------------
+# ---- Now: where every channel stands ------------------------------------------
 
-@app.get("/q4/strip")
-def q4_strip():
+@app.get("/now/strip")
+def now_strip():
     return queries.strip()
 
 
-@app.get("/q4/channels")
-def q4_channels():
-    return queries.q4_channels()
+@app.get("/now/channels")
+def now_channels():
+    return queries.channels()
 
 
-@app.post("/q4/reallocate")
-def q4_reallocate():
-    """Deterministic memo, no LLM. Use /q4/review for the full agent run."""
-    return queries.propose_reallocation()
+@app.post("/now/reallocate")
+def now_reallocate(budget: float | None = None):
+    """Deterministic memo, no LLM. budget defaults to the current annual run rate. /now/review runs the agents."""
+    return _guard(queries.propose_reallocation, budget)
 
 
-@app.post("/q4/review")
-def q4_review():
+@app.post("/now/review")
+def now_review():
     return _sse(orchestrator.guarded(orchestrator.review()))
 
 
 # ---- 2027 Plan -------------------------------------------------------------
+
+@app.get("/plan/current")
+def plan_current():
+    return queries.plan()
+
 
 @app.get("/plan/scenarios")
 def plan_scenarios(budget: float = 1_000_000, rule: str = "12mo"):
@@ -187,15 +201,10 @@ def put_assumption(key: str, body: AssumptionIn):
     return queries.set_assumption(key, body.num, body.txt)
 
 
-@app.post("/simulate")
-def simulate_days(days: int = 14):
-    """Append telemetry in raw platform formats; call /q4/review afterwards for the CMO follow-up."""
-    return _guard(simulate.simulate, days)
-
-
-@app.post("/demo/reset")
-def demo_reset(restore_seed: bool = True):
-    return {"status": queries.reset_demo(), "restored": simulate.restore_seed() if restore_seed else []}
+@app.post("/decisions/reset")
+def decisions_reset():
+    """Clears memos and approved plans; uploaded data is untouched."""
+    return {"status": queries.reset_decisions()}
 
 
 @app.get("/health")
