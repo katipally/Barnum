@@ -63,6 +63,34 @@ CHANNELS = {
                     "(rows), ai_mentions (BRAND_FOUND = yes), rank_sum and ranked_answers (numeric BRAND_RANK), sentiment_sum and "
                     "sentiment_answers (numeric SENTIMENT), top3_mentions (rank <= 3). No spend, no leads.",
         mql_rule="Not measurable from this data: leave mqls NULL.", sql_rule=NOT_MEASURED),
+    "conferences": dict(
+        display_name="Conferences & Events", files=["Datasaur Conferences.csv"],
+        window=("2026-01-01", "2026-10-23"),
+        description="Conference and event results: one lifetime row per event (a few rows are programs rather than conferences, "
+                    "such as a press talk or a model-download promo; treat every row as an event). The export has no dates and "
+                    "no cost column, so spend is not recorded: date every row window_end. Campaign = the event name in the CONFERENCE column, one funnel row per event. Keep "
+                    "attendees_est (NUMBER_OF_ATTENDEES_EST, the event's estimated size), sales_calls_booked_est "
+                    "(NUMBER_OF_SALES_CALLS_BOOKED_EST, an estimate) and events (1 per row) as metrics.",
+        mql_rule="Contacts captured at the event (NUMBER_OF_CONTACTS).",
+        sql_rule="Not measured: leave sqls NULL. Estimated sales calls booked is kept as a native metric, not as a measured SQL."),
+    "email_threads": dict(
+        display_name="Email Reply Threads", files=["Datasaur_email_threads.csv"],
+        window=("2025-01-24", "2026-10-23"),
+        description="Reply threads for the Apollo outbound sequences: one row per message, DIRECTION OUTBOUND or INBOUND, grouped by "
+                    "THREAD_ID. The OUTBOUND rows are the same emails the Outbound Email channel already counts, and spend, MQLs "
+                    "and SQLs belong to that channel, so none are measured here. SOURCE tells what is real: CRM_ACTUAL inbound rows "
+                    "are real prospect replies, SYNTHETIC inbound rows are generated placeholders and are excluded from every count. "
+                    "Map only INBOUND rows with SOURCE = CRM_ACTUAL. Date = day of SENT_AT_PST, campaign = the thread's SEQUENCE "
+                    "(read it from the thread's OUTBOUND rows; '(no sequence)' when null), audience = PROSPECT_COMPANY, creative_text "
+                    "= SUBJECT. Metrics: replies (inbound messages whose REPLY_OUTCOME is not internal_reply or bounce), one count "
+                    "per REPLY_OUTCOME value (positive_meeting, engaged_question, timing_later, referral, send_info, not_interested, "
+                    "out_of_office, internal_reply, bounce, unsubscribe), threads_replied (each thread counted exactly once: 1 on "
+                    "its earliest reply, found with ROW_NUMBER over the thread's replies by time, 0 on its later replies), "
+                    "reply_lag_hours_sum and reply_lag_samples (hours, to the minute: DATEDIFF('minute') / 60.0, from the thread's "
+                    "first OUTBOUND message to each reply, and how many replies were measured), reply_step_sum (OUTBOUND_STEP of each "
+                    "reply). \"Reply\" here means a real inbound message that is not internal_reply or bounce; every one of these "
+                    "metrics except the per-outcome counts uses that definition.",
+        mql_rule="Not measurable from this data: leave mqls NULL (replies are counted by the Outbound Email channel).", sql_rule=NOT_MEASURED),
 }
 
 

@@ -2,7 +2,7 @@
 # Agentic CMO: Build Design Doc
 
 ## 1. What we build
-A CMO orchestrator agent that runs in Snowflake. It manages one isolated agent per marketing channel (Google Ads, LinkedIn Ads, billboards, outbound email, SEO, GEO). Every channel agent turns its own raw export into the shared funnel (MQL, then SQL, then won) for the stages it actually measures. NULL means not measured, never zero. Where spend exists the CMO decides on cost per SQL, CAC and payback; channels without spend are judged on their native outcomes. You manage it like an executive: it proposes memos, and you approve or reject them.
+A CMO orchestrator agent that runs in Snowflake. It manages one isolated agent per marketing channel (Google Ads, LinkedIn Ads, billboards, outbound email, email reply threads, conferences, SEO, GEO). Every channel agent turns its own raw export into the shared funnel (MQL, then SQL, then won) for the stages it actually measures. NULL means not measured, never zero. Where spend exists the CMO decides on cost per SQL, CAC and payback; channels without spend are judged on their native outcomes. You manage it like an executive: it proposes memos, and you approve or reject them.
 
 ```
           CEO / Head of Marketing

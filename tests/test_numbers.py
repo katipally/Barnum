@@ -17,8 +17,14 @@ EXPECTED = {  # channel: (spend_usd or None, mqls or None, sqls or None)
     "outbound": (None, 86, 77),
     "seo": (None, None, None),
     "geo": (None, None, None),
+    "conferences": (None, 87, None),
+    "email_threads": (None, None, None),
 }
-NATIVE = {"seo": {"clicks": 12_462, "impressions": 1_314_511}, "geo": {"ai_answers": 240, "ai_mentions": 79}}
+NO_SPEND = {"outbound", "seo", "geo", "conferences", "email_threads"}
+NATIVE = {"seo": {"clicks": 12_462, "impressions": 1_314_511}, "geo": {"ai_answers": 240, "ai_mentions": 79},
+          "conferences": {"events": 18, "attendees_est": 244_500, "sales_calls_booked_est": 34},
+          "email_threads": {"replies": 337, "positive_meeting": 130, "engaged_question": 116, "internal_reply": 43, "bounce": 14,
+                            "threads_replied": 244, "reply_step_sum": 520, "reply_lag_hours_sum": 16_969}}
 
 
 @pytest.fixture(scope="module")
@@ -61,6 +67,14 @@ def test_unmeasured_is_never_zero():
     rows = {r["channel_id"]: r for r in queries.channels()["data"]}
     assert rows["outbound"]["spend_usd"] is None and rows["outbound"]["cost_per_sql"] is None
     assert rows["seo"]["mqls"] is None and rows["geo"]["sqls"] is None
+    assert rows["conferences"]["spend_usd"] is None and rows["conferences"]["cost_per_mql"] is None
+    assert rows["email_threads"]["mqls"] is None and rows["email_threads"]["sqls"] is None
+
+
+def test_conference_sqls_are_estimated_and_replies_stay_out_of_the_funnel():
+    rows = {r["channel_id"]: r for r in queries.channels()["data"]}
+    assert rows["conferences"]["sqls_estimated"] and abs(rows["conferences"]["sqls"] - 87 * 0.15) < 0.01
+    assert not rows["email_threads"]["sqls_estimated"] and rows["email_threads"]["annual_spend_usd"] is None
 
 
 def test_sql_estimation_uses_assumed_rate_and_is_flagged():
@@ -69,13 +83,13 @@ def test_sql_estimation_uses_assumed_rate_and_is_flagged():
     rows = {r["channel_id"]: r for r in queries.channels()["data"]}
     assert rows["google"]["sqls_estimated"] and not rows["outbound"]["sqls_estimated"]
     assert abs(rows["google"]["sqls"] - 2325 * 0.15) < 0.01 and rows["outbound"]["sqls"] == 77
-    assert s["sqls_estimated"] and set(s["channels_without_spend"]) == {"outbound", "seo", "geo"}
+    assert s["sqls_estimated"] and set(s["channels_without_spend"]) == NO_SPEND
 
 
 def test_windows_match_data_and_flights_are_not_annualized():
     rows = {r["channel_id"]: r for r in queries.channels()["data"]}
     span = {r["channel"]: (r["a"], r["b"]) for r in sf.query("SELECT channel, MIN(date) a, MAX(date) b FROM CMO_DB.CORE.FUNNEL_FACT GROUP BY 1")}
-    for cid in ("seo", "geo", "outbound"):
+    for cid in ("seo", "geo", "outbound", "conferences", "email_threads"):
         assert rows[cid]["window_start"] <= span[cid][0] and span[cid][1] <= rows[cid]["window_end"], (cid, span[cid])
     assert rows["billboard"]["annual_spend_usd"] == rows["billboard"]["spend_usd"]
     assert rows["google"]["annual_spend_usd"] < rows["google"]["spend_usd"]  # 875-day window
@@ -90,7 +104,7 @@ def test_strip_cost_metrics_cover_paid_channels_only():
 
 def test_reallocation_memo_and_approval():
     m = queries.propose_reallocation()
-    assert set(m["deltas"]) == {"google", "linkedin", "billboard"} and set(m["impact"]["not_allocated"]) == {"outbound", "seo", "geo"}
+    assert set(m["deltas"]) == {"google", "linkedin", "billboard"} and set(m["impact"]["not_allocated"]) == NO_SPEND
     assert abs(sum(d["recommended_usd"] for d in m["deltas"].values()) - m["impact"]["budget_usd"]) <= 3
     assert m["impact"]["sqls_after"] >= m["impact"]["sqls_before"]
     if m["status"] == "pending":
@@ -103,7 +117,7 @@ def test_reallocation_memo_and_approval():
 @pytest.mark.parametrize("rule", ["12mo", "3yr"])
 def test_unit_econ_runs_on_paid_channels(rule):
     u = queries.unit_econ(1_000_000, rule)["data"]
-    assert set(u["channels_not_allocated"]) == {"outbound", "seo", "geo"}
+    assert set(u["channels_not_allocated"]) == NO_SPEND
     assert {s["channel"] for s in u["plan"]["split"]} == {"google", "linkedin", "billboard"}
     assert u["plan"]["customers"] > 0 and "google" in u["sqls_estimated_for"]
 

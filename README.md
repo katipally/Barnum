@@ -1,6 +1,6 @@
 # Agentic CMO
 
-A CMO agent that lives in Snowflake. One orchestrator manages one isolated agent per marketing channel: Google Ads, LinkedIn Ads, billboards, outbound email, SEO and GEO. Each channel agent reads its own raw platform export and reports what it actually measures. Where channels share a funnel (MQL, SQL, cost per SQL, CAC) the CMO compares them on it, writes decision memos, and plans next year in the CFO's language. A channel that does not measure a stage reports NULL, never zero.
+A CMO agent that lives in Snowflake. One orchestrator manages one isolated agent per marketing channel: Google Ads, LinkedIn Ads, billboards, outbound email, email reply threads, conferences, SEO and GEO. Each channel agent reads its own raw platform export and reports what it actually measures. Where channels share a funnel (MQL, SQL, cost per SQL, CAC) the CMO compares them on it, writes decision memos, and plans next year in the CFO's language. A channel that does not measure a stage reports NULL, never zero.
 
 Built on Snowflake Cortex Agents, Cortex Analyst, `AI_COMPLETE` and Claude.
 
@@ -39,7 +39,7 @@ warehouse = "YOUR_WH"
 ```bash
 uv sync
 uv run python -m backend.app.setup        # CMO_DB, CMO_WH, core SQL, CMO agent (idempotent)
-uv run python -m seed.load_real ../test-data   # the 6 real exports (kept outside the repo) through the plugin path
+uv run python -m seed.load_real ../test-data   # the 8 real exports (kept outside the repo) through the plugin path
 uv run uvicorn backend.app.main:app --port 8000
 ```
 
@@ -99,11 +99,11 @@ SSE events: `strip`, `delegation {channel, state, text, seconds}`, `memo`, `stat
 
 ## The model
 
-- **Estimated SQLs.** Google, LinkedIn and billboards measure MQLs but not SQLs. Their SQLs are MQLs × the `MQL_TO_SQL_OVERRIDE` assumption (default 0.15), flagged `sqls_estimated`. Set that key to NULL to learn the rate from channels that measure both stages (today only outbound, which gives 0.895). Outbound keeps its measured SQLs.
+- **Estimated SQLs.** Google, LinkedIn, billboards and conferences measure MQLs but not SQLs. Their SQLs are MQLs × the `MQL_TO_SQL_OVERRIDE` assumption (default 0.15), flagged `sqls_estimated`. Set that key to NULL to learn the rate from channels that measure both stages (today only outbound, which gives 0.895). Outbound keeps its measured SQLs.
 - **Run rates.** Each channel is annualized from its own data window (`CHANNEL_REGISTRY.window_start` / `window_end`, set by the approved mapping). A `flight` channel such as billboards is a one-off test, so its actual spend is the run rate, not scaled up.
 - **Reallocation.** Each budget channel's response is `SQLs = S·(y/X)^b`, with `X` and `S` the annual spend and SQLs. `PROPOSE_REALLOCATION` allocates greedily over a max-heap: O((B/step)·log C), optimal because b < 1 makes every curve concave. Moves under `AUTONOMY_LIMIT_PCT` auto-apply. Bigger moves wait for approval.
 - **Annual plan.** `UNIT_ECON(budget, rule)` uses the same curves on annualized run rates, with floors from `MIN_SHARE:<channel>`. No channel is allocated more than `SCALE_CAP_X` (default 3) times its run rate, because the curves are only trusted near observed spend. Budget that does not fit is reported as `unallocated_usd`, not forced in. Last-customer CAC = marginal $/SQL ÷ win rate + sales cost. The ceiling is the largest budget that fits under the caps and whose last customer still pays back: one year of gross profit (`12mo`) or three (`3yr`). `ceiling_limited_by` says which stopped it (`cac` or `scale_cap`).
-- **Not budget-bought.** Outbound, SEO and GEO have no spend. They are reported on their own native outcomes and are never allocated budget.
+- **Not budget-bought.** Outbound, email reply threads, conferences, SEO and GEO have no spend (conferences have no booth cost in the export). They are reported on their own native outcomes and are never allocated budget.
 - **Assumptions.** ACV, margin, win rate and sales cost in `ASSUMPTIONS` are placeholders. Swap them via `PUT /assumptions/{key}` before showing anyone outside the team.
 
 ## Use it from Claude
