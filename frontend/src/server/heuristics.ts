@@ -161,7 +161,7 @@ export function scoreObjective(
   return {
     objective: o,
     northStar: ns,
-    status: statusFromRatio(attainment(forecast, ns.target, ns.direction)),
+    status: ns.target === 0 ? "on_track" : statusFromRatio(attainment(forecast, ns.target, ns.direction)), // no target yet is not a miss
     attainment: round(attainment(latest(ns.series), ns.target, ns.direction), 3),
     forecast: round(forecast, 2),
     trend: trendOf(ns.series),

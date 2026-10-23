@@ -26,17 +26,17 @@ type Num = number | null;
 interface Strip {
   measured_spend_usd: Num; annual_run_rate_usd: Num; plan_budget_usd: Num; plan_projected_sqls: Num;
   mqls: Num; sqls: Num; cost_per_mql: Num; cost_per_sql: Num; cac_full_usd: Num; payback_months: Num;
-  mql_to_sql_rate: Num; sqls_estimated: boolean | null; channels_without_spend: string[] | null;
+  mql_to_sql_rate: Num; mql_to_sql_source?: string | null; sqls_estimated: boolean | null; channels_without_spend: string[] | null;
 }
 interface Channel {
-  channel_id: string; display_name: string; spend_usd: Num; plan_usd: Num; mqls: Num; sqls: Num;
+  channel_id: string; display_name: string; spend_usd: Num; annual_spend_usd?: Num; annual_sqls?: Num; window_days?: Num; plan_usd: Num; mqls: Num; sqls: Num;
   sqls_estimated: boolean | null; cost_per_mql: Num; cost_per_sql: Num; mql_to_sql: Num; marginal_cost_per_sql: Num;
 }
 interface Memo {
   memo_id: string; created_at: string; title: string; finding: string; recommendation: string; status: string;
   decided_at?: string | null;
   deltas: Record<string, { current_usd: number; recommended_usd: number; delta_usd: number; sqls_before: number; sqls_after: number }>;
-  impact: { budget_usd?: number | null; run_rate_usd?: number | null; moved_usd?: number; sqls_before?: number; sqls_after?: number; sql_gain?: number; autonomy_limit_usd?: number; estimated_channels?: string[] | null };
+  impact: { budget_usd?: number | null; run_rate_usd?: number | null; moved_usd?: number; sqls_before?: number; sqls_after?: number; sql_gain?: number; unallocated_usd?: number | null; autonomy_limit_usd?: number; estimated_channels?: string[] | null };
 }
 
 async function get<T>(path: string): Promise<T> {
@@ -78,9 +78,9 @@ function period(a: Record<string, unknown>) {
   return { label, end: new Date(Date.now() + weeksInPeriod * 6048e5).toISOString().slice(0, 10), weeksInPeriod, week: weeksInPeriod };
 }
 
-function hypothesisOf(c: Channel) {
+function hypothesisOf(c: Channel, assumed: boolean) {
   if (c.mqls == null || c.sqls == null) return "No lead data for this channel yet, so I cannot judge it.";
-  const rate = c.mql_to_sql == null ? "" : ` (${Math.round(c.mql_to_sql * 100)}%${c.sqls_estimated ? ", estimated" : ""})`;
+  const rate = c.mql_to_sql == null ? "" : ` (${Math.round(c.mql_to_sql * 100)}%${c.sqls_estimated ? (assumed ? ", assumed" : ", estimated") : ""})`;
   const spend = c.spend_usd == null ? " No spend is tracked for it." : "";
   return `${Math.round(c.mqls)} marketing leads became ${c.sqls_estimated ? "about " : ""}${Math.round(c.sqls)} qualified leads${rate}.${spend} I judge it on qualified leads, because those turn into revenue.`;
 }
@@ -102,7 +102,8 @@ export async function fetchLive(): Promise<CaseData> {
   const mqls = n(s.mqls);
   const mqlToSql = s.mql_to_sql_rate ?? (mqls ? sqls / mqls : 0);
   const series = (v: Num) => (v == null ? [] : [{ week: p.week, value: v }]);
-  const sqlSource = `${SOURCE}.EXEC_STRIP${s.sqls_estimated ? " (partly estimated)" : ""}`;
+  const assumed = !!s.mql_to_sql_source?.startsWith("assumed");
+  const sqlSource = `${SOURCE}.EXEC_STRIP${s.sqls_estimated ? (assumed ? ` (partly estimated, assumed ${Math.round(mqlToSql * 100)}% lead to qualified rate)` : " (partly estimated)") : ""}`;
 
   const metrics: Metric[] = [
     { id: "m-sqls", label: "Qualified sales leads", unit: "count", target: sqlTarget, direction: "up", lagging: true, source: sqlSource, objectiveId: "o-sqls", series: series(sqls) },
@@ -134,14 +135,14 @@ export async function fetchLive(): Promise<CaseData> {
     label: c.display_name,
     channel: c.display_name,
     funnelStage: stageOf(c.channel_id),
-    budget: c.plan_usd ?? c.spend_usd ?? 0,
-    spent: c.spend_usd,
+    budget: c.plan_usd ?? c.annual_spend_usd ?? c.spend_usd ?? 0,
+    spent: c.annual_spend_usd ?? c.spend_usd,
     resultLabel: "qualified lead",
-    results: c.sqls,
+    results: c.annual_sqls ?? c.sqls,
     costPerResult: c.cost_per_sql ?? null,
     marginalCostPerResult: c.marginal_cost_per_sql ?? null,
     weeksRunning: p.week,
-    hypothesis: hypothesisOf(c),
+    hypothesis: hypothesisOf(c, assumed),
     status: "live",
   }));
   const contributions: Contribution[] = actions.flatMap((x) => [
@@ -159,7 +160,7 @@ export async function fetchLive(): Promise<CaseData> {
         id: m.memo_id,
         title: m.title,
         rationale: m.finding,
-        impact: `About ${imp.sql_gain ?? 0} more qualified leads a year (${imp.sqls_before ?? "?"} → ${imp.sqls_after ?? "?"}) from a ${money(imp.budget_usd ?? imp.run_rate_usd ?? 0)} yearly budget.`,
+        impact: `About ${imp.sql_gain ?? 0} more qualified leads a year (${imp.sqls_before ?? "?"} → ${imp.sqls_after ?? "?"}) from a ${money(imp.budget_usd ?? imp.run_rate_usd ?? 0)} yearly budget.${imp.unallocated_usd ? ` ${money(imp.unallocated_usd)} stays unallocated because no channel can absorb more.` : ""}`,
         risk: `Assumes each channel keeps getting less effective as we spend more, at the rate we have seen so far.${imp.estimated_channels?.length ? ` Qualified leads for ${imp.estimated_channels.join(", ")} are estimated, not measured.` : ""}`,
         reason: "above_autonomy",
         amount: imp.moved_usd,
@@ -190,6 +191,9 @@ export async function fetchLive(): Promise<CaseData> {
   const noSpend = (s.channels_without_spend ?? []).map(label);
   if (noSpend.length) changes.push({ id: "c-nospend", title: `No spend is tracked for ${noSpend.join(", ")}`, detail: "Their cost per lead is not measured, so I leave them out of budget moves.", impact: "neutral", source: `${SOURCE}.EXEC_STRIP` });
 
+  const days = Math.max(0, ...chans.filter((c) => c.spend_usd != null).map((c) => n(c.window_days)));
+  if (s.measured_spend_usd != null) changes.push({ id: "c-alltime", title: `All-time measured spend: ${money(s.measured_spend_usd)}`, detail: `${days ? `Across up to ${days.toLocaleString("en-US")} days of data. ` : ""}Budget and channel figures above are yearly, so they compare like with like.`, impact: "neutral", source: `${SOURCE}.EXEC_STRIP` });
+
   const pending = decisions.filter((d) => d.status === "pending");
   const leads = `${s.sqls_estimated ? "About " : ""}${Math.round(sqls).toLocaleString("en-US")}`;
   const each = s.cost_per_sql == null ? "" : `, at ${money(s.cost_per_sql)} each`;
@@ -218,7 +222,7 @@ export async function fetchLive(): Promise<CaseData> {
     ],
     guardrails: {
       budgetTotal: budget,
-      budgetSpent: n(s.measured_spend_usd),
+      budgetSpent: n(s.annual_run_rate_usd ?? s.measured_spend_usd),
       autonomyPct: num(a, "AUTONOMY_LIMIT_PCT", 0.1) * 100,
       brandFloorPct: 0,
       maxShiftPerWeekPct: num(a, "AUTONOMY_LIMIT_PCT", 0.1) * 100,

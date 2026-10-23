@@ -27,7 +27,7 @@ export function buildBrief(data: CaseData): WeeklyBrief {
   return {
     case: data.case,
     overall: overallStatus(
-      goals.map((g) => g.status),
+      goals.filter((g) => g.target > 0).map((g) => g.status),
       scorecard.map((s) => s.status),
     ),
     headline: data.headline,
