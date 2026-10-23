@@ -77,7 +77,7 @@ export const TOUR_STEPS: TourStep[] = [
     route: "/goals",
     caseId: "tessellate",
     anchor: "ask-cmo",
-    title: "Ask the CMO",
+    title: "Ask Barnum",
     body: "Ask in plain words, like \"Why is LinkedIn so expensive?\" Claude answers with live numbers from Snowflake (Cortex Analyst) and context from sales call notes (Cortex Search).",
   },
   {

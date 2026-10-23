@@ -1,4 +1,4 @@
-# Agentic CMO frontend
+# Barnum frontend
 
 Next.js 15 app: the CEO's weekly memo from the CMO agent, the objectives-to-actions map, the numbers it watches,
 goals and limits, and Ask the CMO. Server routes under `src/app/api/companies` sit between the UI and the data.

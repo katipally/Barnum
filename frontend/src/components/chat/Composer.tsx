@@ -20,7 +20,7 @@ export const Composer = forwardRef<HTMLTextAreaElement, { onSend: (q: string) =>
         className="flex items-end gap-2 rounded-lg border border-line-strong bg-surface-2 p-1.5 focus-within:border-ink/30"
       >
         <label htmlFor={inputId} className="sr-only">
-          Ask the CMO agent
+          Ask Barnum
         </label>
         <textarea
           id={inputId}
