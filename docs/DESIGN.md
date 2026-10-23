@@ -1,8 +1,3 @@
----
-created: 2026-10-23T19:27:03.574Z
-session: 84d965a0-ec1d-427f-8b01-a8ea0bb01757
-working_directory: /Users/yashwanthreddy/Desktop/Claudeflake
----
 
 # Agentic CMO: Build Design Doc
 
