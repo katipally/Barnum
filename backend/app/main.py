@@ -1,5 +1,8 @@
 """Agentic CMO API. Run: uvicorn backend.app.main:app --reload"""
-from fastapi import FastAPI, File, HTTPException, UploadFile
+import threading
+from contextlib import asynccontextmanager
+
+from fastapi import FastAPI, File, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
@@ -7,14 +10,56 @@ from pydantic import BaseModel, Field
 from . import orchestrator, queries
 from .channels import ingest, mapping, provision
 
-app = FastAPI(title="Agentic CMO", version="0.1.0")
+PAGE_LOAD_READS = (queries.strip, queries.channels, queries.memos, queries.assumptions)
+
+
+def _warm():
+    for read in PAGE_LOAD_READS:
+        try:
+            read(None) if read is queries.memos else read()  # memos is keyed by its status argument
+        except Exception:
+            return  # warming is best effort; the first real request reports the error
+
+
+def _changed():
+    queries.invalidate()
+    threading.Thread(target=_warm, daemon=True).start()
+
+
+@asynccontextmanager
+async def lifespan(_):
+    threading.Thread(target=_warm, daemon=True).start()
+    yield
+
+
+app = FastAPI(title="Agentic CMO", version="0.1.0", lifespan=lifespan)
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+
+
+@app.middleware("http")
+async def drop_cache_after_writes(request: Request, call_next):
+    """Any non-GET may change what the reads return; channel routes write outside queries.py."""
+    try:
+        return await call_next(request)
+    finally:
+        if request.method not in ("GET", "HEAD", "OPTIONS"):
+            _changed()
+
 
 SSE_HEADERS = {"Cache-Control": "no-cache", "X-Accel-Buffering": "no"}
 
 
+async def _invalidate_when_done(gen):
+    """Review and ask write memos while streaming, after the middleware has returned."""
+    try:
+        async for chunk in gen:
+            yield chunk
+    finally:
+        _changed()
+
+
 def _sse(gen) -> StreamingResponse:
-    return StreamingResponse(gen, media_type="text/event-stream", headers=SSE_HEADERS)
+    return StreamingResponse(_invalidate_when_done(gen), media_type="text/event-stream", headers=SSE_HEADERS)
 
 
 def _guard(fn, *args):
