@@ -45,7 +45,7 @@ MERGE INTO CMO_DB.CORE.ASSUMPTIONS t USING (
     ('SALES_COST_PER_WON', 40000,  NULL, 'placeholder'),
     ('AUTONOMY_LIMIT_PCT', 0.10,   NULL, 'moves below this share of the budget auto-apply'),
     ('PERIOD',             NULL,   'NEXT_12M', 'period that ALLOCATION plans'),
-    ('MQL_TO_SQL_OVERRIDE', NULL,  NULL, 'set to replace the MQL->SQL rate learned from channels that measure both'),
+    ('MQL_TO_SQL_OVERRIDE', 0.15,  NULL, 'assumed MQL->SQL rate for channels without measured SQLs; NULL learns it from channels that measure both'),
     ('MQL_RULE', NULL, 'Lead from a Fortune 2000 healthcare or finance company, title Director or above, with one real action (form fill, meeting, or reply).', 'default when a channel has no rule'),
     ('SQL_RULE', NULL, 'Sales accepted the lead and held a first meeting.', 'default when a channel has no rule')
   AS v(key, num, txt, note)
@@ -86,7 +86,7 @@ WHERE FALSE;
 CREATE OR REPLACE VIEW CMO_DB.CORE.MQL_TO_SQL_RATE AS
 SELECT COALESCE((SELECT num FROM CMO_DB.CORE.ASSUMPTIONS WHERE key = 'MQL_TO_SQL_OVERRIDE'),
                 SUM(sqls) / NULLIF(SUM(mqls), 0)) AS rate,
-       IFF((SELECT num FROM CMO_DB.CORE.ASSUMPTIONS WHERE key = 'MQL_TO_SQL_OVERRIDE') IS NOT NULL, 'override',
+       IFF((SELECT num FROM CMO_DB.CORE.ASSUMPTIONS WHERE key = 'MQL_TO_SQL_OVERRIDE') IS NOT NULL, 'assumed (ASSUMPTIONS)',
            'learned from ' || COALESCE(LISTAGG(DISTINCT channel, ', '), 'no channel')) AS source
 FROM CMO_DB.CORE.FUNNEL_RAW WHERE sqls IS NOT NULL AND mqls IS NOT NULL;
 

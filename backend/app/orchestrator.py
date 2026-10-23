@@ -5,7 +5,7 @@ Events (SSE `event:` names) the frontend can render:
   strip         executive strip numbers
   delegation    {channel, state: started|done|error, text?, seconds?}
   memo          decision memo (deterministic, from PROPOSE_REALLOCATION)
-  cmo_delta     {text}             streamed CMO tokens
+  cmo_delta     {text}             the CMO's answer text, sent once the stream ends; narration before a tool call is dropped
   tool          {name, input}      CMO tool calls (in /ask)
   done          {seconds}
   error         {message}
@@ -40,15 +40,19 @@ async def _channel(ch: dict, question: str, client: httpx.AsyncClient) -> dict:
 
 
 async def _cmo_stream(messages: list[dict]) -> AsyncIterator[str]:
+    held = ""  # text before a tool call is narration, so only text after the last tool call is sent
     async for event, data in sf.stream_agent("CORE", "CMO_AGENT", messages):
         if event == "response.text.delta":
-            yield sse("cmo_delta", {"text": data.get("text", "")})
+            held += data.get("text", "")
         elif event == "response.tool_use":
+            held = ""
             yield sse("tool", {"name": data.get("name"), "input": data.get("input")})
         elif event == "response.status":
             yield sse("status", {"stage": "cmo", "message": data.get("message") or data.get("status")})
         elif event == "error":
             yield sse("error", {"message": data.get("message", data)})
+    if held:
+        yield sse("cmo_delta", {"text": held})
 
 
 async def guarded(gen: AsyncIterator[str]) -> AsyncIterator[str]:

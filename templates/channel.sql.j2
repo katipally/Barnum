@@ -27,11 +27,11 @@ CREATE OR REPLACE SEMANTIC VIEW CMO_DB.{{ s }}.SV
     {%- endfor %}{% endfor %}
   )
   DIMENSIONS (
-    funnel.day AS date WITH SYNONYMS = ('date', 'day'),
+    funnel.activity_date AS "DATE" WITH SYNONYMS = ('date', 'day', 'month', 'time'),
     funnel.campaign AS campaign WITH SYNONYMS = ('campaign', 'creative', 'keyword', 'board', 'sequence', 'query', 'page'),
     funnel.creative_text AS creative_text,
     funnel.audience AS audience,
-    native.metric_day AS date,
+    native.metric_activity_date AS "DATE" WITH SYNONYMS = ('date', 'day', 'month', 'time'),
     native.metric_campaign AS campaign,
     native.metric_audience AS audience,
     native.metric AS metric WITH SYNONYMS = ('native metric', 'kpi')

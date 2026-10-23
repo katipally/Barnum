@@ -64,7 +64,7 @@ def approve(cid: str, version: int | None = None) -> dict:
     sf.conn().execute_string(render(ch, rec["mapping"]), remove_comments=True)
     m = rec["mapping"]
     sf.execute("""UPDATE CMO_DB.CORE.CHANNEL_REGISTRY SET status = 'active', map_version = %s, grain = %s,
-                  window_start = COALESCE(window_start, TRY_TO_DATE(%s::STRING)), window_end = COALESCE(window_end, TRY_TO_DATE(%s::STRING)),
+                  window_start = COALESCE(TRY_TO_DATE(%s::STRING), window_start), window_end = COALESCE(TRY_TO_DATE(%s::STRING), window_end),
                   updated_at = CURRENT_TIMESTAMP() WHERE channel_id = %s""",
                (rec["version"], m["grain"], m["window_start"], m["window_end"], cid))
     sf.execute("UPDATE CMO_DB.CORE.MAPPING_HISTORY SET status = 'approved' WHERE channel_id = %s AND version = %s",

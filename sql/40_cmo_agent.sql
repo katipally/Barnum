@@ -14,11 +14,11 @@ CREATE OR REPLACE SEMANTIC VIEW CMO_DB.CORE.FUNNEL_SV
     funnel.opp_fact AS opps, funnel.pipeline_fact AS pipeline_usd, funnel.won_fact AS won, native.value_fact AS value
   )
   DIMENSIONS (
-    funnel.day AS date WITH SYNONYMS = ('date', 'day', 'month'),
+    funnel.activity_date AS "DATE" WITH SYNONYMS = ('date', 'day', 'month', 'time'),
     funnel.channel AS channel WITH SYNONYMS = ('source', 'platform', 'channel agent'),
     funnel.campaign AS campaign WITH SYNONYMS = ('creative', 'keyword', 'board', 'sequence', 'query', 'page'),
     funnel.sqls_estimated AS sqls_estimated,
-    native.metric_day AS date,
+    native.metric_activity_date AS "DATE" WITH SYNONYMS = ('date', 'day', 'month', 'time'),
     native.metric_channel AS channel,
     native.metric_campaign AS campaign,
     native.metric AS metric WITH SYNONYMS = ('native metric', 'kpi')
@@ -56,8 +56,8 @@ def run(session, channel_id, question):
     body = json.dumps({"messages": [{"role": "user", "content": [{"type": "text", "text": question}]}]})
     agent = f"CMO_DB.{rows[0][0]}.AGENT"  # schema_name is CH_<ident>, validated at creation
     res = json.loads(session.sql(f"SELECT SNOWFLAKE.CORTEX.DATA_AGENT_RUN('{agent}', ?)", params=[body]).collect()[0][0])
-    text = "".join(c.get("text", "") for c in res.get("content", []) if c.get("type") == "text")
-    return {"channel": channel_id, "answer": text}
+    texts = [c.get("text", "") for c in res.get("content", []) if c.get("type") == "text"]
+    return {"channel": channel_id, "answer": texts[-1] if texts else ""}  # earlier text blocks are pre-tool narration
 $$;
 
 CREATE OR REPLACE FUNCTION CMO_DB.CORE.LIST_CHANNELS()

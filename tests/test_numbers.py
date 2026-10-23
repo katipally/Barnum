@@ -63,12 +63,22 @@ def test_unmeasured_is_never_zero():
     assert rows["seo"]["mqls"] is None and rows["geo"]["sqls"] is None
 
 
-def test_sql_estimation_is_flagged_and_learned_from_outbound():
+def test_sql_estimation_uses_assumed_rate_and_is_flagged():
     s = queries.strip()["data"]
-    assert "outbound" in s["mql_to_sql_source"] and 0.85 < s["mql_to_sql_rate"] < 0.95  # 77 / 86
+    assert s["mql_to_sql_source"].startswith("assumed") and s["mql_to_sql_rate"] == 0.15
     rows = {r["channel_id"]: r for r in queries.channels()["data"]}
     assert rows["google"]["sqls_estimated"] and not rows["outbound"]["sqls_estimated"]
+    assert abs(rows["google"]["sqls"] - 2325 * 0.15) < 0.01 and rows["outbound"]["sqls"] == 77
     assert s["sqls_estimated"] and set(s["channels_without_spend"]) == {"outbound", "seo", "geo"}
+
+
+def test_windows_match_data_and_flights_are_not_annualized():
+    rows = {r["channel_id"]: r for r in queries.channels()["data"]}
+    span = {r["channel"]: (r["a"], r["b"]) for r in sf.query("SELECT channel, MIN(date) a, MAX(date) b FROM CMO_DB.CORE.FUNNEL_FACT GROUP BY 1")}
+    for cid in ("seo", "geo", "outbound"):
+        assert rows[cid]["window_start"] <= span[cid][0] and span[cid][1] <= rows[cid]["window_end"], (cid, span[cid])
+    assert rows["billboard"]["annual_spend_usd"] == rows["billboard"]["spend_usd"]
+    assert rows["google"]["annual_spend_usd"] < rows["google"]["spend_usd"]  # 875-day window
 
 
 def test_strip_cost_metrics_cover_paid_channels_only():
@@ -96,3 +106,12 @@ def test_unit_econ_runs_on_paid_channels(rule):
     assert set(u["channels_not_allocated"]) == {"outbound", "seo", "geo"}
     assert {s["channel"] for s in u["plan"]["split"]} == {"google", "linkedin", "billboard"}
     assert u["plan"]["customers"] > 0 and "google" in u["sqls_estimated_for"]
+
+
+def test_unit_econ_respects_scale_cap():
+    u = queries.unit_econ(2_000_000, "12mo")["data"]
+    cap = u["basis"]["scale_cap_x"]
+    for s in u["plan"]["split"]:
+        assert s["usd"] <= cap * u["basis"]["curves"][s["channel"]]["annual_spend_usd"] + 1, s
+    assert u["plan"]["unallocated_usd"] > 0
+    assert abs(sum(s["usd"] for s in u["plan"]["split"]) + u["plan"]["unallocated_usd"] - 2_000_000) <= 3

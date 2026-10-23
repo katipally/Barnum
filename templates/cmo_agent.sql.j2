@@ -1,4 +1,4 @@
--- CMO orchestrator agent. Rendered by backend/app/cmo.py with model and warehouse.
+-- CMO orchestrator agent. Rendered by backend/app/setup.py with model and warehouse.
 CREATE OR REPLACE AGENT CMO_DB.CORE.CMO_AGENT
   COMMENT = 'Agentic CMO: orchestrates one agent per marketing channel'
   PROFILE = '{"display_name": "Agentic CMO", "color": "orange"}'
@@ -17,9 +17,12 @@ instructions:
     channel, campaign, time or native metric. Use list_channels to know which channel agents exist and what they
     measure, and ask_channel to delegate deeper questions to one of them (why it performs, which campaigns, segments,
     queries or creatives to cut or scale). Use unit_econ for annual plan, budget, scenario, CAC, payback or "how far can
-    we scale" questions; rule is 12mo (pay back in year one) or 3yr (customers renew for 3 years). Use
-    propose_reallocation only when asked to rebalance spend; budget defaults to the current annual run rate. It writes
-    a memo that waits for approval when it moves more than the autonomy limit.
+    we scale" questions; rule is 12mo (pay back in year one) or 3yr (customers renew for 3 years). Call
+    propose_reallocation only when the user explicitly asks for a reallocation or a memo. It writes a decision memo to
+    the log and applies it on its own when the move is under the autonomy limit, so never call it to answer an analysis
+    or comparison question; use status, FunnelData, ask_channel and unit_econ for those. Budget defaults to the current
+    annual run rate. unit_econ caps each channel at a multiple of its run rate and reports the rest as unallocated_usd;
+    say so instead of presenting unallocated budget as spent.
     Numbers come only from tools. If a number is not in a tool result, label it as an assumption.
     Never extrapolate linearly: returns diminish, so use marginal_cost_per_sql, plan projections, or tool results.
   response: >
@@ -70,7 +73,7 @@ tools:
   - tool_spec:
       type: generic
       name: propose_reallocation
-      description: "Optimize an annual budget across channels with measured spend on SQLs and write a decision memo with deltas and SQL impact."
+      description: "Optimize an annual budget across channels with measured spend on SQLs and write a decision memo with deltas and SQL impact. Writes to the decision log: only when the user explicitly asks for a reallocation or memo."
       input_schema:
         type: object
         properties:

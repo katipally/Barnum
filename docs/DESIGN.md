@@ -2,7 +2,7 @@
 # Agentic CMO: Build Design Doc
 
 ## 1. What we build
-A CMO orchestrator agent that runs in Snowflake. It manages one isolated agent per marketing channel. Every channel agent turns its own raw data into one common currency (MQL, then SQL, then won), and the CMO decides on cost per SQL, CAC and payback. You manage it like an executive: it proposes memos, and you approve or reject them.
+A CMO orchestrator agent that runs in Snowflake. It manages one isolated agent per marketing channel (Google Ads, LinkedIn Ads, billboards, outbound email, SEO, GEO). Every channel agent turns its own raw export into the shared funnel (MQL, then SQL, then won) for the stages it actually measures. NULL means not measured, never zero. Where spend exists the CMO decides on cost per SQL, CAC and payback; channels without spend are judged on their native outcomes. You manage it like an executive: it proposes memos, and you approve or reject them.
 
 ```
           CEO / Head of Marketing
@@ -11,7 +11,7 @@ A CMO orchestrator agent that runs in Snowflake. It manages one isolated agent p
           |  CMO ORCHESTRATOR |  judges on $/SQL, CAC, payback
           +--+----+----+----+-+
              |    |    |    |     delegates, never reads raw data
-          [GOOG][LNKD][OOH][EVNT] [+ any channel you upload]
+          [GOOG][LNKD][OOH][MAIL][SEO][GEO] [+ any channel you upload]
              |    |    |    |
           own raw data, own schema, own tools
 ```
@@ -21,11 +21,11 @@ A CMO orchestrator agent that runs in Snowflake. It manages one isolated agent p
 |---|---|---|
 | Surface | Cortex Agents | 1 CMO agent + N channel agents, all on Claude |
 | Surface | CoWork | CMO agent shows up in CoWork for business users (free extra demo surface) |
-| Context | Stage + COPY / INFER_SCHEMA | CSV upload per channel |
+| Context | Stage + COPY / INFER_SCHEMA | normalized CSV upload per channel |
 | Context | Semantic views | one per channel (raw) + one FUNNEL view (CMO) |
 | Toolkit | Cortex Analyst | text-to-SQL inside each agent |
 | Toolkit | Cortex Search | text columns (ad copy, event notes, survey verbatims) |
-| Toolkit | Custom tools (procs) | RECONCILE, MARGINAL_CPS, UNIT_ECON, PROPOSE/APPROVE memo |
+| Toolkit | Custom tools (procs) | REPORT, RECONCILE, UNIT_ECON, PROPOSE/APPLY memo |
 | Toolkit | Code execution tool | charts and scratch math in the CMO agent |
 | Intelligence | AI_COMPLETE + structured outputs | Claude writes each channel's raw-to-funnel mapping |
 | Intelligence | AI Gateway (Anthropic Messages API) | backend calls Claude directly when needed, same PAT |
@@ -42,14 +42,14 @@ Account check (done): ATTENDEE_ROLE has CORTEX_USER, CREATE DATABASE, ROLE, WARE
 ```
  FRONTEND (your mock)  --REST + SSE-->  FASTAPI BACKEND  --PAT-->  SNOWFLAKE
                                          |
-   deterministic routes  ----SQL-------->|  /q4/strip /q4/channels /plan/scenarios
+   deterministic routes  ----SQL-------->|  /now/strip /now/channels /plan/scenarios
    agent routes   --Agent Run API (parallel)--> channel agents --> CMO agent
    onboarding     --stage/AI_COMPLETE/DDL-----> CH_<X> schema
  ------------------------------------------------------------------------
  CMO_DB
-  CORE       CHANNEL_REGISTRY  FUNNEL_FACT(view)  CRM_LEADS  ASSUMPTIONS
+  CORE       CHANNEL_REGISTRY  FUNNEL_FACT(view)  MQL_TO_SQL_RATE  ASSUMPTIONS
              ALLOCATION  DECISION_LOG  MAPPING_HISTORY  FUNNEL_SV  CMO_AGENT
-  CH_GOOGLE  UPLOADS(stage) RAW_* MAP(view) SV RECONCILE MARGINAL_CPS AGENT
+  CH_GOOGLE  UPLOADS(stage) RAW_* MAP(view) SV REPORT RECONCILE AGENT
   CH_LINKEDIN ...same shape...
   CH_<ANY>   ...created by the API...
 ```
@@ -57,49 +57,50 @@ Account check (done): ATTENDEE_ROLE has CORTEX_USER, CREATE DATABASE, ROLE, WARE
 
 ## 4. The channel plugin (the part you'll use the most)
 ```
- 1 CREATE  POST /channels {name, description, mql_rule?}
+ 1 CREATE  POST /channels {name, description, mql_rule?, sql_rule?, window?}
            -> schema CH_<X>, stage, registry row  status=draft
  2 UPLOAD  POST /channels/x/files  (CSV, repeatable, many files)
+           -> normalize (encoding, delimiter, preambles, "1,129.58", "6.65%", dates)
            -> PUT @CH_X.UPLOADS -> INFER_SCHEMA -> RAW_<file> (create or append)
- 3 PROFILE columns, types, null %, 20 sample rows
-           outcome mode auto-detect:
-             SELF  dataset has sql/won-like columns
-             CRM   has join key (email, gclid, utm, account) to CORE.CRM_LEADS
-             NONE  -> 409, ask user which column links to CRM
- 4 PROPOSE AI_COMPLETE(claude, schema+samples+contract+mql_rule, structured JSON)
-           -> {select_sql, column_notes, assumptions}
- 5 VALIDATE compile | contract cols+types | spend(raw)==spend(map) to $1
-           | mqls >= sqls >= won | CRM mode: matched leads exist
-           fail -> error fed back to Claude, retry up to 2x
+ 3 PROFILE columns, types, non-null counts, example values
+ 4 PROPOSE AI_COMPLETE(claude, schema+samples+contract+rules, structured JSON)
+           -> {select_sql, raw_spend_sql, measures, grain, window, metric_notes, assumptions}
+           or a hand-written mapping (seed/mappings/<channel>.sql)
+ 5 VALIDATE runs | no null dates/campaigns | metrics numeric | unmeasured is NULL, not 0
+           | mqls >= sqls | spend(raw)==spend(map) to $1 | rows inside window
+           fail -> error fed back to Claude, retry up to 3x
  6 APPROVE human clicks once (UI shows SQL + diffs)
            -> CREATE VIEW MAP, semantic view, procs, CREATE AGENT (template)
-           -> registry status=active, CALL CORE.REBUILD_FUNNEL()
+           -> registry status=active, window set from the mapping, CALL CORE.REBUILD_FUNNEL()
  7 LIVE    CMO fan-out now includes it. Zero code change.
  re-upload, same columns -> append, MAP still valid
  re-upload, new columns  -> status=needs_mapping, back to step 4
 ```
-**FUNNEL contract** (the only output every mapping must produce): `date, channel, campaign, spend_usd, mqls, sqls, opps, pipeline_usd, won, won_acv_usd`, plus optional `creative_text, audience`.
+**FUNNEL contract** (the only output every mapping must produce): `date, channel, campaign, spend_usd, mqls, sqls, opps, pipeline_usd, won, won_acv_usd, creative_text, audience, metrics`. Every funnel field is nullable. `metrics` is an object of additive native counts (clicks, opens, replies, ai_mentions...) kept per row. Rates are always derived from summed numerators and denominators.
+
+**Estimated SQLs.** A channel with MQLs but no SQLs gets `sqls = mqls x MQL_TO_SQL_OVERRIDE` (default 0.15) and `sqls_estimated = true`. With the key set to NULL the rate is learned from channels that measure both stages.
 
 **Shared MQL definition** (stored in ASSUMPTIONS and editable): F2000 healthcare or finance, Director or above, one real action. A channel can override it with its own `mql_rule` text, which goes into the mapping prompt.
 
-**One agent template** (`templates/channel_agent.yaml.j2`): an instruction block with the channel description, and tools for Analyst on its own semantic view, RECONCILE, MARGINAL_CPS, and Search when text columns exist. Each agent returns a fixed report JSON: spend, plan, mqls, sqls, $/sql, marginal $/sql for the next $10k, a flag, and creative copy.
+**One agent template** (`templates/channel.sql.j2`): an instruction block with the channel description and what it does and does not measure, and tools for Analyst on its own semantic view (funnel, native metrics, raw tables), REPORT and RECONCILE.
 
 ## 5. The CMO brain
-- **Deterministic numbers:** FUNNEL_FACT plus the `UNIT_ECON(budget, rule)` Python proc. Each channel gets a diminishing-returns curve fit from its data. Budget is allocated greedily with a max-heap in $10k steps, which is O((B/step)·log C) and optimal because the curves are concave. The proc returns the PRD scenario table: SQL, customers, ARR, average and last-customer CAC, payback, year-1 and 3-year net. ACV, margin, win rate and sales cost come from ASSUMPTIONS, which you'll swap for real Datasaur values.
+- **Deterministic numbers:** FUNNEL_FACT plus the `UNIT_ECON(budget, rule)` Python proc. Each budget-bought channel gets a diminishing-returns curve (`SQLs = S·(y/X)^b`) anchored on its annualized run rate; a `flight` channel is not annualized because it is a one-off test. Budget is allocated greedily with a max-heap in $10k steps, which is O((B/step)·log C) and optimal because the curves are concave. No channel gets more than `SCALE_CAP_X` (default 3) times its run rate; what does not fit is returned as `unallocated_usd`. The proc returns the PRD scenario table: SQL, customers, ARR, average and last-customer CAC, payback, year-1 and 3-year net. ACV, margin, win rate and sales cost come from ASSUMPTIONS, which you'll swap for real Datasaur values.
 - **Autonomy:** moves under the limit (default 10%) are auto-applied and logged. Bigger moves become memos with `status=pending`.
 - **Memo schema:** id, title, finding, evidence_sql, recommendation, delta_by_channel, impact (SQL before and after), status.
-- **CMO agent tools:** funnel Analyst, UNIT_ECON, PROPOSE_REALLOCATION, ASK_CHANNEL(name, question), code execution.
+- **CMO agent tools:** funnel Analyst, status, list_channels, UNIT_ECON, PROPOSE_REALLOCATION (only on an explicit reallocation or memo request), ASK_CHANNEL(name, question), charts.
 
 ## 6. Backend API
 | Route | Kind | Returns |
 |---|---|---|
-| GET /channels, POST /channels, POST /channels/{id}/files | onboarding | registry, profile, outcome mode |
+| GET /channels, POST /channels, POST /channels/{id}/files | onboarding | registry, profile |
 | POST /channels/{id}/mapping/propose, /approve | onboarding | SQL, validation report |
-| GET /q4/strip, /q4/channels | SQL | 5 KPIs, per-channel cards, each with `sql` |
-| GET /plan/scenarios?budget&rule | SQL proc | split + scenario rows |
-| POST /q4/review, /ask | SSE | delegation events, cmo tokens, memo |
+| GET /now/strip, /now/channels | SQL | headline KPIs, per-channel cards, each with `sql` |
+| POST /now/reallocate | SQL proc | deterministic reallocation memo |
+| GET /plan/current, /plan/scenarios?budget&rule | SQL proc | plan vs run rate, split + unallocated + scenario rows |
+| POST /now/review, /ask | SSE | delegation events, cmo text, memo |
 | GET /memos, POST /memos/{id}/approve or reject | SQL | updates ALLOCATION, DECISION_LOG |
-| POST /simulate?days=14 | proc | new rows, triggers re-review |
+| GET /assumptions, PUT /assumptions/{key} | SQL | every non-measured number |
 
 **Stack:** Python 3.12, FastAPI, snowflake-connector-python (PAT), httpx (Agent Run SSE), jinja2, pydantic. Credentials come from the existing `~/.snowflake/connections.toml` PAT connection, so no secret lives in the repo.
 
@@ -109,9 +110,10 @@ CMO-Agent/
   docs/DESIGN.md
   sql/        00_setup  10_core  20_unit_econ  30_decisions  40_cmo_agent  50_mcp
   templates/  channel.sql.j2 (MAP, semantic view, REPORT, RECONCILE, AGENT)  cmo_agent.sql.j2
-  backend/app/ main.py orchestrator.py queries.py simulate.py snowflake.py setup.py
+  backend/app/ main.py orchestrator.py queries.py snowflake.py setup.py
                channels/ ingest.py (upload + profile) mapping.py (propose + validate) provision.py
-  seed/ csv/ (google, linkedin, ooh, events, badge_scans, crm, webinars) generate.py load.py
+  seed/       load_real.py (loads ../test-data, kept outside the repo)  mappings/ (hand-written)
+  frontend/   Next.js app, connects through CMO_API_URL
   tests/  test_numbers.py  smoke.sh
 ```
 
@@ -119,28 +121,28 @@ CMO-Agent/
 0. **Spike, 20m:** Agent Run REST with a PAT, SQL AGENT_RUN signature, AI_COMPLETE structured JSON.
 1. **Core, 40m:** setup SQL, CORE tables, ASSUMPTIONS, REBUILD_FUNNEL.
 2. **Plugin engine, 70m:** ingest, profile, mapper, validator, provision, plus routes.
-3. **Seed via the plugin, 30m:** 4 channels plus CRM uploaded through the API, then reconciled and checked against the PRD numbers.
+3. **Load via the plugin, 30m:** the 6 real exports uploaded through the API, then reconciled and checked against independent pandas counts.
 4. **CMO, 50m:** UNIT_ECON, memos, CMO agent, orchestrator SSE.
-5. **P1, 30m:** simulate, a webinar channel added live, MCP server for the CMO agent, a few eval questions.
+5. **P1, 30m:** a channel added live, MCP server for the CMO agent, a few eval questions.
 6. **Hardening, 20m:** smoke script passes 3 times in a row, README.
 
 ## 9. Verification
 - Every channel's RECONCILE shows zero diff.
-- FUNNEL totals match the PRD: 140 MQL, 25 SQL, $63k spend, $3,000 per SQL for LinkedIn.
-- UNIT_ECON(1M, 12mo) gives about 45 customers and an 8.9-month payback.
-- A webinar channel added through the API alone appears in /q4/channels and the CMO fan-out.
-- Approving a memo moves SQLs from 25 to 27.
+- Measured values match the real exports (spend, MQLs, SQLs, native metrics), and unmeasured fields are NULL, never 0.
+- Estimated SQLs are flagged and use the `MQL_TO_SQL_OVERRIDE` rate.
+- UNIT_ECON never allocates a channel past its scale cap and reports the rest as unallocated.
+- A channel added through the API alone appears in /now/channels and the CMO fan-out.
 - Smoke script passes 3 times in a row.
 
 ## 10. Risks
 - **SQL AGENT_RUN fails:** the CMO drill-down goes through the backend tool instead. Fan-out is unaffected.
 - **Claude writes a bad mapping:** the validator plus retries catch it, and the human approves before anything goes live.
-- **Your dataset has no link to CRM:** the API returns a clear 409 asking which column is the join key.
-- **The seed numbers are demo values:** ASSUMPTIONS is the single place to swap in real values.
+- **No CRM, so SQLs are estimated:** the MQL-to-SQL rate is an assumption. It is flagged everywhere and changed in one place.
+- **Placeholder economics:** ACV, margin, win rate and sales cost live in ASSUMPTIONS until real values replace them.
 
 ## Critical Files
-- `backend/app/channels/mapper.py` + `validator.py`: how a new dataset becomes funnel rows
-- `templates/channel_agent.yaml.j2`: every subagent comes from this
-- `sql/core/rebuild_funnel.sql`: registry-driven FUNNEL_FACT
+- `backend/app/channels/mapping.py`: how a new dataset becomes funnel rows, and the validator
+- `templates/channel.sql.j2`: every subagent comes from this
+- `sql/00_setup.sql`: registry-driven FUNNEL_FACT and the SQL estimate
 - `backend/app/orchestrator.py`: parallel fan-out and SSE
-- `sql/core/unit_econ.sql`: the 2027 plan math
+- `sql/20_unit_econ.sql`: the annual plan math

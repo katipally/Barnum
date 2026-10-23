@@ -81,8 +81,8 @@ async def run_agent(schema: str, agent: str, question: str, client: httpx.AsyncC
     r = await client.post(_agent_url(schema, agent), json=body, headers=_headers(), timeout=300)
     r.raise_for_status()
     data = r.json()
-    text = "".join(c.get("text", "") for c in data.get("content", []) if c.get("type") == "text")
-    return {"text": text, "raw": data}
+    texts = [c.get("text", "") for c in data.get("content", []) if c.get("type") == "text"]
+    return {"text": texts[-1] if texts else "", "raw": data}  # earlier text blocks are pre-tool narration; the last is the answer
 
 
 async def stream_agent(schema: str, agent: str, messages: list[dict]) -> AsyncIterator[tuple[str, dict]]:

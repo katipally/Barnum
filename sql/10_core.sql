@@ -38,7 +38,7 @@ WITH agg AS (
 SELECT r.channel_id, r.display_name, r.grain, r.mql_rule, r.sql_rule,
        COALESCE(r.window_start, a.first_date) AS window_start, COALESCE(r.window_end, a.last_date) AS window_end,
        DATEDIFF('day', COALESCE(r.window_start, a.first_date), COALESCE(r.window_end, a.last_date)) + 1 AS window_days,
-       365.0 / NULLIF(window_days, 0) AS annual_factor,
+       IFF(r.grain = 'flight', 1, 365.0 / NULLIF(window_days, 0)) AS annual_factor,  -- a flight is a one-off test, not a rate
        a.spend_usd, a.mqls, a.sqls, COALESCE(a.sqls_estimated, FALSE) AS sqls_estimated, a.opps, a.pipeline_usd, a.won,
        a.spend_usd / NULLIF(a.mqls, 0) AS cost_per_mql,
        a.spend_usd / NULLIF(a.sqls, 0) AS cost_per_sql,
